@@ -26,6 +26,23 @@ config.py — Настройки API ключей и модели.
 """
 
 import os
+import time
+import threading
+
+# Глобальная блокировка для распределения запросов между потоками
+_GLOBAL_API_LOCK = threading.Lock()
+_last_api_time = 0.0
+_MIN_API_INTERVAL = 4.5  # минимум 4.5 секунды между любыми запросами
+
+def rate_limit_sleep():
+    """Синхронизированный ограничитель: гарантирует, что между любыми запросами пройдет не менее 4.5 сек."""
+    global _last_api_time
+    with _GLOBAL_API_LOCK:
+        elapsed = time.time() - _last_api_time
+        if elapsed < _MIN_API_INTERVAL:
+            time.sleep(_MIN_API_INTERVAL - elapsed)
+        _last_api_time = time.time()
+
 
 # ════════════════════════════════════════════════════════════════
 #  Настройки провайдера

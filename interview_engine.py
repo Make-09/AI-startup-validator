@@ -555,6 +555,8 @@ def _run_single_interview(
         for attempt in range(retries + 1):
             try:
                 client = get_llm()
+                import config as _cfg
+                _cfg.rate_limit_sleep()
                 resp = client.chat.completions.create(**kwargs)
                 return resp.choices[0].message.content
             except Exception as e:
@@ -667,8 +669,6 @@ def run_all_interviews(
                 )
             ))
 
-        # Пауза между запросами для соблюдения RPM лимитов (бесплатный Gemini = 15 RPM, то есть нужен интервал > 4 сек)
-        if idx < len(personas):
-            time.sleep(5)
+        # Локальная пауза больше не нужна, так как работает глобальный rate_limit_sleep()
 
     return results

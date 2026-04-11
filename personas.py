@@ -276,6 +276,8 @@ gender         — "male" или "female" (определяется по име�
 
     try:
         client = get_llm()
+        import config as _cfg
+        _cfg.rate_limit_sleep()
         resp = client.chat.completions.create(
             model=model,
             messages=[{"role": "user", "content": prompt}],
@@ -316,6 +318,8 @@ gender         — "male" или "female" (определяется по име�
                     # Повторная попытка с новым ключом
                     try:
                         client2 = get_llm()
+                        import config as _cfg
+                        _cfg.rate_limit_sleep()
                         resp2 = client2.chat.completions.create(
                             model=model,
                             messages=[{"role": "user", "content": prompt}],
