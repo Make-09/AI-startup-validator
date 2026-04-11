@@ -35,7 +35,7 @@ from models import (
 from monte_carlo import run_monte_carlo
 from personas import generate_personas
 from unit_economics import calculate_unit_economics
-from usage_counter import consume_run, get_remaining_runs, current_count, MAX_DAILY_RUNS
+from usage_counter import consume_run, get_remaining_runs, current_count, MAX_DAILY_RUNS, next_reset_info
 from feedback import send_feedback, is_email_configured
 
 # ── Логирование ──────────────────────────────────────────────
@@ -104,8 +104,10 @@ with st.expander("📖 Для участников группы — читайт
 
 # Счётчик запусков в шапке
 _remaining = get_remaining_runs()
-if _remaining == 0:
-    st.error(f"🚫 **Дневной лимит исчерпан** — {MAX_DAILY_RUNS}/{MAX_DAILY_RUNS} запусков использовано сегодня. Приходите завтра!")
+_limit_reached = _remaining == 0
+if _limit_reached:
+    _reset_time = next_reset_info()
+    st.error(f"🚫 **Дневной лимит исчерпан** — {MAX_DAILY_RUNS}/{MAX_DAILY_RUNS} запусков использовано сегодня. Лимит сбросится через **{_reset_time}** ⏳")
 elif _remaining <= 3:
     st.warning(f"⚠️ Осталось запусков сегодня: **{_remaining}** из {MAX_DAILY_RUNS} — используйте разумно!")
 else:
@@ -126,6 +128,13 @@ with st.sidebar:
         st.success(f"✅ API ключ подключён")
         st.caption(f"🤖 Модель: `{_model}`")
         st.caption(f"🌐 Провайдер: `{_base}`")
+        # Статус пула ключей
+        try:
+            _pool = config.get_pool_status()
+            _pool_color = "🟢" if _pool["alive_keys"] == _pool["total_keys"] else "🟡" if _pool["alive_keys"] > 0 else "🔴"
+            st.caption(f"{_pool_color} Ключей: {_pool['alive_keys']}/{_pool['total_keys']} живых | Ошибок: {_pool['total_errors']}")
+        except Exception:
+            pass
     else:
         st.error("❌ API ключ не настроен")
         st.markdown(
@@ -363,7 +372,7 @@ with tab1:
             step=1,
             help="Максимум 10 персон. Рекомендуем 5–7 для быстрого теста.",
         )
-        st.caption(f"🔁 Будет сделано примерно **{int(num_personas) * 2}** API-вызовов")
+        st.caption(f"🔁 Будет сделано примерно **{int(num_personas) + 1}** API-вызовов (1 генерация персон + {int(num_personas)} интервью)")
 
         # Информация о бенчмарке (реальные если есть, статичные иначе)
         active_bench = st.session_state.get("realtime_benchmark") or get_benchmark(business_type)
@@ -389,7 +398,15 @@ with tab1:
 
     col1, col2 = st.columns([3, 1])
     with col1:
-        start_btn = st.button("🔬 Запустить валидацию", type="primary", use_container_width=True)
+        # Блокируем кнопку если дневной лимит исчерпан
+        _btn_disabled = _limit_reached
+        _btn_label = "🔬 Запустить валидацию" if not _btn_disabled else f"🚫 Лимит исчерпан — обновится через {next_reset_info()}"
+        start_btn = st.button(
+            _btn_label,
+            type="primary",
+            use_container_width=True,
+            disabled=_btn_disabled,
+        )
     with col2:
         if st.button("🗑 Очистить / Отменить", type="secondary", use_container_width=True):
             st.session_state.clear()
@@ -524,18 +541,19 @@ with tab1:
                 st.info("ℹ️ Рыночный контекст не найден, интервью пройдут по базовому сценарию")
 
             # 2. AI-интервью (двухфазный Mom Test, последовательно)
-            # Проверяем что LLM доступен до запуска
-            try:
-                from interview_engine import get_llm
-                get_llm()
-            except Exception as llm_err:
+            # Проверяем наличие живых ключей БЕЗ потребления cooldown-слота
+            _pool_check = config.get_pool_status()
+            if _pool_check["total_keys"] == 0:
                 st.error(
-                    f"**❌ Не удалось подключиться к LLM**\n\n"
-                    f"{llm_err}\n\n"
-                    f"**Откройте `config.py` и проверьте:**\n"
-                    f"- `API_KEY` — вставьте ваш ключ\n"
-                    f"- `BASE_URL` — для Groq: `https://api.groq.com/openai/v1`\n"
-                    f"- `MODEL` — для Groq: `llama-3.3-70b-versatile`"
+                    "**❌ API ключи не настроены!**\n\n"
+                    "Добавьте ключи через `OPENAI_API_KEY` в Streamlit Secrets или переменные окружения.\n\n"
+                    "Получить бесплатные ключи Groq: [console.groq.com](https://console.groq.com/)"
+                )
+                st.stop()
+            if _pool_check["alive_keys"] == 0:
+                st.error(
+                    "**❌ Все API ключи исчерпали дневной лимит!**\n\n"
+                    "Попробуйте завтра — лимиты Groq сбрасываются в полночь."
                 )
                 st.stop()
 

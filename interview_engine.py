@@ -523,25 +523,44 @@ def _run_single_interview(
     sim_prompt = _make_simulation_user_message(persona, business_input, price_desc, business_input.language)
 
     def _call(messages, json_mode=False, attempt_label=""):
+        import config as _cfg
+        _model = os.environ.get("OPENAI_MODEL", _cfg.MODEL)
+        
         kwargs = dict(
-            model=_LLM_MODEL,
+            model=_model,
             messages=messages,
             temperature=0.85,
             max_tokens=2500,
         )
         if json_mode:
             kwargs["response_format"] = {"type": "json_object"}
+
+        _current_key = ""  # Отслеживаем какой ключ использовался
             
         for attempt in range(retries + 1):
             try:
-                client = get_llm()
-                import config as _cfg
-                _cfg.rate_limit_sleep()
+                _current_key = _cfg.get_best_key_and_wait()
+                if not _current_key:
+                    raise QuotaExceededError(
+                        "🚫 Все API ключи исчерпали дневной лимит. "
+                        "Попробуйте завтра."
+                    )
+                base_url = os.environ.get("OPENAI_BASE_URL", _cfg.BASE_URL)
+                if base_url:
+                    client = OpenAI(api_key=_current_key, base_url=base_url)
+                else:
+                    client = OpenAI(api_key=_current_key)
+                
                 resp = client.chat.completions.create(**kwargs)
                 return resp.choices[0].message.content
+            except QuotaExceededError:
+                raise
             except Exception as e:
                 err = str(e)
                 logger.error(f"[{persona.name}] Simulation error (attempt {attempt+1}): {err}")
+                
+                import config as _cfg
+                
                 # Проверяем — исчерпана ли квота (суточный лимит)
                 quota_keywords = (
                     "quota", "rate_limit_exceeded", "insufficient_quota",
@@ -549,28 +568,37 @@ def _run_single_interview(
                     "resource_exhausted", "RESOURCE_EXHAUSTED",
                 )
                 is_quota = any(kw.lower() in err.lower() for kw in quota_keywords)
+                
                 if is_quota:
-                    # Пробуем следующий ключ из пула
-                    try:
-                        import config as _cfg
-                        new_key = _cfg.rotate_key()
-                        if new_key:
-                            logger.warning(f"[{persona.name}] Квота исчерпана — переключаемся на следующий ключ")
-                            reset_llm()
-                            time.sleep(2.0)
-                            continue
-                    except Exception:
-                        pass
-                    raise QuotaExceededError(
-                        "🚫 Все API ключи исчерпали дневной лимит. "
-                        "Добавьте новые ключи через запятую в Streamlit Secrets или попробуйте завтра."
-                    )
-                if attempt < retries:
-                    if "429" in err:
-                        logger.warning(f"[{persona.name}] Rate limit, ждём 15 сек...")
-                        time.sleep(15.0)
+                    # Помечаем ключ как мёртвый
+                    if _current_key:
+                        _cfg.mark_key_dead(_current_key)
+                    # Проверяем есть ли ещё живые ключи
+                    pool_status = _cfg.get_pool_status()
+                    if pool_status["alive_keys"] > 0:
+                        logger.warning(
+                            f"[{persona.name}] Квота ключа исчерпана — "
+                            f"осталось {pool_status['alive_keys']} живых ключей"
+                        )
+                        time.sleep(2.0)
+                        continue
                     else:
+                        raise QuotaExceededError(
+                            "🚫 Все API ключи исчерпали дневной лимит. "
+                            "Добавьте новые ключи через запятую в Streamlit Secrets или попробуйте завтра."
+                        )
+                
+                if "429" in err:
+                    # Rate limit (не quota) — штрафуем ключ и пробуем другой
+                    if _current_key:
+                        _cfg.rotate_key(failed_key=_current_key)
+                    if attempt < retries:
+                        logger.warning(f"[{persona.name}] Rate limit 429, переключаем ключ...")
                         time.sleep(3.0)
+                        continue
+                
+                if attempt < retries:
+                    time.sleep(3.0)
         return None
 
     messages = [
