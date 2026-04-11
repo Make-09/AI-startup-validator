@@ -37,57 +37,37 @@ class QuotaExceededError(Exception):
 #  LLM — Google Gemini API (ленивая инициализация)
 # ═══════════════════════════════════════════════════════════════
 
-_LLM_CLIENT: Optional[OpenAI] = None
-_LLM_MODEL = "gpt-4o-mini"
+_LLM_MODEL = "llama-3.3-70b-versatile"
 _LLM_NAME_VALUE = "Не инициализирован"
 
-
-def _init_llm():
-    """Инициализирует OpenAI API при первом вызове."""
-    global _LLM_CLIENT, _LLM_MODEL, _LLM_NAME_VALUE
-    if _LLM_CLIENT is not None:
-        return
-
-    _LLM_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
-    api_key = os.environ.get("OPENAI_API_KEY", "")
-    if not api_key:
+def get_llm() -> OpenAI:
+    """Возвращает инициализированный клиент OpenAI с автовыбором наилучшего ключа из пула."""
+    import config as _cfg
+    best_key = _cfg.get_best_key_and_wait()
+    base_url = os.environ.get("OPENAI_BASE_URL", _cfg.BASE_URL)
+    model = os.environ.get("OPENAI_MODEL", _cfg.MODEL)
+    
+    global _LLM_MODEL, _LLM_NAME_VALUE
+    _LLM_MODEL = model
+    _LLM_NAME_VALUE = f"LLM ({model})"
+    
+    if not best_key:
         raise ValueError(
             "OPENAI_API_KEY не установлен. "
-            "Получите ключ на сайте выбранного провайдера (OpenAI, Groq, OpenRouter и т.д.)"
+            "Добавьте ключи в Streamlit Secrets или переменные окружения."
         )
-
-    base_url = os.environ.get("OPENAI_BASE_URL")
-    
-    if base_url:
-        _LLM_CLIENT = OpenAI(api_key=api_key, base_url=base_url)
-    else:
-        _LLM_CLIENT = OpenAI(api_key=api_key)
         
-    _LLM_NAME_VALUE = f"LLM ({_LLM_MODEL})"
-    logger.info(f"{_LLM_NAME_VALUE} инициализирован.")
-
-
-def get_llm() -> OpenAI:
-    """Возвращает инициализированный клиент OpenAI."""
-    _init_llm()
-    return _LLM_CLIENT
-
+    if base_url:
+        return OpenAI(api_key=best_key, base_url=base_url)
+    return OpenAI(api_key=best_key)
 
 def get_llm_name() -> str:
     """Возвращает название активной модели."""
-    if _LLM_CLIENT is not None:
-        return _LLM_NAME_VALUE
-    api_key = os.environ.get("OPENAI_API_KEY", "")
-    if api_key:
-        return f"LLM {_LLM_MODEL} (ожидает инициализации)"
-    return "⚠️ API ключ не установлен"
-
+    return _LLM_NAME_VALUE
 
 def reset_llm():
-    """Сбрасывает LLM для переинициализации с новым ключом."""
-    global _LLM_CLIENT, _LLM_NAME_VALUE
-    _LLM_CLIENT = None
-    _LLM_NAME_VALUE = "Не инициализирован"
+    """Сбрасывает LLM для переинициализации (оставлено для совместимости; инициализация теперь динамическая)."""
+    pass
 
 
 # ═══════════════════════════════════════════════════════════════

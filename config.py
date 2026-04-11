@@ -29,35 +29,20 @@ import os
 import time
 import threading
 
-# Глобальная блокировка для распределения запросов между потоками
-_GLOBAL_API_LOCK = threading.Lock()
-_last_api_time = 0.0
-_MIN_API_INTERVAL = 4.5  # минимум 4.5 секунды между любыми запросами
-
-def rate_limit_sleep():
-    """Синхронизированный ограничитель: гарантирует, что между любыми запросами пройдет не менее 4.5 сек."""
-    global _last_api_time
-    with _GLOBAL_API_LOCK:
-        elapsed = time.time() - _last_api_time
-        if elapsed < _MIN_API_INTERVAL:
-            time.sleep(_MIN_API_INTERVAL - elapsed)
-        _last_api_time = time.time()
-
-
 # ════════════════════════════════════════════════════════════════
 #  Настройки провайдера
 # ════════════════════════════════════════════════════════════════
 
-BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai"
-MODEL    = "gemini-2.0-flash"
-
+BASE_URL = "https://api.groq.com/openai/v1"
+MODEL    = "llama-3.3-70b-versatile"
+_MIN_API_INTERVAL = 2.1  # Groq: 30 RPM = интервал ~2.01 сек на каждый ключ
 
 # ════════════════════════════════════════════════════════════════
-#  Ротация ключей — НЕ ТРОГАЙТЕ НИЖЕ
+#  Смарт-балансировщик пула ключей (KeyPoolScheduler)
 # ════════════════════════════════════════════════════════════════
 
-_key_index = 0
-
+_pool_lock = threading.Lock()
+_key_states = {}
 
 def _read_keys() -> list:
     """Читает ключи из Streamlit secrets или env. Поддерживает список через запятую."""
@@ -71,41 +56,47 @@ def _read_keys() -> list:
         raw = os.environ.get("OPENAI_API_KEY", "")
     return [k.strip() for k in raw.split(",") if k.strip()]
 
+def _init_pool():
+    global _key_states
+    with _pool_lock:
+        if not _key_states:
+            keys = _read_keys()
+            if keys:
+                _key_states = {k: 0.0 for k in keys}
 
-def get_current_key() -> str:
-    keys = _read_keys()
-    if not keys:
-        return ""
-    return keys[_key_index % len(keys)]
-
+def get_best_key_and_wait() -> str:
+    """Выдает самый отдохнувший ключ из пула и организует очередь ожидания."""
+    _init_pool()
+    with _pool_lock:
+        if not _key_states:
+            return ""
+        # Находим ключ, который отдыхал дольше всех
+        best_key = min(_key_states, key=_key_states.get)
+        elapsed = time.time() - _key_states[best_key]
+        if elapsed < _MIN_API_INTERVAL:
+            time.sleep(_MIN_API_INTERVAL - elapsed)
+        _key_states[best_key] = time.time()
+        return best_key
 
 def rotate_key() -> str:
-    """Переключается на следующий ключ при 429. Возвращает новый ключ."""
-    global _key_index
-    keys = _read_keys()
-    if len(keys) <= 1:
-        return keys[0] if keys else ""
-    _key_index = (_key_index + 1) % len(keys)
-    new_key = keys[_key_index]
-    os.environ["OPENAI_API_KEY"] = new_key
-    return new_key
+    """Штрафует текущий перегруженный ключ (429 ошибка) и выдает следующий."""
+    _init_pool()
+    with _pool_lock:
+        if not _key_states: return ""
+        # Если вызвали эту функцию, значит ключ словил 429. Штрафуем его на 60 секунд.
+        best_key = min(_key_states, key=_key_states.get)
+        _key_states[best_key] = time.time() + 60.0
+        return best_key
+        
+def rate_limit_sleep():
+    """Оставлено для обратной совместимости, но теперь спит внутри get_best_key_and_wait."""
+    pass
 
+def get_current_key() -> str:
+    return get_best_key_and_wait()
 
 def get_keys_count() -> int:
     return len(_read_keys())
 
-
 def apply():
-    """Применяет настройки в os.environ."""
-    key = get_current_key()
-    if key:
-        os.environ["OPENAI_API_KEY"] = key
-    if BASE_URL:
-        os.environ["OPENAI_BASE_URL"] = BASE_URL
-    elif "OPENAI_BASE_URL" in os.environ:
-        del os.environ["OPENAI_BASE_URL"]
-    if MODEL:
-        os.environ["OPENAI_MODEL"] = MODEL
-
-
-apply()
+    pass
