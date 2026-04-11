@@ -121,8 +121,8 @@ with st.sidebar:
     st.header("⚙️ Статус")
 
     _api_key = os.environ.get("OPENAI_API_KEY", "")
-    _model   = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
-    _base    = os.environ.get("OPENAI_BASE_URL", "OpenAI (default)")
+    _model   = os.environ.get("OPENAI_MODEL", config.MODEL)
+    _base    = os.environ.get("OPENAI_BASE_URL", config.BASE_URL)
 
     if _api_key and _api_key != "your_api_key_here":
         st.success(f"✅ API ключ подключён")
