@@ -669,6 +669,6 @@ def run_all_interviews(
 
         # Пауза между запросами для соблюдения RPM лимитов (бесплатный Gemini = 15 RPM, то есть нужен интервал > 4 сек)
         if idx < len(personas):
-            time.sleep(4.5)
+            time.sleep(5)
 
     return results
