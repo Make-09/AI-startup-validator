@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Streamlit — только секреты, не всю папку
+.streamlit/secrets.toml
+
+# Jupyter
+.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Simulation outputs
+simulation_*.json
+*.log
+
+__pycache__/
+*.pyc
+*.pyo
+
+__pycache__/
+*.pyc
+*.pyo
+api_keys
