@@ -1,15 +1,15 @@
 """
-usage_counter.py — Счётчик дневных запусков симуляции.
-Максимум MAX_DAILY_RUNS запусков в сутки (сбрасывается в полночь UTC+5).
+usage_counter.py — Глобальный счётчик запусков, общий для ВСЕХ пользователей сервиса.
 
-Работает на Streamlit Cloud:
-  - Основное хранилище: st.cache_resource (shared singleton в RAM, живёт пока жив процесс)
-  - Резервное: файл /tmp/startup_sim_counter.json (пережиавет soft-restart)
-  - Файл рядом со скриптом .usage_counter.json (для локальной разработки)
+Принцип работы:
+  - st.cache_resource создаёт ОДИН объект на весь Streamlit-процесс.
+    Все пользователи (сессии) видят один и тот же счётчик в RAM.
+  - Файл /tmp/startup_sim_counter.json — резервное хранилище на случай
+    мягкого перезапуска воркера (данные пережигают soft-restart).
+  - threading.Lock() гарантирует корректность при одновременных запросах.
 
-Гарантии потокобезопасности:
-  - threading.Lock() защищает все read/write операции
-  - Все Streamlit-сессии внутри одного воркера видят один счётчик
+Итог: если пользователь A использовал 3 запуска, у пользователя B
+останется уже 17, а не снова 20.
 """
 
 import json
@@ -19,100 +19,79 @@ import threading
 from typing import Optional
 
 MAX_DAILY_RUNS = 20
-
-# Таймзона Казахстана (UTC+5) — лимит сбрасывается в полночь по Алматы
-_UTC_OFFSET_HOURS = 5
-
-_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-_PRIMARY_FILE = os.path.join(_SCRIPT_DIR, ".usage_counter.json")
-_FALLBACK_FILE = "/tmp/startup_sim_counter.json"
+_UTC_OFFSET_HOURS = 5  # UTC+5 (Казахстан) — сброс в полночь по Алматы
+_COUNTER_FILE = "/tmp/startup_sim_counter.json"
 
 
-# ════════════════════════════════════════════════════════════════
-#  In-memory singleton (shared между всеми Streamlit-сессиями)
-# ════════════════════════════════════════════════════════════════
-
-class _CounterStore:
-    """Thread-safe синглтон-счётчик в RAM."""
+class _GlobalCounter:
+    """
+    Единственный экземпляр на весь процесс Streamlit.
+    Все пользовательские сессии обращаются к одному объекту.
+    """
     def __init__(self):
         self._lock = threading.Lock()
         self._date: str = ""
         self._count: int = 0
-        # При старте — пробуем загрузить из файла (если воркер перезапустился)
-        self._load_from_disk()
+        self._load()
 
     def _today(self) -> str:
-        """Текущая дата по UTC+5 (Казахстан)."""
         utc_now = datetime.datetime.utcnow()
         local_now = utc_now + datetime.timedelta(hours=_UTC_OFFSET_HOURS)
         return str(local_now.date())
 
-    def _load_from_disk(self):
-        """Восстанавливает счётчик из файла при запуске."""
-        for path in (_PRIMARY_FILE, _FALLBACK_FILE):
-            try:
-                with open(path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    if isinstance(data, dict) and data.get("date") == self._today():
-                        self._date = data["date"]
-                        self._count = data.get("count", 0)
-                        return
-            except Exception:
-                continue
-        # Файлы не найдены или дата другая — начинаем с нуля
+    def _load(self):
+        """Восстанавливает счётчик из файла при старте воркера."""
+        try:
+            with open(_COUNTER_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if data.get("date") == self._today():
+                self._date = data["date"]
+                self._count = data.get("count", 0)
+                return
+        except Exception:
+            pass
         self._date = self._today()
         self._count = 0
 
-    def _save_to_disk(self):
-        """Атомарный сброс на диск (best-effort, не блокирует при ошибке)."""
-        data = {"date": self._date, "count": self._count}
-        for path in (_PRIMARY_FILE, _FALLBACK_FILE):
-            tmp = path + ".tmp"
-            try:
-                with open(tmp, "w", encoding="utf-8") as f:
-                    json.dump(data, f)
-                os.replace(tmp, path)
-                return  # Успех — одного файла достаточно
-            except Exception:
-                try:
-                    os.unlink(tmp)
-                except Exception:
-                    pass
-                continue
+    def _save(self):
+        """Сохраняет текущий счётчик на диск (best-effort)."""
+        try:
+            tmp = _COUNTER_FILE + ".tmp"
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump({"date": self._date, "count": self._count}, f)
+            os.replace(tmp, _COUNTER_FILE)
+        except Exception:
+            pass
 
-    def _ensure_today(self):
-        """Проверяет что дата актуальна. Если наступил новый день — сбрасывает."""
+    def _check_day(self):
+        """Сбрасывает счётчик если наступил новый день."""
         today = self._today()
         if self._date != today:
             self._date = today
             self._count = 0
-            self._save_to_disk()
+            self._save()
 
     def get_remaining(self) -> int:
         with self._lock:
-            self._ensure_today()
+            self._check_day()
             return max(0, MAX_DAILY_RUNS - self._count)
 
     def get_count(self) -> int:
         with self._lock:
-            self._ensure_today()
+            self._check_day()
             return self._count
 
     def consume(self) -> bool:
-        """Пытается занять слот. Возвращает True если разрешено."""
+        """Занимает один слот. Возвращает True если разрешено, False если лимит."""
         with self._lock:
-            self._ensure_today()
+            self._check_day()
             if self._count >= MAX_DAILY_RUNS:
                 return False
             self._count += 1
-            self._save_to_disk()
+            self._save()
             return True
 
-    def is_limit(self) -> bool:
-        return self.get_remaining() == 0
-
     def next_reset_info(self) -> str:
-        """Возвращает строку с временем до следующего сброса."""
         utc_now = datetime.datetime.utcnow()
         local_now = utc_now + datetime.timedelta(hours=_UTC_OFFSET_HOURS)
         tomorrow = (local_now + datetime.timedelta(days=1)).replace(
@@ -124,57 +103,41 @@ class _CounterStore:
         return f"{hours}ч {minutes}мин"
 
 
-# ════════════════════════════════════════════════════════════════
-#  Singleton через st.cache_resource (или fallback)
-# ════════════════════════════════════════════════════════════════
+# ── Глобальный синглтон через st.cache_resource ───────────────
+# Создаётся ОДИН РАЗ при первом обращении и живёт весь срок жизни процесса.
+# Все пользователи получают один и тот же объект _GlobalCounter.
 
-_fallback_store: Optional[_CounterStore] = None
+_fallback: Optional[_GlobalCounter] = None
 
-def _get_store() -> _CounterStore:
-    """Получает глобальный синглтон счётчика."""
-    global _fallback_store
+def _get() -> _GlobalCounter:
+    global _fallback
     try:
         import streamlit as st
 
         @st.cache_resource
-        def _create_counter():
-            return _CounterStore()
+        def _make():
+            return _GlobalCounter()
 
-        return _create_counter()
+        return _make()
     except Exception:
-        # Вне Streamlit (тесты, CLI)
-        if _fallback_store is None:
-            _fallback_store = _CounterStore()
-        return _fallback_store
+        if _fallback is None:
+            _fallback = _GlobalCounter()
+        return _fallback
 
 
-# ════════════════════════════════════════════════════════════════
-#  Публичный API (обратная совместимость)
-# ════════════════════════════════════════════════════════════════
+# ── Публичный API ─────────────────────────────────────────────
 
 def get_remaining_runs() -> int:
-    """Возвращает количество оставшихся запусков на сегодня."""
-    return _get_store().get_remaining()
-
+    return _get().get_remaining()
 
 def current_count() -> int:
-    """Возвращает количество запусков, совершённых сегодня."""
-    return _get_store().get_count()
-
+    return _get().get_count()
 
 def consume_run() -> bool:
-    """
-    Пытается занять один слот.
-    Возвращает True если запуск разрешён, False если лимит исчерпан.
-    """
-    return _get_store().consume()
-
+    return _get().consume()
 
 def is_limit_reached() -> bool:
-    """True если сегодняшний лимит исчерпан."""
-    return _get_store().is_limit()
-
+    return _get().get_remaining() == 0
 
 def next_reset_info() -> str:
-    """Сколько времени до сброса лимита (для UI)."""
-    return _get_store().next_reset_info()
+    return _get().next_reset_info()
