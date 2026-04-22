@@ -1,6 +1,6 @@
 """
 main.py — Streamlit UI для AI Customer Discovery Validator.
-4 вкладки: Ввод идеи → AI Интервью → Monte Carlo → Юнит-экономика.
+3 вкладки: Ввод идеи → AI Интервью → Рекомендации.
 """
 
 import logging
@@ -32,9 +32,7 @@ from interview_engine import research_market_context, run_all_interviews, get_ll
 from models import (
     BusinessInput, BusinessType, ValidationReport, RevenueModel,
 )
-from monte_carlo import run_monte_carlo
 from personas import generate_personas
-from unit_economics import calculate_unit_economics
 from usage_counter import consume_run, get_remaining_runs, current_count, MAX_DAILY_RUNS, next_reset_info
 from feedback import send_feedback, is_email_configured
 
@@ -52,7 +50,7 @@ st.set_page_config(
 )
 
 st.title("🔬 AI Startup Validator")
-st.caption("Валидация бизнес-идей через AI Customer Discovery + Monte Carlo")
+st.caption("Валидация бизнес-идей через AI Customer Discovery")
 
 # ═══════════════════════════════════════════════════════════════
 # 🎓 Баннер для участников группы
@@ -71,7 +69,6 @@ with st.expander("📖 Для участников группы — читайт
 | Функция | Что это значит |
 |--------|---------------|
 | 🧠 **AI-интервью (Mom Test)** | ИИ симулирует реальных людей и «интервьюирует» их по вашей идее |
-| 📊 **Monte Carlo прогноз** | 1000 финансовых сценариев — покажет, выживет ли бизнес |
 | 💰 **Юнит-экономика** | Считает LTV, CAC, окупаемость, runway |
 | 🏆 **Итоговый score 0–100** | Общая оценка жизнеспособности вашей идеи |
 
@@ -179,11 +176,10 @@ if "report" not in st.session_state:
 #  ВКЛАДКИ
 # ═══════════════════════════════════════════════════════════════
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4 = st.tabs([
     "📝 Ваша идея",
     "🧑‍🤝‍🧑 AI Customer Discovery",
-    "📊 Monte Carlo Прогноз",
-    "💡 Юнит-экономика и рекомендации",
+    "💡 Рекомендации и оценка",
     "💬 Оставить отзыв",
 ])
 
@@ -578,53 +574,18 @@ with tab1:
                     f"Проверьте API ключ и название модели в настройках."
                 )
 
-            # 4. Monte Carlo
-            # Используем актуальные бенчмарки если были загружены, иначе статичные
-            _active_bench = st.session_state.get("realtime_benchmark") or None
-            ep = business_input.get_effective_price()
-            st.info(
-                f"💰 Эффективный доход/пользователь/мес (для Monte Carlo и LTV): **${ep:.2f}**"
-            )
-            with st.spinner("📊 Monte Carlo симуляция (1000 сценариев)..."):
-                mc_results = run_monte_carlo(
-                    business_input, aggregated,
-                    num_simulations=1000, num_months=12,
-                    benchmark=_active_bench,
-                )
-            st.success("✅ Monte Carlo завершён")
+            # 4. Инсайты
+            insights = generate_insights(business_input, aggregated)
 
-            # 5. Юнит-экономика
-            ai_conversion_rate = aggregated.pct_would_buy
-            # ai_churn_modifier: fit=5 → 0 (медиана), fit=10 → -1 (ниже медианы), fit=1 → +0.8 (выше)
-            ai_churn_modifier = 1.0 - (aggregated.avg_solution_fit / 5.0)
-            ai_churn_modifier = max(-0.5, min(0.5, ai_churn_modifier))  # ±50% от медианы, защита от нереалистичного LTV
-            ue = calculate_unit_economics(
-                business_input, ai_conversion_rate, ai_churn_modifier,
-                benchmark=_active_bench,
-            )
-
-            # 6. Инсайты
-            insights = generate_insights(business_input, aggregated, ue, mc_results)
-
-            # 7. Overall Score
+            # 5. Overall Score (только интервью)
             score = 0.0
-            score += min(25.0, ue.ltv_cac_ratio / 3.0 * 25.0)
-            # pct_would_buy: 50% intent = max (выдающийся показатель по любым бенчмаркам)
-            score += min(25.0, (aggregated.pct_would_buy / 0.5) * 25.0)
-            score += min(25.0, (1 - mc_results.bankruptcy_probability) * 25.0)
-            score += min(25.0, aggregated.avg_solution_fit / 10.0 * 25.0)
+            score += min(50.0, (aggregated.pct_would_buy / 0.5) * 50.0)
+            score += min(50.0, aggregated.avg_solution_fit / 10.0 * 50.0)
 
-            if ue.runway_months < 3:
-                score = min(score, 20.0)  # критический runway — максимум 20/100
-            elif ue.runway_months < 6:
-                score *= 0.85  # предупреждающий runway — скидка 15%
-
-            # 8. Сохранить отчёт
+            # 6. Сохранить отчёт
             st.session_state.report = ValidationReport(
                 business_input=business_input,
                 interview_results=aggregated,
-                monte_carlo_results=mc_results,
-                unit_economics=ue,
                 insights=insights,
                 overall_score=round(score),
             )
@@ -821,234 +782,17 @@ with tab2:
 
 
 # ═══════════════════════════════════════════════════════════════
-#  TAB 3 — Monte Carlo Прогноз
+#  TAB 3 — Рекомендации и итоговая оценка
 # ═══════════════════════════════════════════════════════════════
 
 with tab3:
     report = st.session_state.report
 
-    if report is None or report.monte_carlo_results is None:
+    if report is None:
         st.info("ℹ️ Сначала запустите валидацию на вкладке «📝 Ваша идея»")
         st.stop()
 
-    mc = report.monte_carlo_results
-    months_axis = list(range(1, mc.num_months + 1))
-
-    # ── Секция A: 4 ключевые метрики ─────────────────────────
-    st.subheader("🎲 Вероятностные метрики (1000 сценариев)")
-    col1, col2, col3, col4 = st.columns(4)
-
-    with col1:
-        bankruptcy_pct = mc.bankruptcy_probability * 100
-        st.metric(
-            "💀 Вероятность банкротства",
-            f"{bankruptcy_pct:.0f}%",
-            delta="Высокий риск!" if mc.bankruptcy_probability > 0.5 else "Риск умеренный",
-            delta_color="inverse" if mc.bankruptcy_probability > 0.5 else "normal",
-        )
-    with col2:
-        st.metric(
-            "🚀 Вероятность $10K MRR",
-            f"{mc.prob_reach_10k_mrr * 100:.0f}%",
-        )
-    with col3:
-        st.metric(
-            "👥 Вероятность 1000 польз.",
-            f"{mc.prob_reach_1k_users * 100:.0f}%",
-        )
-    with col4:
-        be_val = f"Месяц {mc.median_break_even_month}" if mc.median_break_even_month else "Не достигнут"
-        st.metric("⚖️ Медианный break-even", be_val)
-
-    st.divider()
-
-    # ── Секция B: 3 графика Plotly ────────────────────────────
-
-    def make_fan_chart(
-        months, p10, p50, p90,
-        title, yaxis_title,
-        fill_color, fill_alpha_color, line_color,
-        zero_line: bool = False,
-    ) -> go.Figure:
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(
-            x=months, y=p10,
-            name="P10 (пессимизм)",
-            line=dict(color=fill_color, width=1, dash="dot"),
-            showlegend=True,
-        ))
-        fig.add_trace(go.Scatter(
-            x=months, y=p90,
-            name="P90 (оптимизм)",
-            line=dict(color=fill_color, width=1, dash="dot"),
-            fill="tonexty",
-            fillcolor=fill_alpha_color,
-            showlegend=True,
-        ))
-        fig.add_trace(go.Scatter(
-            x=months, y=p50,
-            name="P50 (медиана)",
-            line=dict(color=line_color, width=3),
-            showlegend=True,
-        ))
-        if zero_line:
-            fig.add_hline(
-                y=0,
-                line_color="red",
-                line_dash="dash",
-                annotation_text="Порог банкротства",
-                annotation_position="bottom right",
-            )
-        fig.update_layout(
-            title=title,
-            xaxis_title="Месяц",
-            yaxis_title=yaxis_title,
-            height=380,
-            hovermode="x unified",
-            legend=dict(orientation="h", yanchor="bottom", y=1.02),
-        )
-        return fig
-
-    # График 1: MRR
-    fig_mrr = make_fan_chart(
-        months_axis, mc.mrr_p10, mc.mrr_p50, mc.mrr_p90,
-        title="MRR — 1000 сценариев",
-        yaxis_title="MRR ($)",
-        fill_color="rgb(0, 200, 100)",
-        fill_alpha_color="rgba(0, 200, 100, 0.15)",
-        line_color="rgb(0, 160, 80)",
-    )
-    st.plotly_chart(fig_mrr, use_container_width=True)
-
-    col_c2, col_c3 = st.columns(2)
-
-    # График 2: Пользователи
-    with col_c2:
-        fig_users = make_fan_chart(
-            months_axis, mc.users_p10, mc.users_p50, mc.users_p90,
-            title="Пользователи",
-            yaxis_title="Активных пользователей",
-            fill_color="rgb(60, 120, 255)",
-            fill_alpha_color="rgba(60, 120, 255, 0.15)",
-            line_color="rgb(40, 100, 220)",
-        )
-        st.plotly_chart(fig_users, use_container_width=True)
-
-    # График 3: Баланс
-    with col_c3:
-        fig_balance = make_fan_chart(
-            months_axis, mc.balance_p10, mc.balance_p50, mc.balance_p90,
-            title="Баланс",
-            yaxis_title="Баланс ($)",
-            fill_color="rgb(255, 150, 0)",
-            fill_alpha_color="rgba(255, 150, 0, 0.15)",
-            line_color="rgb(230, 130, 0)",
-            zero_line=True,
-        )
-        st.plotly_chart(fig_balance, use_container_width=True)
-
-
-# ═══════════════════════════════════════════════════════════════
-#  TAB 4 — Юнит-экономика и рекомендации
-# ═══════════════════════════════════════════════════════════════
-
-with tab4:
-    report = st.session_state.report
-
-    if report is None or report.unit_economics is None:
-        st.info("ℹ️ Сначала запустите валидацию на вкладке «📝 Ваша идея»")
-        st.stop()
-
-    ue = report.unit_economics
-    ir = report.interview_results
-
-    # ── Секция A: 6 метрик───────────────────────────────────
-    st.subheader("💹 Юнит-экономика")
-    row1 = st.columns(3)
-    with row1[0]:
-        st.metric("📈 LTV", f"${ue.ltv:,.0f}")
-    with row1[1]:
-        st.metric("💸 CAC", f"${ue.cac:,.0f}")
-        from benchmarks import get_adjusted_cac
-        adj_cac = get_adjusted_cac(report.business_input.business_type, report.business_input.country)
-        st.caption(f"(Диапазон: ${adj_cac.low:.0f} - ${adj_cac.high:.0f})")
-    with row1[2]:
-        ratio_color = "normal" if ue.ltv_cac_ratio >= 3.0 else "inverse"
-        st.metric(
-            "⚖️ LTV/CAC",
-            f"{ue.ltv_cac_ratio:.1f}x",
-            delta="✅ Хорошо" if ue.ltv_cac_ratio >= 3.0 else "⚠️ Ниже нормы",
-            delta_color=ratio_color,
-        )
-
-    row2 = st.columns(3)
-    with row2[0]:
-        st.metric("⏳ CAC Payback", f"{ue.cac_payback_months:.0f} мес")
-    with row2[1]:
-        st.metric("🏦 Runway", f"{ue.runway_months} мес")
-    with row2[2]:
-        be_str = f"Месяц {ue.break_even_month}" if ue.break_even_month else "Не достигнут"
-        st.metric("📅 Break-even", be_str)
-
-    st.divider()
-
-    # ── Секция B: Таблица сравнения с бенчмарками ─────────────
-    st.subheader("📊 Сравнение с отраслевыми бенчмарками")
-    bench = st.session_state.get("realtime_benchmark") or get_benchmark(report.business_input.business_type)
-    bench_is_rt = "realtime_benchmark" in st.session_state
-    st.caption(
-        f"📊 Бенчмарк: {bench.source} "
-        + ("🟢 актуальный" if bench_is_rt else "🟡 статичный")
-    )
-    if bench_is_rt:
-        st.caption("⚠️ AI-синтез: рекомендуется проверить источник вручную")
-
-    # Показываем эффективную цену с пояснением
-    bi = report.business_input
-    ep = bi.get_effective_price()
-    rm_labels = {
-        "subscription": "📅 Подписка",
-        "pay_per_use": "🎫 Pay-per-use",
-        "commission": "💸 Комиссия",
-    }
-    rm_label = rm_labels.get(bi.revenue_model.value, bi.revenue_model.value)
-    st.info(f"{rm_label} | Эффективный доход/пользователь/мес: **${ep:.2f}** | LTV базируется на этой цифре")
-
-    benchmark_df = pd.DataFrame([
-        {
-            "Метрика": "LTV/CAC ratio",
-            "Ваше значение": f"{ue.ltv_cac_ratio:.2f}x",
-            "Индустрия (P10)": f"{bench.typical_ltv_cac_ratio.low:.1f}x",
-            "Индустрия (P50)": f"{bench.typical_ltv_cac_ratio.median:.1f}x",
-            "Индустрия (P90)": f"{bench.typical_ltv_cac_ratio.high:.1f}x",
-        },
-        {
-            "Метрика": "Monthly Churn",
-            "Ваше значение": f"{ue.adjusted_churn:.1%}",
-            "Индустрия (P10)": f"{bench.monthly_churn.low:.1%}",
-            "Индустрия (P50)": f"{bench.monthly_churn.median:.1%}",
-            "Индустрия (P90)": f"{bench.monthly_churn.high:.1%}",
-        },
-        {
-            "Метрика": "Conversion Rate",
-            "Ваше значение": f"{ir.pct_would_buy:.1%}",
-            "Индустрия (P10)": f"{bench.conversion_trial_to_paid.low:.1%}",
-            "Индустрия (P50)": f"{bench.conversion_trial_to_paid.median:.1%}",
-            "Индустрия (P90)": f"{bench.conversion_trial_to_paid.high:.1%}",
-        },
-        {
-            "Метрика": "Gross Margin",
-            "Ваше значение": f"{ue.gross_margin:.1%}",
-            "Индустрия (P10)": f"{bench.gross_margin.low:.1%}",
-            "Индустрия (P50)": f"{bench.gross_margin.median:.1%}",
-            "Индустрия (P90)": f"{bench.gross_margin.high:.1%}",
-        },
-    ])
-    st.dataframe(benchmark_df, use_container_width=True, hide_index=True)
-
-    st.divider()
-
-    # ── Секция C: Рекомендации ────────────────────────────────
+    # ── Секция A: Рекомендации ────────────────────────────────
     st.subheader("💡 Рекомендации")
 
     if report.insights:
@@ -1100,10 +844,10 @@ with tab4:
         st.markdown("🟢 **Перспективный проект** — базовая валидация пройдена")
 
 # ═══════════════════════════════════════════════════════════════
-#  TAB 5 — Отзыв
+#  TAB 4 — Отзыв
 # ═══════════════════════════════════════════════════════════════
 
-with tab5:
+with tab4:
     st.header("💬 Оставить отзыв")
     st.caption("Ваш отзыв поможет улучшить инструмент — он придёт напрямую автору")
 
