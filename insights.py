@@ -49,7 +49,7 @@ def generate_insights(
         insights.append(
             Insight(
                 severity="critical",
-                title="🔴 Проблема не является острой (Витамин, а не Обезболивающее)",
+                title="Проблема не является острой (Витамин, а не Обезболивающее)",
                 message=(
                     f"Средняя острота проблемы составляет всего {avg_problem_severity:.1f}/10. "
                     "Пользователи не страдают от текущей ситуации и решают задачу бесплатными или привычными способами."
@@ -62,7 +62,7 @@ def generate_insights(
         insights.append(
             Insight(
                 severity="success",
-                title="🟢 Острая рыночная боль подтверждена",
+                title="Острая рыночная боль подтверждена",
                 message=f"Респонденты подтверждают высокий уровень боли ({avg_problem_severity:.1f}/10). Проблема действительно беспокоит целевую аудиторию.",
                 recommendation="В маркетинговых сообщениях делайте главный акцент именно на избавлении от этой конкретной боли.",
             )
@@ -73,7 +73,7 @@ def generate_insights(
         insights.append(
             Insight(
                 severity="critical",
-                title="🔴 Низкий покупательский интерес (<30%)",
+                title="Низкий покупательский интерес (<30%)",
                 message=f"Только {pct_would_buy:.0%} опрошенных персон выразили твердую готовность приобрести продукт по предложенной цене.",
                 recommendation="Пересмотрите ценностное предложение (Value Proposition) либо скорректируйте целевую аудиторию под более платежеспособный сегмент.",
             )
@@ -82,7 +82,7 @@ def generate_insights(
         insights.append(
             Insight(
                 severity="success",
-                title="🟢 Сильный сигнал Product-Market Fit",
+                title="Сильный сигнал Product-Market Fit",
                 message=(
                     f"Solution Fit составляет {avg_solution_fit:.1f}/10, при этом {pct_would_buy:.0%} респондентов готовы купить продукт."
                 ),
@@ -96,7 +96,7 @@ def generate_insights(
         insights.append(
             Insight(
                 severity="warning",
-                title="🟠 Продукт недостаточно хорошо решает заявленную проблему",
+                title="Продукт недостаточно хорошо решает заявленную проблему",
                 message=f"Боль у людей есть ({avg_problem_severity:.1f}/10), но предложенное решение получило средний фит всего {avg_solution_fit:.1f}/10.",
                 recommendation="Внимательно изучите топ-3 опасений и пожеланий по фичам в ответах персон и переработайте функционал.",
             )
@@ -110,7 +110,7 @@ def generate_insights(
         insights.append(
             Insight(
                 severity="warning",
-                title="🟠 Высокий барьер стоимости",
+                title="Высокий барьер стоимости",
                 message=f"{pct_price_too_high:.0%} респондентов считают заявленную цену завышенной для предлагаемой ценности.",
                 recommendation="Внедрите freemium-тариф, триал или снизьте цену на старте для снижения стоимости первой пробы.",
             )
@@ -119,7 +119,7 @@ def generate_insights(
         insights.append(
             Insight(
                 severity="info",
-                title="ℹ️ Возможность для повышения монетизации",
+                title="Возможность для повышения монетизации",
                 message=f"{pct_price_too_low:.0%} опрошенных находят цену подозрительно низкой. Вы рискуете недополучать выручку.",
                 recommendation="Протестируйте повышение базовой цены на 20–30% или сформируйте Pro/Business тарифный план.",
             )
@@ -149,7 +149,7 @@ def generate_insights(
                 insights.append(
                     Insight(
                         severity="warning",
-                        title="🟠 Замедленная оборачиваемость: CAC Payback > статического Runway",
+                        title="Замедленная оборачиваемость: CAC Payback > статического Runway",
                         message=(
                             f"Когортный возврат затрат на привлечение клиента занимает {_payback:.1f} мес., "
                             f"что превышает статический runway без выручки ({_runway} мес.). "
@@ -172,7 +172,7 @@ def generate_insights(
                 insights.append(
                     Insight(
                         severity="critical",
-                        title="🔴 Кассовый разрыв: капитала не хватает до точки безубыточности",
+                        title="Кассовый разрыв: капитала не хватает до точки безубыточности",
                         message=(
                             f"При текущем темпе привлечения стартап исчерпает средства "
                             f"с дефицитом ~${unit_economics.peak_capital_deficit:,.0f}. "
@@ -189,7 +189,7 @@ def generate_insights(
             insights.append(
                 Insight(
                     severity="warning",
-                    title="🟠 Слишком долгий CAC Payback (>18 месяцев)",
+                    title="Слишком долгий CAC Payback (>18 месяцев)",
                     message=(
                         f"Возврат затрат на привлечение клиента занимает {_payback:.1f} мес. — "
                         "это замедляет оборачиваемость оборотного капитала."
@@ -204,7 +204,7 @@ def generate_insights(
             insights.append(
                 Insight(
                     severity="critical",
-                    title="🔴 Экономика привлекает клиентов в убыток (LTV < CAC)",
+                    title="Экономика привлекает клиентов в убыток (LTV < CAC)",
                     message=(
                         f"LTV (${unit_economics.ltv:.2f}) ниже стоимости привлечения клиента CAC (${unit_economics.cac:.2f}). "
                         f"Отношение LTV:CAC = {unit_economics.ltv_cac_ratio:.2f}x. При масштабировании проект будет сжигать капитал пропорционально росту."
@@ -217,7 +217,7 @@ def generate_insights(
             insights.append(
                 Insight(
                     severity="warning",
-                    title="🟠 Пограничная маржинальность привлечения (LTV:CAC < 2.5x)",
+                    title="Пограничная маржинальность привлечения (LTV:CAC < 2.5x)",
                     message=(
                         f"Отношение LTV к CAC составляет {unit_economics.ltv_cac_ratio:.2f}x. "
                         "В реальных условиях с учетом непредвиденных расходов запас прочности мал."
@@ -229,7 +229,7 @@ def generate_insights(
             insights.append(
                 Insight(
                     severity="success",
-                    title="🟢 Эффективная юнит-экономика (LTV:CAC ≥ 3.0x)",
+                    title="Эффективная юнит-экономика (LTV:CAC ≥ 3.0x)",
                     message=(
                         f"Отношение LTV:CAC составляет {unit_economics.ltv_cac_ratio:.2f}x (LTV: ${unit_economics.ltv:.2f}, CAC: ${unit_economics.cac:.2f}). "
                         "Каждый вложенный в маркетинг доллар генерирует здоровую отдачу."
@@ -244,7 +244,7 @@ def generate_insights(
             insights.append(
                 Insight(
                     severity="critical",
-                    title="🔴 Слишком долгий срок окупаемости привлечения (>18 месяцев)",
+                    title="Слишком долгий срок окупаемости привлечения (>18 месяцев)",
                     message=(
                         f"Возврат затрат на привлечение одного клиента занимает {unit_economics.cac_payback_months:.1f} мес. "
                         "Это создает огромную нагрузку на оборотный капитал стартапа."
@@ -257,7 +257,7 @@ def generate_insights(
             insights.append(
                 Insight(
                     severity="success",
-                    title="🟢 Быстрая окупаемость CAC (до 6 месяцев)",
+                    title="Быстрая окупаемость CAC (до 6 месяцев)",
                     message=f"Клиент окупает затраты на маркетинг всего за {unit_economics.cac_payback_months:.1f} мес. Это ускоряет реинвестирование выручки.",
                     recommendation="Отличный показатель оборачиваемости капитала.",
                 )
@@ -268,7 +268,7 @@ def generate_insights(
             insights.append(
                 Insight(
                     severity="critical",
-                    title="🔴 Критический дефицит ликвидности (Runway < 6 месяцев)",
+                    title="Критический дефицит ликвидности (Runway < 6 месяцев)",
                     message=(
                         f"При стартовом капитале ${business_input.initial_capital:,.0f} и ежемесячном сжигании ${unit_economics.monthly_burn_rate:,.0f} "
                         f"денег хватит всего на {unit_economics.runway_months} мес. Стартап рискует закрыться до достижения первой выручки."
@@ -280,7 +280,7 @@ def generate_insights(
             insights.append(
                 Insight(
                     severity="warning",
-                    title="🟠 Умеренный финансовый запас (Runway 6–12 месяцев)",
+                    title="Умеренный финансовый запас (Runway 6–12 месяцев)",
                     message=f"Текущего бюджета хватит на {unit_economics.runway_months} месяцев работы. Времени на ошибки мало.",
                     recommendation="Сфокусируйтесь на получении первых платящих клиентов уже в первые 60 дней.",
                 )
@@ -296,7 +296,7 @@ def generate_insights(
             insights.append(
                 Insight(
                     severity="critical",
-                    title="🔴 Высокая вероятность исчерпания средств по Монте-Карло",
+                    title="Высокая вероятность исчерпания средств по Монте-Карло",
                     message=(
                         f"По результатам {monte_carlo_results.num_simulations} вероятностных сценариев "
                         f"вероятность банкротства в течение 24 месяцев составляет {bankrupt_p:.1f}%. "
@@ -310,7 +310,7 @@ def generate_insights(
             insights.append(
                 Insight(
                     severity="success",
-                    title="🟢 Высокая вероятность финансовой выживаемости (>80%)",
+                    title="Высокая вероятность финансовой выживаемости (>80%)",
                     message=(
                         f"Вероятность сохранения платежеспособности в течение 24 месяцев составляет {100.0 - bankrupt_p:.1f}%. "
                         "Бизнес-модель демонстрирует устойчивость к рыночным колебаниям."
@@ -324,7 +324,7 @@ def generate_insights(
             insights.append(
                 Insight(
                     severity="warning",
-                    title="⚠️ Subscription для разовой задачи — Churn Cliff",
+                    title="Subscription для разовой задачи — Churn Cliff",
                     message=(
                         "Продукт решает разовую задачу (найти работу, создать резюме), "
                         "но монетизируется через ежемесячную подписку. "
@@ -347,7 +347,7 @@ def generate_insights(
             insights.append(
                 Insight(
                     severity="success",
-                    title="🟢 Достижимая цель роста ($10K+ MRR)",
+                    title="Достижимая цель роста ($10K+ MRR)",
                     message=f"В {monte_carlo_results.prob_reach_10k_mrr:.1f}% симуляций проект выходит на выручку свыше $10,000 в месяц к концу 2-го года.",
                     recommendation="Потенциал коммерческой масштабируемости подтвержден математическим моделированием.",
                 )
@@ -362,7 +362,7 @@ def generate_insights(
             insights.append(
                 Insight(
                     severity="warning",
-                    title=f"⚠️ Плотная конкурентная среда ({market_research.competition_level})",
+                    title=f"Плотная конкурентная среда ({market_research.competition_level})",
                     message=(
                         f"На рынке действуют сильные альтернативы: {', '.join(c.name for c in market_research.competitors[:3])}. "
                         "Прямая лобовая конкуренция приведет к высокому CAC."
@@ -386,7 +386,7 @@ def generate_insights(
         insights.append(
             Insight(
                 severity="info",
-                title="⚠️ Калибровочное предупреждение: Подозрительно позитивные ответы",
+                title="Калибровочное предупреждение: Подозрительно позитивные ответы",
                 message=(
                     f"Средний балл симуляции {all_avg:.1f}/10 и {pct_would_buy:.0%} готовности купить — это аномально высокий результат. "
                     "В реальных условиях клиенты более инертны и скептичны."

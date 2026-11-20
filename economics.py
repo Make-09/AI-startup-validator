@@ -150,7 +150,7 @@ def detect_product_type(business_input: BusinessInput) -> str:
         # Если продукт монетизируется подпиской, но потребность разовая — предупреждение
         if best == "one_shot" and business_input.revenue_model == RevenueModel.SUBSCRIPTION:
             logger.info(
-                "[detect_product_type] ⚠️ Subscription для разовой задачи → "
+                "[detect_product_type] Subscription для разовой задачи → "
                 "ожидайте Churn Cliff: 40–45% клиентов уйдут в месяц 1"
             )
         return best

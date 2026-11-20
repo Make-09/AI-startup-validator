@@ -52,7 +52,6 @@ for _lib in ("ddgs", "duckduckgo_search", "httpx", "httpcore", "urllib3"):
 # ── Конфигурация страницы ────────────────────────────────────
 st.set_page_config(
     page_title="AI Startup Validator",
-    page_icon="🔬",
     layout="wide",
 )
 
@@ -1607,7 +1606,6 @@ with tab1:
         <div style="background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(226, 232, 240, 0.9); border-radius: 14px; padding: 14px 16px; margin-top: 14px; box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
             <div style="display: flex; align-items: center; gap: 7px;">
-              <span style="font-size: 1rem;">📊</span>
               <span style="font-weight: 600; font-size: 0.88rem; color: #0F172A;">Бенчмарк: {active_bench.display_name}</span>
             </div>
             <span style="font-size: 0.70rem; padding: 2px 8px; border-radius: 999px; background: rgba(37, 99, 235, 0.08); color: #2563EB; font-weight: 600; border: 1px solid rgba(37, 99, 235, 0.16);">{bench_badge}</span>
@@ -1627,7 +1625,7 @@ with tab1:
             </div>
           </div>
           <div style="font-size: 0.72rem; color: #64748B; display: flex; align-items: center; gap: 5px;">
-            <span>ℹ️</span> <span>Источник: {active_bench.source}</span>
+            <span>Источник: {active_bench.source}</span>
           </div>
         </div>
         """, unsafe_allow_html=True)

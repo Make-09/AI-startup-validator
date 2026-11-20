@@ -69,27 +69,25 @@ def send_feedback(
         logger.warning("EMAIL_APP_PASSWORD не настроен")
         return False
 
-    stars = "⭐" * rating + "☆" * (5 - rating)
     now   = datetime.datetime.now().strftime("%d.%m.%Y %H:%M")
-
-    subject = f"[AI Startup Validator] Новый отзыв {stars} — {now}"
+    subject = f"[AI Startup Validator] Новый отзыв ({rating}/5) — {now}"
 
     # HTML-тело письма
-    idea_line  = f"<tr><td style='color:#666;padding:6px 0'>💡 Идея</td><td><b>{idea_name}</b></td></tr>" if idea_name else ""
-    score_line = f"<tr><td style='color:#666;padding:6px 0'>🏆 Score</td><td><b>{idea_score}/100</b></td></tr>" if idea_score is not None else ""
+    idea_line  = f"<tr><td style='color:#666;padding:6px 0'>Идея</td><td><b>{idea_name}</b></td></tr>" if idea_name else ""
+    score_line = f"<tr><td style='color:#666;padding:6px 0'>Score</td><td><b>{idea_score}/100</b></td></tr>" if idea_score is not None else ""
 
     html = f"""
 <html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
   <div style="background:#f8f9fa;border-radius:12px;padding:24px;border:1px solid #e0e0e0">
-    <h2 style="margin:0 0 16px;color:#1a1a1a">📬 Новый отзыв — AI Startup Validator</h2>
+    <h2 style="margin:0 0 16px;color:#1a1a1a">Новый отзыв — AI Startup Validator</h2>
     <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
-      <tr><td style="color:#666;padding:6px 0">🕐 Время</td><td>{now}</td></tr>
-      <tr><td style="color:#666;padding:6px 0">⭐ Оценка</td><td><b>{stars} ({rating}/5)</b></td></tr>
+      <tr><td style="color:#666;padding:6px 0">Время</td><td>{now}</td></tr>
+      <tr><td style="color:#666;padding:6px 0">Оценка</td><td><b>{rating}/5</b></td></tr>
       {idea_line}
       {score_line}
     </table>
     <div style="background:#fff;border-radius:8px;padding:16px;border:1px solid #e0e0e0">
-      <p style="margin:0 0 8px;color:#666;font-size:13px">💬 Отзыв:</p>
+      <p style="margin:0 0 8px;color:#666;font-size:13px">Отзыв:</p>
       <p style="margin:0;font-size:15px;line-height:1.6;color:#1a1a1a">{text.strip()}</p>
     </div>
   </div>

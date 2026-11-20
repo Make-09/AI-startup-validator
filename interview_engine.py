@@ -707,7 +707,7 @@ def _run_single_interview(
                 _current_key = _cfg.get_best_key_and_wait()
                 if not _current_key:
                     raise QuotaExceededError(
-                        "🚫 Все API ключи исчерпали дневной лимит. "
+                        "Все API ключи исчерпали дневной лимит. "
                         "Попробуйте завтра."
                     )
                 base_url = os.environ.get("OPENAI_BASE_URL", _cfg.BASE_URL)
@@ -765,7 +765,7 @@ def _run_single_interview(
                         continue
                     else:
                         raise QuotaExceededError(
-                            "🚫 Все API ключи исчерпали дневной лимит. "
+                            "Все API ключи исчерпали дневной лимит. "
                             "Добавьте новые ключи или попробуйте завтра."
                         )
 
@@ -792,7 +792,7 @@ def _run_single_interview(
     # Ошибка
     model_name = os.environ.get("OPENAI_MODEL", "неизвестна")
     raise RuntimeError(
-        f"❌ Симуляция для {persona.name} не удалась. Модель {model_name} не ответила или лимиты исчерпаны."
+        f"Симуляция для {persona.name} не удалась. Модель {model_name} не ответила или лимиты исчерпаны."
     )
 
 
@@ -838,7 +838,7 @@ def run_all_interviews(
                 willingness_to_pay=0,
                 switching_likelihood=0,
                 recommend_likelihood=0,
-                main_concern=f"⚠️ ОШИБКА API: {str(e)[:300]}",
+                main_concern=f"ОШИБКА API: {str(e)[:300]}",
                 desired_feature="",
                 price_feedback="нормально",
                 would_buy=False,

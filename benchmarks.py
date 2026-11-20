@@ -543,7 +543,7 @@ def fetch_calibrated_benchmarks(
     )
 
     source_info = (
-        f"✅ World Bank GDP {country.upper()}: ${gdp:,.0f}/кап. "
+        f"World Bank GDP {country.upper()}: ${gdp:,.0f}/кап. "
         f"(CAC-калибровка: ×{cac_multiplier:.2f})"
     )
     if page_data:
