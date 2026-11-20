@@ -159,26 +159,36 @@ div[data-baseweb="tab-border"] {
     padding: 0 !important;
 }
 
-/* Стеклянная дорожка-капсула Apple Segmented Control */
+/* Стеклянная дорожка-капсула Apple Segmented Control (iOS Liquid Glass) */
 div[role="tablist"],
 [data-testid="stTabs"] [role="tablist"],
 div[data-baseweb="tab-list"],
 [data-baseweb="tab-list"] {
+    position: relative !important;
     display: inline-flex !important;
-    background: rgba(226, 232, 240, 0.65) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.85) !important;
-    border-radius: 14px !important;
+    align-items: center !important;
     padding: 4px !important;
-    gap: 4px !important;
-    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.7) !important;
+    border-radius: 999px !important;
+    
+    /* Эффект матового стекла Apple */
+    background: rgba(255, 255, 255, 0.38) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    
+    /* Тонкий стеклянный бортик и объемная тень */
+    border: 1px solid rgba(255, 255, 255, 0.65) !important;
+    box-shadow: 
+      0 8px 32px rgba(31, 38, 135, 0.07),
+      inset 0 1px 1px rgba(255, 255, 255, 0.8),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.04) !important;
+      
     overflow-x: auto !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
     max-width: 100% !important;
     border-bottom: none !important;
 }
+
 div[role="tablist"]::-webkit-scrollbar,
 div[data-baseweb="tab-list"]::-webkit-scrollbar {
     display: none !important;
@@ -189,7 +199,7 @@ div[data-baseweb="tab-list"]::-webkit-scrollbar {
 /* Полностью скрываем синюю полоску подчеркивания и любые полоски-индикаторы */
 div[data-baseweb="tab-highlight"],
 div[data-baseweb="tab-border"],
-[role="tablist"] > div:not([role="tab"]) {
+[role="tablist"] > div:not([role="tab"]):not(#apple-tab-glider) {
     display: none !important;
     height: 0 !important;
     width: 0 !important;
@@ -220,68 +230,113 @@ button[aria-label*="previous" i] {
     pointer-events: none !important;
 }
 
-/* Сами вкладки — кнопки внутри дорожки */
+/* Плавающая активная стеклянная пилюля Apple (glider) */
+#apple-tab-glider,
+.segment-glider {
+    position: absolute !important;
+    top: 4px !important;
+    left: 4px !important;
+    height: calc(100% - 8px) !important;
+    border-radius: 999px !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+    
+    /* Стеклянный блик активного элемента */
+    background: linear-gradient(
+      180deg, 
+      rgba(255, 255, 255, 0.95) 0%, 
+      rgba(255, 255, 255, 0.78) 100%
+    ) !important;
+    box-shadow: 
+      0 3px 10px rgba(0, 0, 0, 0.08),
+      0 1px 2px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+      
+    /* Пружинящая анимация как в iOS */
+    transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1), 
+                width 0.38s cubic-bezier(0.32, 0.72, 0, 1) !important;
+}
+
+/* Сами вкладки — прозрачные кнопки поверх стеклянной пилюли */
 button[role="tab"],
 button[data-baseweb="tab"] {
-    background-color: transparent !important;
-    background: transparent !important;
+    position: relative !important;
+    z-index: 2 !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
     border: none !important;
     border-bottom: none !important;
     outline: none !important;
-    border-radius: 10px !important;
-    padding: 7px 16px !important;
-    color: #475569 !important;
-    font-weight: 500 !important;
-    font-size: 0.88rem !important;
-    letter-spacing: -0.1px !important;
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    white-space: nowrap !important;
-    cursor: pointer !important;
     box-shadow: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    
+    padding: 8px 18px !important;
+    border-radius: 999px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #475569 !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    user-select: none !important;
+    transition: color 0.25s ease, transform 0.15s ease !important;
 }
+
 button[role="tab"]:hover,
 button[data-baseweb="tab"]:hover {
     color: #0F172A !important;
-    background: rgba(255, 255, 255, 0.35) !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 
-/* Активная вкладка — стеклянный переключатель как у Apple (Glass Pill) */
-button[role="tab"][aria-selected="true"],
-button[data-baseweb="tab"][aria-selected="true"] {
-    background: rgba(255, 255, 255, 0.95) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    color: #0F172A !important;
-    font-weight: 700 !important;
-    border-radius: 10px !important;
+button[role="tab"]:active,
+button[data-baseweb="tab"]:active {
+    transform: scale(0.96) !important;
+}
+
+/* Убираем синюю рамку фокуса раз и навсегда */
+button[role="tab"]:focus,
+button[role="tab"]:focus-visible,
+button[data-baseweb="tab"]:focus,
+button[data-baseweb="tab"]:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
     border: none !important;
     border-bottom: none !important;
-    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12), 0 1px 2px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
 }
+
+/* Активный текст */
+button[role="tab"][aria-selected="true"],
+button[data-baseweb="tab"][aria-selected="true"] {
+    color: #0F172A !important;
+    font-weight: 600 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-bottom: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 button[role="tab"][aria-selected="true"] p,
 button[role="tab"][aria-selected="true"] span,
 button[data-baseweb="tab"][aria-selected="true"] p,
 button[data-baseweb="tab"][aria-selected="true"] span {
     color: #0F172A !important;
-    font-weight: 700 !important;
+    font-weight: 600 !important;
 }
 
 @media (max-width: 640px) {
     div[role="tablist"],
     div[data-baseweb="tab-list"] {
         padding: 3px !important;
-        gap: 2px !important;
-        border-radius: 12px !important;
     }
     button[role="tab"],
     button[data-baseweb="tab"] {
-        padding: 6px 10px !important;
-        font-size: 0.80rem !important;
-        border-radius: 8px !important;
-    }
-    button[role="tab"][aria-selected="true"],
-    button[data-baseweb="tab"][aria-selected="true"] {
-        border-radius: 8px !important;
+        padding: 6px 12px !important;
+        font-size: 12.5px !important;
     }
 }
 
@@ -879,13 +934,22 @@ section[data-testid="stSidebar"],
     ul[data-baseweb="menu"] { background-color: #FFFFFF !important; color: #0F172A !important; border: 1px solid #CBD5E1 !important; }
     div[data-testid="stTabsContent"] { background: transparent !important; }
     .chat-a { background: rgba(248,250,252,0.90) !important; color: #0F172A !important; }
-    button[data-baseweb="tab"] { color: #475569 !important; border-bottom: none !important; }
-    button[data-baseweb="tab"][aria-selected="true"] {
-        background: rgba(255, 255, 255, 0.92) !important;
-        color: #0F172A !important;
-        font-weight: 700 !important;
+    button[role="tab"], button[data-baseweb="tab"] {
+        color: #475569 !important;
+        border: none !important;
         border-bottom: none !important;
-        box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12) !important;
+        outline: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+    button[role="tab"][aria-selected="true"], button[data-baseweb="tab"][aria-selected="true"] {
+        color: #0F172A !important;
+        font-weight: 600 !important;
+        background: transparent !important;
+        border: none !important;
+        border-bottom: none !important;
+        outline: none !important;
+        box-shadow: none !important;
     }
     .app-title { color: #0F172A !important; text-shadow: none !important; filter: none !important; }
     .app-subtitle { color: #334155 !important; text-shadow: none !important; filter: none !important; }
@@ -955,10 +1019,10 @@ _comp_meta.html("""
         '.app-subtitle { color: #334155 !important; text-shadow: none !important; filter: none !important; }',
         /* Вкладки — стеклянный переключатель Apple */
         'div[data-baseweb="tab-highlight"], div[data-baseweb="tab-border"] { display: none !important; height: 0 !important; width: 0 !important; opacity: 0 !important; }',
-        '[data-baseweb="tab-scroll-forward"], [data-baseweb="tab-scroll-backward"], [data-baseweb="tab-bar"] > button { display: none !important; width: 0 !important; height: 0 !important; }',
-        'button[data-baseweb="tab"] { color: #475569 !important; font-weight: 500 !important; border-bottom: none !important; border-radius: 10px !important; }',
-        'button[data-baseweb="tab"][aria-selected="true"] { background: rgba(255, 255, 255, 0.92) !important; color: #0F172A !important; font-weight: 700 !important; border-bottom: none !important; box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12) !important; border-radius: 10px !important; }',
-        '[data-testid="stTabs"] > div:first-child { background: transparent !important; }',
+        '[data-baseweb="tab-scroll-forward"], [data-baseweb="tab-scroll-backward"], [data-baseweb="tab-bar"] > button, [data-testid="stTabs"] button:not([role="tab"]) { display: none !important; width: 0 !important; height: 0 !important; }',
+        'button[role="tab"], button[data-baseweb="tab"] { background: transparent !important; border: none !important; border-bottom: none !important; outline: none !important; box-shadow: none !important; color: #475569 !important; font-weight: 500 !important; border-radius: 999px !important; }',
+        'button[role="tab"][aria-selected="true"], button[data-baseweb="tab"][aria-selected="true"] { background: transparent !important; color: #0F172A !important; font-weight: 600 !important; border: none !important; border-bottom: none !important; outline: none !important; box-shadow: none !important; }',
+        '[data-testid="stTabs"] > div:first-child { background: transparent !important; border-bottom: none !important; }',
         /* Plotly iframe — прозрачный */
         '.stPlotlyChart iframe { background: transparent !important; }',
         '.stPlotlyChart { background: transparent !important; }',
@@ -1126,24 +1190,47 @@ _comp_meta.html("""
         // Стилизация табов Apple Glass Segmented Control через DOM
         var tablist = doc.querySelector('[role="tablist"], [data-baseweb="tab-list"]');
         if (tablist) {
+            tablist.style.setProperty('position', 'relative', 'important');
             tablist.style.setProperty('display', 'inline-flex', 'important');
-            tablist.style.setProperty('background', 'rgba(226, 232, 240, 0.65)', 'important');
-            tablist.style.setProperty('backdrop-filter', 'blur(20px)', 'important');
-            tablist.style.setProperty('-webkit-backdrop-filter', 'blur(20px)', 'important');
-            tablist.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.85)', 'important');
-            tablist.style.setProperty('border-radius', '14px', 'important');
+            tablist.style.setProperty('align-items', 'center', 'important');
+            tablist.style.setProperty('background', 'rgba(255, 255, 255, 0.38)', 'important');
+            tablist.style.setProperty('backdrop-filter', 'blur(20px) saturate(180%)', 'important');
+            tablist.style.setProperty('-webkit-backdrop-filter', 'blur(20px) saturate(180%)', 'important');
+            tablist.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.65)', 'important');
+            tablist.style.setProperty('border-radius', '999px', 'important');
             tablist.style.setProperty('padding', '4px', 'important');
-            tablist.style.setProperty('gap', '4px', 'important');
+            tablist.style.setProperty('box-shadow', '0 8px 32px rgba(31, 38, 135, 0.07), inset 0 1px 1px rgba(255, 255, 255, 0.8), inset 0 -1px 2px rgba(0, 0, 0, 0.04)', 'important');
             tablist.style.setProperty('border-bottom', 'none', 'important');
             
-            // Скрываем все внутренние полоски
+            // Проверяем / создаем скользящий стеклянный ползунок (glider)
+            var glider = tablist.querySelector('#apple-tab-glider');
+            if (!glider) {
+                glider = doc.createElement('div');
+                glider.id = 'apple-tab-glider';
+                glider.className = 'segment-glider';
+                tablist.prepend(glider);
+            }
+
+            // Находим активную вкладку
+            var activeBtn = tablist.querySelector('button[role="tab"][aria-selected="true"], button[data-baseweb="tab"][aria-selected="true"]');
+            if (activeBtn && glider) {
+                var offsetLeft = activeBtn.offsetLeft;
+                var width = activeBtn.offsetWidth;
+                if (width > 0) {
+                    glider.style.width = width + 'px';
+                    glider.style.transform = 'translateX(' + (offsetLeft - 4) + 'px)';
+                }
+            }
+
+            // Скрываем все внутренние элементы Streamlit BaseWeb (кроме кнопок и самого glider)
             var ch = tablist.children;
             for (var k = 0; k < ch.length; k++) {
-                if (ch[k].tagName !== 'BUTTON' && ch[k].getAttribute('role') !== 'tab') {
+                if (ch[k].tagName !== 'BUTTON' && ch[k].id !== 'apple-tab-glider' && ch[k].getAttribute('role') !== 'tab') {
                     ch[k].style.setProperty('display', 'none', 'important');
                 }
             }
         }
+
         var tabsParent = doc.querySelector('[data-testid="stTabs"] > div:first-child');
         if (tabsParent) {
             tabsParent.style.setProperty('border-bottom', 'none', 'important');
@@ -1155,19 +1242,17 @@ _comp_meta.html("""
             tab.style.setProperty('border', 'none', 'important');
             tab.style.setProperty('border-bottom', 'none', 'important');
             tab.style.setProperty('outline', 'none', 'important');
+            tab.style.setProperty('background', 'transparent', 'important');
+            tab.style.setProperty('box-shadow', 'none', 'important');
+            tab.style.setProperty('border-radius', '999px', 'important');
+            
             var isSel = tab.getAttribute('aria-selected') === 'true';
             if (isSel) {
-                tab.style.setProperty('background', 'rgba(255, 255, 255, 0.95)', 'important');
                 tab.style.setProperty('color', '#0F172A', 'important');
-                tab.style.setProperty('font-weight', '700', 'important');
-                tab.style.setProperty('border-radius', '10px', 'important');
-                tab.style.setProperty('box-shadow', '0 3px 12px rgba(15, 23, 42, 0.12), 0 1px 2px rgba(15, 23, 42, 0.06)', 'important');
+                tab.style.setProperty('font-weight', '600', 'important');
             } else {
-                tab.style.setProperty('background', 'transparent', 'important');
                 tab.style.setProperty('color', '#475569', 'important');
                 tab.style.setProperty('font-weight', '500', 'important');
-                tab.style.setProperty('border-radius', '10px', 'important');
-                tab.style.setProperty('box-shadow', 'none', 'important');
             }
         });
 
