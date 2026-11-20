@@ -64,7 +64,7 @@ st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-/* ── Базовая типографика и принудительная светлая тема ── */
+/* ── Переменные ── */
 :root {
     --primary-color: #2563EB;
     --background-color: #F8FAFC;
@@ -72,19 +72,36 @@ st.markdown("""
     --text-color: #334155;
 }
 
-html, body, [class*="st-"], .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
+/* ── Прозрачный фон — метаболлы видны сквозь него ── */
+html, body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    background-color: #F8FAFC !important;
+    background: transparent !important;
+    color: #334155 !important;
+}
+
+[class*="st-"], .stApp {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    background: transparent !important;
     color: #334155 !important;
 }
 
 [data-testid="stAppViewContainer"] {
-    background-color: #F8FAFC !important;
+    background: transparent !important;
+}
+
+/* ── Скрываем верхнюю шторку / toolbar Streamlit ── */
+[data-testid="stToolbar"],
+[data-testid="stDecoration"],
+#MainMenu {
+    display: none !important;
+    visibility: hidden !important;
 }
 
 [data-testid="stHeader"] {
-    background-color: #F8FAFC !important;
-    border-bottom: 1px solid #E2E8F0 !important;
+    background: rgba(248, 250, 252, 0.80) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.7) !important;
 }
 
 /* Принудительная читаемость заголовков и текста */
@@ -131,9 +148,41 @@ div[data-testid="stNumberInput"] input:focus {
 
 /* ── Контейнер приложения ── */
 .block-container {
-    padding-top: 1.75rem !important;
+    padding-top: 1.25rem !important;
     padding-bottom: 3.5rem !important;
     max-width: 1140px !important;
+    background: transparent !important;
+}
+
+
+/* ── Dropdown (selectbox) ── белый список, видимый на любом фоне ── */
+[data-baseweb="select"] > div {
+    background-color: rgba(255,255,255,0.95) !important;
+    color: #0F172A !important;
+}
+[data-baseweb="popover"] [role="listbox"],
+[data-baseweb="menu"],
+ul[data-baseweb="menu"] {
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 16px rgba(15,23,42,0.10) !important;
+}
+[data-baseweb="option"] {
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+}
+[data-baseweb="option"]:hover {
+    background-color: #EFF6FF !important;
+    color: #2563EB !important;
+}
+
+/* Поля ввода — полупрозрачные */
+div[data-testid="stTextInput"] input,
+div[data-testid="stTextArea"] textarea,
+div[data-testid="stNumberInput"] input {
+    background-color: rgba(255,255,255,0.90) !important;
 }
 
 /* ── Шапка ── */
@@ -164,11 +213,13 @@ h1, h2, h3, h4 {
 
 /* ── Hero-карточка ── */
 .hero-card {
-    background: #FFFFFF;
-    border: 1px solid #E2E8F0;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
     border-radius: 12px;
     padding: 24px 28px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
     margin-bottom: 1.75rem;
 }
 .hero-badge {
@@ -255,13 +306,15 @@ h1, h2, h3, h4 {
 
 /* ── Empty State Card ── */
 .empty-state-card {
-    background: #FFFFFF;
-    border: 1px solid #E2E8F0;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
     border-radius: 12px;
     padding: 48px 24px;
     text-align: center;
     margin: 2rem 0;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
 }
 .empty-state-title {
     font-size: 1.15rem;
@@ -279,11 +332,13 @@ h1, h2, h3, h4 {
 
 /* ── Метрики Streamlit ── */
 [data-testid="stMetric"] {
-    background: #FFFFFF !important;
-    border: 1px solid #E2E8F0 !important;
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
     border-radius: 12px !important;
     padding: 16px 20px !important;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
 }
 [data-testid="stMetricLabel"] {
     font-size: 0.72rem !important;
@@ -301,11 +356,13 @@ h1, h2, h3, h4 {
 
 /* ── Карточка скоринга ── */
 .score-card {
-    background: #FFFFFF;
-    border: 1px solid #E2E8F0;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
     border-radius: 12px;
     padding: 24px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
 }
 .score-number {
     font-family: 'JetBrains Mono', monospace;
@@ -355,11 +412,13 @@ h1, h2, h3, h4 {
 
 /* ── Карточки конкурентного анализа ── */
 .comp-card {
-    background: #FFFFFF;
-    border: 1px solid #E2E8F0;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
     border-radius: 12px;
     padding: 18px 22px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
     margin-bottom: 12px;
 }
 .comp-header {
@@ -520,26 +579,34 @@ section[data-testid="stSidebar"] { display: none !important; }
 
 /* ── Принудительная светлая тема при dark-mode ОС/браузера ── */
 @media (prefers-color-scheme: dark) {
-    html, body, [class*="st-"], .stApp,
-    [data-testid="stAppViewContainer"],
-    [data-testid="stHeader"],
-    [data-testid="stSidebar"],
-    [data-testid="stMain"],
-    section[data-testid="stMain"],
-    .block-container {
-        background-color: #F8FAFC !important;
+    html, body { background: transparent !important; color: #334155 !important; }
+    .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"],
+    section[data-testid="stMain"], .block-container {
+        background: transparent !important;
         color: #334155 !important;
     }
-    [data-testid="stMetric"] { background: #FFFFFF !important; border-color: #E2E8F0 !important; }
+    [data-testid="stHeader"] { background: rgba(248,250,252,0.85) !important; }
+    [data-testid="stMetric"] { background: rgba(255,255,255,0.90) !important; border-color: #E2E8F0 !important; }
     [data-testid="stMetricLabel"] { color: #64748B !important; }
     [data-testid="stMetricValue"] { color: #0F172A !important; }
-    .hero-card, .comp-card, .score-card, .empty-state-card { background: #FFFFFF !important; border-color: #E2E8F0 !important; }
-    .chat-a { background: #F8FAFC !important; color: #0F172A !important; }
+    .hero-card, .comp-card, .score-card, .empty-state-card {
+        background: rgba(255,255,255,0.90) !important;
+        border-color: #E2E8F0 !important;
+    }
+    .chat-a { background: rgba(248,250,252,0.90) !important; color: #0F172A !important; }
     button[data-baseweb="tab"] { background-color: transparent !important; color: #64748B !important; }
     button[data-baseweb="tab"][aria-selected="true"] { color: #2563EB !important; }
     div[data-testid="stTextInput"] input,
     div[data-testid="stTextArea"] textarea,
-    div[data-testid="stNumberInput"] input { background-color: #FFFFFF !important; color: #0F172A !important; border-color: #CBD5E1 !important; }
+    div[data-testid="stNumberInput"] input {
+        background-color: rgba(255,255,255,0.92) !important;
+        color: #0F172A !important;
+        border-color: #CBD5E1 !important;
+    }
+    [data-baseweb="select"] > div { background-color: rgba(255,255,255,0.95) !important; color: #0F172A !important; }
+    [data-baseweb="option"],
+    [data-baseweb="menu"],
+    ul[data-baseweb="menu"] { background-color: #FFFFFF !important; color: #0F172A !important; }
     [data-testid="stMarkdownContainer"] p,
     [data-testid="stMarkdownContainer"] span,
     [data-testid="stMarkdownContainer"] li { color: #334155 !important; }
@@ -553,6 +620,67 @@ section[data-testid="stSidebar"] { display: none !important; }
 </style>
 """, unsafe_allow_html=True)
 
+# ── Метабольный фон (анимированные пузырьки) ─────────────────
+import streamlit.components.v1 as _comp_meta
+_comp_meta.html("""
+<script>
+(function() {
+    var doc = window.parent.document;
+    if (doc.getElementById('blue-metaballs-bg')) return;
+
+    var bg = doc.createElement('div');
+    bg.id = 'blue-metaballs-bg';
+    bg.style.cssText = 'position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(135deg,#F0F8FF 0%,#DBEAFE 55%,#EFF6FF 100%);overflow:hidden;';
+
+    bg.innerHTML = '<svg style="position:absolute;width:0;height:0;"><defs><filter id="blue-goo"><feGaussianBlur in="SourceGraphic" stdDeviation="22" result="blur"/><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8" result="goo"/></filter></defs></svg><canvas id="blue-mb-canvas" style="width:100%;height:100%;display:block;filter:url(#blue-goo);opacity:0.72;"></canvas>';
+
+    doc.body.prepend(bg);
+
+    var canvas = doc.getElementById('blue-mb-canvas');
+    var ctx = canvas.getContext('2d');
+    var w, h;
+    function resize() {
+        w = canvas.width  = window.parent.innerWidth;
+        h = canvas.height = window.parent.innerHeight;
+    }
+    resize();
+    window.parent.addEventListener('resize', resize);
+
+    var colors = ['#93C5FD','#60A5FA','#BFDBFE','#7DD3FC','#A5B4FC','#BAE6FD'];
+    var blobs = [];
+    for (var i = 0; i < 11; i++) {
+        blobs.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            vx: (Math.random() - 0.5) * 0.52,
+            vy: (Math.random() - 0.5) * 0.52,
+            r: 70 + Math.random() * 100,
+            color: colors[i % colors.length]
+        });
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, w, h);
+        for (var j = 0; j < blobs.length; j++) {
+            var b = blobs[j];
+            b.x += b.vx;
+            b.y += b.vy;
+            if (b.x < -b.r) b.x = w + b.r;
+            if (b.x > w + b.r) b.x = -b.r;
+            if (b.y < -b.r) b.y = h + b.r;
+            if (b.y > h + b.r) b.y = -b.r;
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+            ctx.fillStyle = b.color;
+            ctx.fill();
+        }
+        requestAnimationFrame(animate);
+    }
+    animate();
+})();
+</script>
+""", height=0, width=0)
+
 # ── Шапка ────────────────────────────────────────────────────
 st.markdown("""
 <div class="app-header">
@@ -561,7 +689,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Счётчик запусков
+# Счётчик запусков (только критическое — лимит)
 _remaining = get_remaining_runs()
 _limit_reached = _remaining == 0
 if _limit_reached:
@@ -569,8 +697,6 @@ if _limit_reached:
     st.error(f"Дневной лимит исчерпан — {MAX_DAILY_RUNS}/{MAX_DAILY_RUNS} запусков использовано. Лимит сбросится через **{_reset_time}**")
 elif _remaining <= 3:
     st.warning(f"Осталось запусков сегодня: **{_remaining}** из {MAX_DAILY_RUNS}")
-else:
-    st.caption(f"Осталось запусков сегодня: {_remaining} из {MAX_DAILY_RUNS}")
 
 # ═══════════════════════════════════════════════════════════════
 # Инициализация session_state
@@ -1356,7 +1482,7 @@ with tab3:
         with _c1:
             st.markdown(
                 "<div class='score-card'>"
-                "<div class='score-number' style='color:#CBD5E1'>—<span class='score-denom'>/100</span></div>"
+                "<div class='score-number' style='color:#CBD5E1;font-size:1.8rem'>—<span class='score-denom' style='font-size:0.95rem'>/100</span></div>"
                 "<div style='margin-top:14px'><span class='badge-warning'>Ожидание симуляции</span></div>"
                 "</div>",
                 unsafe_allow_html=True,
