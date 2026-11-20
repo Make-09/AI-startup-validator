@@ -149,45 +149,58 @@ h1, h2, h3, h4, h5, h6,
 }
 
 [data-testid="stTabs"] > div:first-child,
-div[data-baseweb="tab-bar"] {
+div[data-baseweb="tab-bar"],
+div[data-baseweb="tab-border"] {
     background: transparent !important;
+    border: none !important;
     border-bottom: none !important;
+    box-shadow: none !important;
     margin-bottom: 1.25rem !important;
     padding: 0 !important;
 }
 
-div[data-baseweb="tab-list"] {
+/* Стеклянная дорожка-капсула Apple Segmented Control */
+div[role="tablist"],
+[data-testid="stTabs"] [role="tablist"],
+div[data-baseweb="tab-list"],
+[data-baseweb="tab-list"] {
     display: inline-flex !important;
-    background: rgba(226, 232, 240, 0.55) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.75) !important;
+    background: rgba(226, 232, 240, 0.65) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.85) !important;
     border-radius: 14px !important;
     padding: 4px !important;
     gap: 4px !important;
-    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.7) !important;
     overflow-x: auto !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
     max-width: 100% !important;
+    border-bottom: none !important;
 }
+div[role="tablist"]::-webkit-scrollbar,
 div[data-baseweb="tab-list"]::-webkit-scrollbar {
     display: none !important;
     width: 0 !important;
     height: 0 !important;
 }
 
-/* Полностью скрываем синюю полоску подчеркивания и рамки BaseWeb */
+/* Полностью скрываем синюю полоску подчеркивания и любые полоски-индикаторы */
 div[data-baseweb="tab-highlight"],
-div[data-baseweb="tab-border"] {
+div[data-baseweb="tab-border"],
+[role="tablist"] > div:not([role="tab"]) {
     display: none !important;
     height: 0 !important;
     width: 0 !important;
     opacity: 0 !important;
     visibility: hidden !important;
+    background: transparent !important;
+    border: none !important;
 }
 
 /* Полностью убираем белую плашку с кнопкой-стрелкой прокрутки справа на мобилках */
+[data-testid="stTabs"] button:not([role="tab"]),
 [data-baseweb="tab-scroll-forward"],
 [data-baseweb="tab-scroll-backward"],
 [data-baseweb="tab-bar"] > button,
@@ -207,12 +220,14 @@ button[aria-label*="previous" i] {
     pointer-events: none !important;
 }
 
-/* Сами вкладки — кнопки */
+/* Сами вкладки — кнопки внутри дорожки */
+button[role="tab"],
 button[data-baseweb="tab"] {
     background-color: transparent !important;
     background: transparent !important;
     border: none !important;
     border-bottom: none !important;
+    outline: none !important;
     border-radius: 10px !important;
     padding: 7px 16px !important;
     color: #475569 !important;
@@ -222,23 +237,29 @@ button[data-baseweb="tab"] {
     transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
     white-space: nowrap !important;
     cursor: pointer !important;
+    box-shadow: none !important;
 }
+button[role="tab"]:hover,
 button[data-baseweb="tab"]:hover {
     color: #0F172A !important;
     background: rgba(255, 255, 255, 0.35) !important;
 }
 
 /* Активная вкладка — стеклянный переключатель как у Apple (Glass Pill) */
+button[role="tab"][aria-selected="true"],
 button[data-baseweb="tab"][aria-selected="true"] {
-    background: rgba(255, 255, 255, 0.92) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
     color: #0F172A !important;
     font-weight: 700 !important;
     border-radius: 10px !important;
+    border: none !important;
     border-bottom: none !important;
     box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12), 0 1px 2px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
 }
+button[role="tab"][aria-selected="true"] p,
+button[role="tab"][aria-selected="true"] span,
 button[data-baseweb="tab"][aria-selected="true"] p,
 button[data-baseweb="tab"][aria-selected="true"] span {
     color: #0F172A !important;
@@ -246,16 +267,19 @@ button[data-baseweb="tab"][aria-selected="true"] span {
 }
 
 @media (max-width: 640px) {
+    div[role="tablist"],
     div[data-baseweb="tab-list"] {
         padding: 3px !important;
         gap: 2px !important;
         border-radius: 12px !important;
     }
+    button[role="tab"],
     button[data-baseweb="tab"] {
         padding: 6px 10px !important;
         font-size: 0.80rem !important;
         border-radius: 8px !important;
     }
+    button[role="tab"][aria-selected="true"],
     button[data-baseweb="tab"][aria-selected="true"] {
         border-radius: 8px !important;
     }
@@ -1099,8 +1123,56 @@ _comp_meta.html("""
             el.style.setProperty('color', '#0F172A', 'important');
         });
 
+        // Стилизация табов Apple Glass Segmented Control через DOM
+        var tablist = doc.querySelector('[role="tablist"], [data-baseweb="tab-list"]');
+        if (tablist) {
+            tablist.style.setProperty('display', 'inline-flex', 'important');
+            tablist.style.setProperty('background', 'rgba(226, 232, 240, 0.65)', 'important');
+            tablist.style.setProperty('backdrop-filter', 'blur(20px)', 'important');
+            tablist.style.setProperty('-webkit-backdrop-filter', 'blur(20px)', 'important');
+            tablist.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.85)', 'important');
+            tablist.style.setProperty('border-radius', '14px', 'important');
+            tablist.style.setProperty('padding', '4px', 'important');
+            tablist.style.setProperty('gap', '4px', 'important');
+            tablist.style.setProperty('border-bottom', 'none', 'important');
+            
+            // Скрываем все внутренние полоски
+            var ch = tablist.children;
+            for (var k = 0; k < ch.length; k++) {
+                if (ch[k].tagName !== 'BUTTON' && ch[k].getAttribute('role') !== 'tab') {
+                    ch[k].style.setProperty('display', 'none', 'important');
+                }
+            }
+        }
+        var tabsParent = doc.querySelector('[data-testid="stTabs"] > div:first-child');
+        if (tabsParent) {
+            tabsParent.style.setProperty('border-bottom', 'none', 'important');
+            tabsParent.style.setProperty('box-shadow', 'none', 'important');
+        }
+
+        var tabs = doc.querySelectorAll('button[role="tab"], button[data-baseweb="tab"]');
+        tabs.forEach(function(tab) {
+            tab.style.setProperty('border', 'none', 'important');
+            tab.style.setProperty('border-bottom', 'none', 'important');
+            tab.style.setProperty('outline', 'none', 'important');
+            var isSel = tab.getAttribute('aria-selected') === 'true';
+            if (isSel) {
+                tab.style.setProperty('background', 'rgba(255, 255, 255, 0.95)', 'important');
+                tab.style.setProperty('color', '#0F172A', 'important');
+                tab.style.setProperty('font-weight', '700', 'important');
+                tab.style.setProperty('border-radius', '10px', 'important');
+                tab.style.setProperty('box-shadow', '0 3px 12px rgba(15, 23, 42, 0.12), 0 1px 2px rgba(15, 23, 42, 0.06)', 'important');
+            } else {
+                tab.style.setProperty('background', 'transparent', 'important');
+                tab.style.setProperty('color', '#475569', 'important');
+                tab.style.setProperty('font-weight', '500', 'important');
+                tab.style.setProperty('border-radius', '10px', 'important');
+                tab.style.setProperty('box-shadow', 'none', 'important');
+            }
+        });
+
         // Скрываем синюю полоску и белые кнопки прокрутки табов
-        var tabExtras = doc.querySelectorAll('[data-baseweb="tab-scroll-forward"], [data-baseweb="tab-scroll-backward"], [data-baseweb="tab-highlight"], [data-baseweb="tab-border"], [data-baseweb="tab-bar"] > button');
+        var tabExtras = doc.querySelectorAll('[data-baseweb="tab-scroll-forward"], [data-baseweb="tab-scroll-backward"], [data-baseweb="tab-highlight"], [data-baseweb="tab-border"], [data-baseweb="tab-bar"] > button, [data-testid="stTabs"] button:not([role="tab"])');
         tabExtras.forEach(function(el) {
             el.style.setProperty('display', 'none', 'important');
             el.style.setProperty('width', '0px', 'important');
