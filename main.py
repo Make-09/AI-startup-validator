@@ -312,11 +312,16 @@ button[kind="secondary"]:active,
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08) !important;
 }
 
-/* Главная кнопка действия (Запустить валидацию / Отправить) — элегантный свежий лазурный градиент */
+/* Главная кнопка действия (Запустить валидацию / Отправить отзыв) — элегантный свежий лазурный градиент */
 .stButton > button[kind="primary"],
+.stFormSubmitButton > button,
+div[data-testid="stFormSubmitButton"] > button,
 button[kind="primary"],
+button[kind="primaryFormSubmit"],
 [data-testid="baseButton-primary"],
-button[data-testid="stBaseButton-primary"] {
+[data-testid="baseButton-primaryFormSubmit"],
+button[data-testid="stBaseButton-primary"],
+button[data-testid="stBaseButton-primaryFormSubmit"] {
     background: linear-gradient(135deg, #38BDF8 0%, #2563EB 55%, #1D4ED8 100%) !important;
     background-color: #2563EB !important;
     color: #FFFFFF !important;
@@ -333,18 +338,30 @@ button[data-testid="stBaseButton-primary"] {
 }
 .stButton > button[kind="primary"] p,
 .stButton > button[kind="primary"] span,
+.stFormSubmitButton > button p,
+.stFormSubmitButton > button span,
+div[data-testid="stFormSubmitButton"] > button p,
+div[data-testid="stFormSubmitButton"] > button span,
 button[kind="primary"] p,
 button[kind="primary"] span,
+button[kind="primaryFormSubmit"] p,
+button[kind="primaryFormSubmit"] span,
 [data-testid="baseButton-primary"] p,
-[data-testid="baseButton-primary"] span {
+[data-testid="baseButton-primary"] span,
+[data-testid="baseButton-primaryFormSubmit"] p,
+[data-testid="baseButton-primaryFormSubmit"] span {
     color: #FFFFFF !important;
     font-weight: 700 !important;
     letter-spacing: 0.3px !important;
     text-shadow: 0 1px 2px rgba(15, 23, 42, 0.25) !important;
 }
 .stButton > button[kind="primary"]:hover,
+.stFormSubmitButton > button:hover,
+div[data-testid="stFormSubmitButton"] > button:hover,
 button[kind="primary"]:hover,
-[data-testid="baseButton-primary"]:hover {
+button[kind="primaryFormSubmit"]:hover,
+[data-testid="baseButton-primary"]:hover,
+[data-testid="baseButton-primaryFormSubmit"]:hover {
     background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 50%, #2563EB 100%) !important;
     border-color: rgba(255, 255, 255, 0.5) !important;
     color: #FFFFFF !important;
@@ -353,8 +370,12 @@ button[kind="primary"]:hover,
     filter: brightness(1.04) !important;
 }
 .stButton > button[kind="primary"]:active,
+.stFormSubmitButton > button:active,
+div[data-testid="stFormSubmitButton"] > button:active,
 button[kind="primary"]:active,
-[data-testid="baseButton-primary"]:active {
+button[kind="primaryFormSubmit"]:active,
+[data-testid="baseButton-primary"]:active,
+[data-testid="baseButton-primaryFormSubmit"]:active {
     transform: translateY(0.5px) !important;
     box-shadow: 0 2px 8px rgba(37, 99, 235, 0.22) !important;
 }
@@ -676,8 +697,12 @@ section[data-testid="stSidebar"],
         border-color: #CBD5E1 !important;
     }
     .stButton > button[kind="primary"],
+    .stFormSubmitButton > button,
+    div[data-testid="stFormSubmitButton"] > button,
     button[kind="primary"],
-    [data-testid="baseButton-primary"] {
+    button[kind="primaryFormSubmit"],
+    [data-testid="baseButton-primary"],
+    [data-testid="baseButton-primaryFormSubmit"] {
         background: linear-gradient(135deg, #38BDF8 0%, #2563EB 55%, #1D4ED8 100%) !important;
         color: #FFFFFF !important;
         border: 1px solid rgba(255, 255, 255, 0.35) !important;
@@ -685,8 +710,14 @@ section[data-testid="stSidebar"],
     }
     .stButton > button[kind="primary"] p,
     .stButton > button[kind="primary"] span,
+    .stFormSubmitButton > button p,
+    .stFormSubmitButton > button span,
+    div[data-testid="stFormSubmitButton"] > button p,
+    div[data-testid="stFormSubmitButton"] > button span,
     button[kind="primary"] p,
-    button[kind="primary"] span {
+    button[kind="primary"] span,
+    button[kind="primaryFormSubmit"] p,
+    button[kind="primaryFormSubmit"] span {
         color: #FFFFFF !important;
         font-weight: 700 !important;
     }
