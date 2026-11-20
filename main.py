@@ -56,213 +56,449 @@ st.set_page_config(
     layout="wide",
 )
 
-# ── Глобальный CSS — чистый академический стиль ──────────────
+# ── Глобальный CSS — B2B SaaS Дизайн-система ──────────────
 st.markdown("""
-<style>
-/* Убираем padding сверху */
-.block-container { padding-top: 1.5rem; max-width: 1200px; }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-/* Стильный Hero-блок */
+<style>
+/* ── Базовая типографика и принудительная светлая тема ── */
+:root {
+    --primary-color: #2563EB;
+    --background-color: #F8FAFC;
+    --secondary-background-color: #FFFFFF;
+    --text-color: #334155;
+}
+
+html, body, [class*="st-"], .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    background-color: #F8FAFC !important;
+    color: #334155 !important;
+}
+
+[data-testid="stAppViewContainer"] {
+    background-color: #F8FAFC !important;
+}
+
+[data-testid="stHeader"] {
+    background-color: #F8FAFC !important;
+    border-bottom: 1px solid #E2E8F0 !important;
+}
+
+/* Принудительная читаемость заголовков и текста */
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] span,
+[data-testid="stMarkdownContainer"] li {
+    color: #334155 !important;
+}
+
+[data-testid="stMarkdownContainer"] h1,
+[data-testid="stMarkdownContainer"] h2,
+[data-testid="stMarkdownContainer"] h3,
+[data-testid="stMarkdownContainer"] h4 {
+    color: #0F172A !important;
+}
+
+/* Вкладки (Tabs) */
+button[data-baseweb="tab"] {
+    background-color: transparent !important;
+}
+button[data-baseweb="tab"][aria-selected="true"] {
+    color: #2563EB !important;
+    border-bottom: 2px solid #2563EB !important;
+}
+button[data-baseweb="tab"][aria-selected="false"] {
+    color: #64748B !important;
+}
+
+/* Поля ввода */
+div[data-testid="stTextInput"] input,
+div[data-testid="stTextArea"] textarea,
+div[data-testid="stNumberInput"] input {
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+    border: 1px solid #CBD5E1 !important;
+    border-radius: 8px !important;
+}
+div[data-testid="stTextInput"] input:focus,
+div[data-testid="stTextArea"] textarea:focus,
+div[data-testid="stNumberInput"] input:focus {
+    border-color: #2563EB !important;
+    box-shadow: 0 0 0 1px #2563EB !important;
+}
+
+/* ── Контейнер приложения ── */
+.block-container {
+    padding-top: 1.75rem !important;
+    padding-bottom: 3.5rem !important;
+    max-width: 1140px !important;
+}
+
+/* ── Шапка ── */
+.app-header {
+    border-bottom: 1px solid #E2E8F0;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+.app-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #0F172A !important;
+    letter-spacing: -0.5px;
+    margin: 0 0 4px 0;
+}
+.app-subtitle {
+    font-size: 0.9rem;
+    color: #64748B !important;
+    margin: 0;
+}
+
+/* ── Заголовки ── */
+h1, h2, h3, h4 {
+    color: #0F172A !important;
+    letter-spacing: -0.3px;
+    font-weight: 700 !important;
+}
+
+/* ── Hero-карточка ── */
 .hero-card {
-    background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
-    border: 1px solid #cbd5e1;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
     border-radius: 12px;
-    padding: 22px 26px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    padding: 24px 28px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    margin-bottom: 1.75rem;
 }
 .hero-badge {
     display: inline-block;
-    background: #e0f2fe;
-    color: #0369a1;
+    background: #EFF6FF;
+    color: #2563EB;
     font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.8px;
+    letter-spacing: 0.6px;
     text-transform: uppercase;
-    padding: 3px 10px;
-    border-radius: 9999px;
-    margin-bottom: 8px;
-    border: 1px solid #bae6fd;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
 }
 .hero-title {
     font-size: 1.35rem;
     font-weight: 800;
-    color: #0f172a;
-    margin: 0 0 6px 0;
+    color: #0F172A;
+    margin: 0 0 8px 0;
     letter-spacing: -0.3px;
 }
 .hero-desc {
-    font-size: 0.88rem;
-    color: #475569;
-    line-height: 1.55;
-    margin-bottom: 16px;
+    font-size: 0.9rem;
+    color: #334155;
+    line-height: 1.6;
+    margin-bottom: 18px;
 }
 .hero-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 12px;
 }
 .hero-pill {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
     border-radius: 8px;
-    padding: 12px 14px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    padding: 14px 16px;
 }
 .hero-pill-num {
-    font-weight: 800;
-    color: #2563eb;
-    font-size: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: #2563EB;
+    font-size: 0.8rem;
     margin-bottom: 4px;
 }
 .hero-pill-title {
     font-weight: 700;
-    color: #1e293b;
-    font-size: 0.82rem;
-    margin-bottom: 2px;
+    color: #0F172A;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
 }
 .hero-pill-sub {
-    font-size: 0.74rem;
-    color: #64748b;
-    line-height: 1.35;
+    font-size: 0.78rem;
+    color: #64748B;
+    line-height: 1.45;
 }
 
-/* Баннер "Анализ завершён" */
+/* ── Баннер завершения анализа ── */
 .done-banner {
-    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-    border: 1.5px solid #34d399;
+    background: #F0FDFA;
+    border: 1px solid #CCFBF1;
     border-radius: 10px;
     padding: 14px 20px;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
     gap: 14px;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
 }
 .done-banner-icon {
-    font-size: 1.3rem;
-    background: #10b981;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    background: #0D9488;
     color: white;
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
-}
-.done-banner-text { font-size: 0.95rem; font-weight: 700; color: #065f46; }
-.done-banner-sub  { font-size: 0.8rem; color: #047857; font-weight: 500; }
-
-/* Пресеты */
-.preset-box {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 10px 14px;
-    margin-bottom: 16px;
-}
-
-/* Прогресс-шаги */
-.step-row { display:flex; align-items:center; gap:10px; margin:7px 0; }
-.step-dot-done    { width:10px;height:10px;border-radius:50%;background:#10b981;flex-shrink:0; }
-.step-dot-active  { width:10px;height:10px;border-radius:50%;background:#2563eb;flex-shrink:0;animation:pulse 1s infinite; }
-.step-dot-pending { width:10px;height:10px;border-radius:50%;background:#cbd5e1;flex-shrink:0; }
-.step-text-done    { font-size:0.85rem;color:#065f46;font-weight:500; }
-.step-text-active  { font-size:0.85rem;color:#1d4ed8;font-weight:700; }
-.step-text-pending { font-size:0.85rem;color:#94a3b8; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
-
-/* Шапка */
-.app-header {
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 0.75rem;
-    margin-bottom: 1rem;
-}
-.app-title {
-    font-size: 1.6rem;
     font-weight: 700;
-    color: #1a1a2e;
-    letter-spacing: -0.5px;
-    margin: 0;
 }
-.app-subtitle {
-    font-size: 0.85rem;
-    color: #6b7280;
-    margin: 0;
+.done-banner-text { font-size: 0.95rem; font-weight: 700; color: #0F172A; }
+.done-banner-sub  { font-size: 0.82rem; color: #0D9488; font-weight: 500; }
+
+/* ── Empty State Card ── */
+.empty-state-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 48px 24px;
+    text-align: center;
+    margin: 2rem 0;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+.empty-state-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 8px;
+}
+.empty-state-desc {
+    font-size: 0.9rem;
+    color: #64748B;
+    max-width: 540px;
+    margin: 0 auto;
+    line-height: 1.6;
 }
 
-/* Метки секций */
-.section-label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: #9ca3af;
-    margin-bottom: 4px;
+/* ── Метрики Streamlit ── */
+[data-testid="stMetric"] {
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 12px !important;
+    padding: 16px 20px !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+}
+[data-testid="stMetricLabel"] {
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    color: #64748B !important;
+}
+[data-testid="stMetricValue"] {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 1.55rem !important;
+    font-weight: 700 !important;
+    color: #0F172A !important;
 }
 
-/* Карточка скоринга */
+/* ── Карточка скоринга ── */
 .score-card {
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 1rem;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 .score-number {
+    font-family: 'JetBrains Mono', monospace;
     font-size: 3.5rem;
     font-weight: 800;
     line-height: 1;
-    color: #1a1a2e;
+    color: #0F172A;
 }
 .score-denom {
-    font-size: 1.2rem;
-    color: #9ca3af;
-    font-weight: 400;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.3rem;
+    color: #64748B;
+    font-weight: 500;
 }
 
-/* Вердикт-бейдж */
-.verdict-critical { background:#fee2e2; color:#991b1b; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; }
-.verdict-warning  { background:#fef3c7; color:#92400e; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; }
-.verdict-moderate { background:#dbeafe; color:#1e40af; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; }
-.verdict-good     { background:#d1fae5; color:#065f46; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; }
-.verdict-pending  { background:#f1f5f9; color:#64748b; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; border:1px dashed #cbd5e1; }
-
-/* Карточка превью структуры */
-.empty-state-card {
-    background: #f8fafc;
-    border: 1px dashed #94a3b8;
-    border-radius: 10px;
-    padding: 14px 18px;
-    margin-bottom: 1.25rem;
+/* ── Семантические бейджи ── */
+.badge-success {
+    background: #F0FDFA;
+    color: #0D9488;
+    border: 1px solid #CCFBF1;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    display: inline-block;
+}
+.badge-warning {
+    background: #FFFBEB;
+    color: #D97706;
+    border: 1px solid #FEF3C7;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    display: inline-block;
+}
+.badge-danger {
+    background: #FFF1F2;
+    color: #E11D48;
+    border: 1px solid #FFE4E6;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    display: inline-block;
 }
 
-/* Метрика-карточка */
-.metric-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:1rem; }
-.metric-box {
-    flex:1; min-width:120px;
-    background:#fff; border:1px solid #e5e7eb;
-    border-radius:8px; padding:12px 16px;
+/* ── Карточки конкурентного анализа ── */
+.comp-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 18px 22px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    margin-bottom: 12px;
 }
-.metric-box-label { font-size:0.7rem; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px; }
-.metric-box-value { font-size:1.4rem; font-weight:700; color:#111827; }
+.comp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #F1F5F9;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+}
+.comp-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #0F172A;
+}
+.comp-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #2563EB;
+    background: #EFF6FF;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid #DBEAFE;
+}
+.comp-badge-direct {
+    background: #FFF1F2;
+    color: #E11D48;
+    border: 1px solid #FFE4E6;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+.comp-badge-indirect {
+    background: #FFFBEB;
+    color: #D97706;
+    border: 1px solid #FEF3C7;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+.comp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+.comp-section-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #64748B;
+    margin-bottom: 4px;
+}
+.comp-section-body {
+    font-size: 0.85rem;
+    color: #334155;
+    line-height: 1.5;
+}
 
-/* Диалог интервью */
-.phase-header {
-    font-size:0.72rem; font-weight:600; letter-spacing:0.8px;
-    text-transform:uppercase; color:#6b7280;
-    border-top: 1px solid #e5e7eb;
-    padding-top: 10px; margin: 14px 0 8px 0;
+/* ── Диалоги интервью ── */
+.phase-tag {
+    display: inline-block;
+    background: #EFF6FF;
+    color: #2563EB;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin: 10px 0 6px 0;
 }
-.chat-q { color:#374151; font-size:0.88rem; margin:4px 0 2px 16px; font-style:italic; }
+.chat-q {
+    color: #475569;
+    font-size: 0.88rem;
+    font-style: italic;
+    margin: 4px 0 4px 0;
+}
 .chat-a {
-    background:#f9fafb; border-left:3px solid #d1d5db;
-    padding:8px 14px; border-radius:0 6px 6px 0;
-    margin:2px 0 10px 16px; font-size:0.9rem; color:#111827;
+    background: #F8FAFC;
+    border-left: 3px solid #2563EB;
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    color: #0F172A;
+    margin: 4px 0 12px 0;
+    line-height: 1.5;
+}
+.mono-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
 }
 
-/* Убираем стандартные иконки streamlit-метрик */
+/* ── Прогресс шаги ── */
+.step-row { display:flex; align-items:center; gap:10px; margin:7px 0; }
+.step-dot-done    { width:9px;height:9px;border-radius:50%;background:#0D9488;flex-shrink:0; }
+.step-dot-active  { width:9px;height:9px;border-radius:50%;background:#2563EB;flex-shrink:0;animation:pulse 1s infinite; }
+.step-dot-pending { width:9px;height:9px;border-radius:50%;background:#CBD5E1;flex-shrink:0; }
+.step-text-done    { font-size:0.85rem;color:#0D9488;font-weight:500; }
+.step-text-active  { font-size:0.85rem;color:#1D4ED8;font-weight:700; }
+.step-text-pending { font-size:0.85rem;color:#94A3B8; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+/* ── Кнопки ── */
+.stButton > button {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 0.88rem !important;
+    padding: 0.5rem 1rem !important;
+    transition: all 0.15s ease !important;
+}
+.stButton > button[kind="primary"] {
+    background-color: #2563EB !important;
+    color: #FFFFFF !important;
+    border: 1px solid #2563EB !important;
+    box-shadow: 0 1px 2px rgba(37, 99, 235, 0.15) !important;
+}
+.stButton > button[kind="primary"]:hover {
+    background-color: #1D4ED8 !important;
+    border-color: #1D4ED8 !important;
+}
+.stButton > button[kind="secondary"] {
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+    border: 1px solid #CBD5E1 !important;
+}
+.stButton > button[kind="secondary"]:hover {
+    background-color: #F8FAFC !important;
+    border-color: #94A3B8 !important;
+}
+
+/* ── Сайдбар ── */
+[data-testid="stSidebar"] {
+    background-color: #FFFFFF !important;
+    border-right: 1px solid #E2E8F0 !important;
+}
+
+/* Убираем стрелочки delta у метрик */
 [data-testid="stMetricDelta"] svg { display:none; }
 </style>
 """, unsafe_allow_html=True)
@@ -902,67 +1138,24 @@ with tab1:
 
 with tab2:
     st.header("Customer Discovery — результаты интервью")
-    st.caption("Глубинные двухфазные интервью с репрезентативной выборкой синтетических клиентов")
+    st.caption("Глубинные двухфазные интервью по методологии Mom Test с репрезентативной выборкой клиентов")
 
     report: ValidationReport = st.session_state.report
 
     if report is None or report.interview_results is None:
         st.markdown("""
         <div class="empty-state-card">
-          <div style="font-weight:700;font-size:0.92rem;color:#1e293b;margin-bottom:3px">Режим предварительного просмотра архитектуры Customer Discovery</div>
-          <div style="font-size:0.82rem;color:#64748b">Интервью ещё не запущены. Ниже отображается макет сбора клиентских инсайтов. Для получения расчётных данных запустите валидацию на вкладке «Ваша идея».</div>
+          <div class="empty-state-title">Данные Customer Discovery ещё не сформированы</div>
+          <div class="empty-state-desc">
+            Для генерации профилей клиентов, проведения двухфазных интервью по методологии Mom Test и оценки платежеспособного спроса перейдите на вкладку <strong>«Ваша идея»</strong> и запустите валидацию.
+          </div>
         </div>
         """, unsafe_allow_html=True)
+        st.stop()
 
-        st.subheader("Сводка")
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric("Острота проблемы", "— / 10")
-        with col2:
-            st.metric("Готовы купить", "— %")
-        with col3:
-            st.metric("Рекомендация (ср.)", "— / 10")
-        with col4:
-            st.metric("Solution Fit", "— / 10")
-
-        st.divider()
-
-        col_pie, col_concerns = st.columns([1, 1])
-        with col_pie:
-            st.markdown("**Ценовое восприятие**")
-            fig_pie_empty = go.Figure(data=[go.Pie(
-                labels=["Ожидание расчёта"],
-                values=[1],
-                marker_colors=["#e2e8f0"],
-                hole=0.45,
-                textinfo="none",
-                hoverinfo="skip",
-            )])
-            fig_pie_empty.update_layout(
-                height=260,
-                margin=dict(t=10, b=10, l=10, r=10),
-                showlegend=False,
-                annotations=[dict(text="Ожидание данных", x=0.5, y=0.5, font_size=13, font_color="#94a3b8", showarrow=False)]
-            )
-            st.plotly_chart(fig_pie_empty, use_container_width=True)
-
-        with col_concerns:
-            st.markdown("**Топ-3 опасения**")
-            st.caption("— Ключевые барьеры перехода с альтернативных решений")
-            st.caption("— Скрытые риски использования и недоверие")
-            st.caption("— Ценовые возражения целевой аудитории")
-
-            st.markdown("**Топ-3 желаемые функции**")
-            st.caption("— Первоочередные требования для запуска MVP")
-            st.caption("— Функционал с наивысшей готовностью платить")
-            st.caption("— Запросы на интеграции и формат сервиса")
-
-        st.divider()
-        st.subheader("Ответы персон")
-        for placeholder_name in ["Респондент #1 · Ожидание запуска", "Респондент #2 · Ожидание запуска", "Респондент #3 · Ожидание запуска"]:
-            with st.expander(placeholder_name):
-                st.caption("Стенограмма двухфазного интервью (Phase 1: выявление скрытой боли, Phase 2: проверка ценности решения) сформируется автоматически после старта валидации.")
     else:
+
+
         ir = report.interview_results
 
         if ir.fallback_count > 0:
@@ -990,17 +1183,39 @@ with tab2:
 
         with col_pie:
             st.markdown("**Ценовое восприятие**")
+            labels = ["Дорого", "Нормально", "Дёшево"]
+            values = [ir.pct_price_too_high, ir.pct_price_ok, ir.pct_price_too_low]
+            # Монохромная строгая палитра в стилистике B2B SaaS:
+            # Дорого: Slate 800 (#1E293B), Нормально: Brand Blue (#2563EB), Дёшево: Slate 400 (#94A3B8)
+            marker_colors = ["#1E293B", "#2563EB", "#94A3B8"]
+            # Цвета строго по дизайн-системе: Slate 900, Royal Blue, Slate 500
+            marker_colors = ["#0F172A", "#2563EB", "#64748B"]
             fig_pie = go.Figure(data=[go.Pie(
-                labels=["Дорого", "Нормально", "Дёшево"],
-                values=[ir.pct_price_too_high, ir.pct_price_ok, ir.pct_price_too_low],
-                marker_colors=["#e74c3c", "#2ecc71", "#3498db"],
-                hole=0.4,
+                labels=labels,
+                values=values,
+                marker_colors=marker_colors,
+                hole=0.55,
+                textinfo="percent+label",
+                textposition="auto",
+                insidetextfont=dict(family="JetBrains Mono, monospace", size=12, color="#FFFFFF"),
+                outsidetextfont=dict(family="Inter, sans-serif", size=12, color="#0F172A"),
+                hoverinfo="label+percent",
             )])
             fig_pie.update_layout(
-                height=280,
-                margin=dict(t=10, b=10, l=10, r=10),
+                height=260,
+                margin=dict(t=15, b=15, l=15, r=15),
                 showlegend=True,
-                font=dict(family="sans-serif"),
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#FFFFFF",
+                font=dict(family="Inter, sans-serif", color="#334155", size=12),
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=-0.25,
+                    xanchor="center",
+                    x=0.5,
+                    font=dict(family="Inter, sans-serif", size=12, color="#475569")
+                ),
             )
             st.plotly_chart(fig_pie, use_container_width=True)
 
@@ -1009,27 +1224,24 @@ with tab2:
             if ir.top_concerns:
                 for concern in ir.top_concerns:
                     st.warning(concern)
-            else:
                 st.caption("Нет данных")
 
             st.markdown("**Топ-3 желаемые функции**")
             if ir.top_desired_features:
                 for feature in ir.top_desired_features:
                     st.info(feature)
-            else:
                 st.caption("Нет данных")
 
         # ── Детальные ответы персон ───────────────────────────────
         st.divider()
         st.subheader("Ответы персон")
 
-        _phase_labels = {1: "Фаза 1 — До знакомства с продуктом", 2: "Фаза 2 — После знакомства с продуктом"}
-
         for resp in ir.responses:
-            buy_label = "купит" if resp.would_buy else "не купит"
-            err_label = " · ошибка API" if getattr(resp, "is_error", False) else ""
-            with st.expander(f"{resp.persona_name} · {resp.persona_occupation} · {buy_label}{err_label}"):
+            buy_status = "Купит" if resp.would_buy else "Не купит"
+            err_status = " · Ошибка API" if getattr(resp, "is_error", False) else ""
+            header_title = f"{resp.persona_name} · {resp.persona_occupation} · {buy_status}{err_status}"
 
+            with st.expander(header_title):
                 if getattr(resp, "is_error", False):
                     st.error(
                         f"Ответ не получен от LLM.  \n{resp.main_concern}  \n"
@@ -1046,28 +1258,19 @@ with tab2:
 
                         if phase != current_phase:
                             current_phase = phase
-                            label = _phase_labels.get(phase, f"Фаза {phase}")
-                            st.markdown(
-                                f"<div class='phase-header'>{label}</div>",
-                                unsafe_allow_html=True,
-                            )
+                            p_label = "Фаза 1 · Прошлый опыт (без знания о продукте)" if phase == 1 else "Фаза 2 · Презентация продукта и цена"
+                            st.markdown(f"<div class='phase-tag'>{p_label}</div>", unsafe_allow_html=True)
 
                         if q:
-                            st.markdown(
-                                f"<div class='chat-q'>— {q}</div>",
-                                unsafe_allow_html=True,
-                            )
+                            st.markdown(f"<div class='chat-q'>— {q}</div>", unsafe_allow_html=True)
                         if a:
-                            st.markdown(
-                                f"<div class='chat-a'>{a}</div>",
-                                unsafe_allow_html=True,
-                            )
+                            st.markdown(f"<div class='chat-a'>{a}</div>", unsafe_allow_html=True)
                     st.divider()
                 elif resp.raw_opinion:
                     st.markdown(f"*«{resp.raw_opinion}»*")
                     st.divider()
 
-                st.caption("Итоговые оценки")
+                st.caption("Оценки респондента")
                 cols = st.columns(5)
                 metrics = [
                     ("Острота проблемы", resp.problem_severity),
@@ -1081,14 +1284,13 @@ with tab2:
                         st.metric(label, f"{val}/10")
                         st.progress(val / 10)
 
-                st.markdown(
-                    f"**Цена:** {resp.price_feedback} &nbsp;&nbsp; "
-                    f"**Купит:** {'да' if resp.would_buy else 'нет'}"
-                )
+                st.markdown(f"**Цена:** `{resp.price_feedback}` &nbsp;&nbsp; **Купит:** {'да' if resp.would_buy else 'нет'}")
                 if resp.main_concern:
-                    st.markdown(f"**Опасение:** {resp.main_concern}")
+                    st.markdown(f"**Ключевое опасение:** {resp.main_concern}")
                 if resp.desired_feature:
                     st.markdown(f"**Желаемая функция:** {resp.desired_feature}")
+
+
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -1101,97 +1303,17 @@ with tab3:
     if report is None:
         st.markdown("""
         <div class="empty-state-card">
-          <div style="font-weight:700;font-size:0.92rem;color:#1e293b;margin-bottom:3px">Режим предварительного просмотра архитектуры инвестиционного отчета</div>
-          <div style="font-size:0.82rem;color:#64748b">Расчёт экономической модели ещё не выполнен. Ниже представлена структура итогового инвестиционного скоринга, когортной юнит-экономики и симуляции Монте-Карло.</div>
+          <div class="empty-state-title">Инвестиционный отчёт ещё не сформирован</div>
+          <div class="empty-state-desc">
+            Для расчёта скоринга жизнеспособности (Overall Viability Score), когортной юнит-экономики (LTV, CAC, Runway, Payback) и симуляции Монте-Карло перейдите на вкладку <strong>«Ваша идея»</strong> и запустите валидацию.
+          </div>
         </div>
         """, unsafe_allow_html=True)
-
-        st.subheader("Общая оценка жизнеспособности (Overall Viability Score)")
-        col_score1, col_score2 = st.columns([1, 2])
-        with col_score1:
-            st.markdown(
-                "<div class='score-card'>"
-                "<div class='score-number'>—<span class='score-denom'>/100</span></div>"
-                "<br><span class='verdict-pending'>Ожидание запуска симуляции</span>"
-                "</div>",
-                unsafe_allow_html=True,
-            )
-            st.progress(0.0)
-
-        with col_score2:
-            st.markdown("**Компоненты скоринга**")
-            st.caption("Валидация проблемы: **0.0 / 40.0**")
-            st.progress(0.0)
-            st.caption("Solution Fit и спрос: **0.0 / 35.0**")
-            st.progress(0.0)
-            st.caption("Экономическая устойчивость: **0.0 / 25.0**")
-            st.progress(0.0)
-
-        st.divider()
-        st.subheader("Юнит-экономика")
-        st.caption("Расчёт на основе эффективного дохода, страновых коэффициентов и отраслевых бенчмарков")
-
-        c1, c2, c3, c4 = st.columns(4)
-        c1.metric("LTV (пожизненная ценность)", "—")
-        c2.metric("CAC (стоимость привлечения)", "—")
-        c3.metric("LTV : CAC", "—")
-        c4.metric("Окупаемость CAC", "—")
-
-        c5, c6, c7, c8 = st.columns(4)
-        c5.metric("Monthly Burn Rate", "—")
-        c6.metric("Runway (статический)", "—")
-        c7.metric("Break-even", "—")
-        c8.metric("Базовый отток (Churn)", "—")
-
-        cf1, cf2, cf3 = st.columns(3)
-        cf1.metric("Дно кассовой ямы", "—")
-        cf2.metric("Расход капитала до безубытка", "—")
-        cf3.metric("Дефицит капитала", "—")
-
-        st.divider()
-        st.subheader("Вероятностный прогноз роста MRR — Fan Chart")
-        st.caption("10 000 симуляций · 24 месяца · когортный отток · стресс-тест ликвидности")
-
-        fig_mc_empty = go.Figure()
-        fig_mc_empty.add_trace(go.Scatter(
-            x=[0, 6, 12, 18, 24],
-            y=[0, 0, 0, 0, 0],
-            mode="lines",
-            line=dict(color="#cbd5e1", dash="dot", width=1.5),
-            name="Базовая линия",
-        ))
-        fig_mc_empty.update_layout(
-            title=dict(
-                text="Коридор вероятности выручки (P10–P90) сформируется после проведения анализа",
-                font=dict(size=13, color="#64748b"),
-            ),
-            xaxis_title="Месяц",
-            yaxis_title="MRR (USD)",
-            height=340,
-            margin=dict(l=20, r=20, t=50, b=20),
-        )
-        st.plotly_chart(fig_mc_empty, use_container_width=True)
-
-        mc1, mc2, mc3, mc4 = st.columns(4)
-        mc1.metric("Риск банкротства (24 мес)", "—")
-        mc2.metric("Медианная безубыточность", "—")
-        mc3.metric("Вероятность $10K+ MRR", "—")
-        mc4.metric("Вероятность 1 000+ клиентов", "—")
-
-        st.divider()
-        st.subheader("Анализ конкурентной среды")
-        st.caption("Поиск прямых и косвенных конкурентов в реальном времени с оценкой сильных и слабых сторон.")
-        df_empty = pd.DataFrame([
-            {"Конкурент": "Конкурент 1 (прямой)", "Категория": "Прямой конкурент", "Преимущества": "Данные формируются...", "Уязвимости": "Данные формируются...", "Ценовая модель": "—"},
-            {"Конкурент": "Конкурент 2 (косвенный)", "Категория": "Косвенный аналог", "Преимущества": "Данные формируются...", "Уязвимости": "Данные формируются...", "Ценовая модель": "—"},
-        ])
-        st.dataframe(df_empty, use_container_width=True, hide_index=True)
-
-        st.divider()
-        st.subheader("Экспертные инсайты и рекомендации")
-        st.info("Рекомендации инвестиционного комитета и анализ критических рисков будут выведены после симуляции.")
+        st.stop()
 
     else:
+
+
 
         # ── Overall Viability Score ───────────────────────────────
         st.subheader("Общая оценка жизнеспособности (Overall Viability Score)")
@@ -1202,16 +1324,15 @@ with tab3:
         with col_score1:
             # Определяем вердикт
             if score <= 25:
-                verdict_class = "verdict-critical"
+                verdict_class = "badge-danger"
                 verdict_text  = "Критический риск — требуется пересмотр"
             elif score <= 50:
-                verdict_class = "verdict-warning"
+                verdict_class = "badge-danger"
                 verdict_text  = "Высокий риск — значительные доработки"
             elif score <= 65:
-                verdict_class = "verdict-moderate"
+                verdict_class = "badge-warning"
                 verdict_text  = "Умеренный риск — необходима проверка"
-            else:
-                verdict_class = "verdict-good"
+                verdict_class = "badge-success"
                 verdict_text  = "Перспективная идея — рекомендуется пилот"
 
             st.markdown(
@@ -1329,7 +1450,7 @@ with tab3:
                 x=months_x + months_x[::-1],
                 y=mc.mrr_p90 + mc.mrr_p10[::-1],
                 fill="toself",
-                fillcolor="rgba(99,110,250,0.08)",
+                fillcolor="rgba(37, 99, 235, 0.08)",
                 line=dict(width=0),
                 showlegend=True,
                 name="Коридор вероятности (P10–P90)",
@@ -1338,19 +1459,19 @@ with tab3:
             fig_mc.add_trace(go.Scatter(
                 x=months_x, y=mc.mrr_p90,
                 mode="lines",
-                line=dict(color="rgba(46,204,113,0.9)", width=1.8, dash="dot"),
+                line=dict(color="#0D9488", width=1.8, dash="dot"),
                 name=f"Оптимистичный P90 (${mc.mrr_p90[-1]:,.0f})",
             ))
             fig_mc.add_trace(go.Scatter(
                 x=months_x, y=mc.mrr_p10,
                 mode="lines",
-                line=dict(color="rgba(231,76,60,0.9)", width=1.8, dash="dot"),
+                line=dict(color="#E11D48", width=1.8, dash="dot"),
                 name=f"Пессимистичный P10 (${mc.mrr_p10[-1]:,.0f})",
             ))
             fig_mc.add_trace(go.Scatter(
                 x=months_x, y=mc.mrr_p50,
                 mode="lines",
-                line=dict(color="#3498db", width=3),
+                line=dict(color="#2563EB", width=3),
                 name=f"Медианный прогноз P50 (${mc.mrr_p50[-1]:,.0f})",
             ))
 
@@ -1358,24 +1479,41 @@ with tab3:
                 br = report.unit_economics.monthly_burn_rate
                 fig_mc.add_hline(
                     y=br,
-                    line_dash="dot", line_color="#f39c12", line_width=1.5,
+                    line_dash="dot", line_color="#D97706", line_width=1.5,
                     annotation_text=f"Burn Rate ${br:,.0f}/мес",
                     annotation_position="bottom right",
-                    annotation_font_color="#f39c12",
+                    annotation_font_color="#D97706",
                 )
 
             fig_mc.update_layout(
                 title=dict(
                     text="Динамика Monthly Recurring Revenue — 24 месяца<br>"
-                         "<sup>Гуще = вероятнее | Красные линии = сценарии банкротства</sup>",
-                    font=dict(size=14),
+                         "<span style='font-size:11px;font-weight:400;color:#64748B'>Гуще = вероятнее | Красные линии = сценарии банкротства</span>",
+                    font=dict(family="Inter, sans-serif", size=14, color="#0F172A"),
                 ),
-                xaxis_title="Месяц",
-                yaxis_title="MRR (USD)",
+                xaxis=dict(
+                    title=dict(text="Месяц", font=dict(family="Inter, sans-serif", size=12, color="#64748B")),
+                    gridcolor="#E2E8F0",
+                    tickfont=dict(family="JetBrains Mono, monospace", size=11, color="#64748B"),
+                ),
+                yaxis=dict(
+                    title=dict(text="MRR (USD)", font=dict(family="Inter, sans-serif", size=12, color="#64748B")),
+                    gridcolor="#E2E8F0",
+                    tickfont=dict(family="JetBrains Mono, monospace", size=11, color="#64748B"),
+                ),
                 height=420,
                 margin=dict(l=20, r=20, t=60, b=20),
                 hovermode="x unified",
-                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=1.02,
+                    xanchor="right",
+                    x=1,
+                    font=dict(family="Inter, sans-serif", size=11, color="#475569")
+                ),
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#FFFFFF",
             )
             st.plotly_chart(fig_mc, use_container_width=True)
 
@@ -1427,29 +1565,33 @@ with tab3:
                         st.markdown(f"- [{src_url}]({src_url})")
 
             if mr.competitors:
-                comp_rows = []
-                for c in mr.competitors:
-                    comp_rows.append({
-                        "Конкурент": c.name,
-                        "Категория": c.category,
-                        "Преимущества": c.strengths,
-                        "Уязвимости": c.weaknesses,
-                        "Ценовая модель": c.price_point,
-                    })
-                df_comp = pd.DataFrame(comp_rows)
-                st.dataframe(df_comp, use_container_width=True, hide_index=True)
+                for comp in mr.competitors:
+                    is_direct = "прямой" in comp.category.lower()
+                    badge_class = "comp-badge-direct" if is_direct else "comp-badge-indirect"
+                    badge_text = "Прямой конкурент" if is_direct else "Косвенный аналог"
+                    price_html = f"<div class='comp-price'>{comp.price_point}</div>" if comp.price_point else ""
 
-                st.markdown("**Ценовое сравнение конкурентов**")
-                price_cols = st.columns(min(len(mr.competitors), 4))
-                for i, (col, comp) in enumerate(zip(price_cols, mr.competitors)):
-                    with col:
-                        price_str = comp.price_point or "н/д"
-                        cat_label = "Прямой" if "Прямой" in comp.category else "Косвенный" if "Косвенный" in comp.category else "Иной"
-                        st.metric(
-                            label=f"{comp.name[:25]} · {cat_label}",
-                            value=price_str[:40],
-                            help=f"{comp.category}\n\n+ {comp.strengths}\n\n− {comp.weaknesses}",
-                        )
+                    st.markdown(f"""
+                    <div class="comp-card">
+                      <div class="comp-header">
+                        <div style="display:flex;align-items:center;gap:10px;">
+                          <span class="comp-name">{comp.name}</span>
+                          <span class="{badge_class}">{badge_text}</span>
+                        </div>
+                        {price_html}
+                      </div>
+                      <div class="comp-grid">
+                        <div>
+                          <div class="comp-section-title" style="color:#0D9488;">Ключевые преимущества</div>
+                          <div class="comp-section-body">{comp.strengths}</div>
+                        </div>
+                        <div>
+                          <div class="comp-section-title" style="color:#E11D48;">Слабые стороны и уязвимости</div>
+                          <div class="comp-section-body">{comp.weaknesses}</div>
+                        </div>
+                      </div>
+                    </div>
+                    """, unsafe_allow_html=True)
 
             if mr.differentiation_strategy:
                 st.success(f"**Рекомендуемая стратегия дифференциации (УТП):**  \n{mr.differentiation_strategy}")
@@ -1478,9 +1620,7 @@ with tab3:
                     st.warning(msg)
                 elif insight.severity == "success":
                     st.success(msg)
-                else:
                     st.info(msg)
-        else:
             st.caption("Инсайты не сгенерированы")
 
         st.divider()
@@ -1495,6 +1635,9 @@ with tab3:
             mime="application/json",
             type="primary",
         )
+
+
+
 
 # ═══════════════════════════════════════════════════════════════
 #  TAB 4 — Отзыв
