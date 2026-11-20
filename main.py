@@ -46,80 +46,169 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s — %(message)s",
 )
-# Подавляем DNS-шум от сторонних библиотек в офлайн-режиме
 for _lib in ("ddgs", "duckduckgo_search", "httpx", "httpcore", "urllib3"):
     logging.getLogger(_lib).setLevel(logging.ERROR)
 
 # ── Конфигурация страницы ────────────────────────────────────
 st.set_page_config(
-    page_title="AI Startup Validator — Валидатор бизнес-идей",
+    page_title="AI Startup Validator",
     page_icon="🔬",
     layout="wide",
 )
 
-st.title("🔬 AI Startup Validator")
-st.caption("Валидация бизнес-идей через AI Customer Discovery")
+# ── Глобальный CSS — чистый академический стиль ──────────────
+st.markdown("""
+<style>
+/* Убираем padding сверху */
+.block-container { padding-top: 1.5rem; }
 
+/* Шапка */
+.app-header {
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+}
+.app-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    letter-spacing: -0.5px;
+    margin: 0;
+}
+.app-subtitle {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0;
+}
 
-# Счётчик запусков в шапке
+/* Метки секций */
+.section-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 4px;
+}
+
+/* Карточка скоринга */
+.score-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+}
+.score-number {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #1a1a2e;
+}
+.score-denom {
+    font-size: 1.2rem;
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+/* Вердикт-бейдж */
+.verdict-critical { background:#fee2e2; color:#991b1b; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; }
+.verdict-warning  { background:#fef3c7; color:#92400e; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; }
+.verdict-moderate { background:#dbeafe; color:#1e40af; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; }
+.verdict-good     { background:#d1fae5; color:#065f46; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; }
+
+/* Метрика-карточка */
+.metric-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:1rem; }
+.metric-box {
+    flex:1; min-width:120px;
+    background:#fff; border:1px solid #e5e7eb;
+    border-radius:8px; padding:12px 16px;
+}
+.metric-box-label { font-size:0.7rem; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px; }
+.metric-box-value { font-size:1.4rem; font-weight:700; color:#111827; }
+
+/* Диалог интервью */
+.phase-header {
+    font-size:0.72rem; font-weight:600; letter-spacing:0.8px;
+    text-transform:uppercase; color:#6b7280;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 10px; margin: 14px 0 8px 0;
+}
+.chat-q { color:#374151; font-size:0.88rem; margin:4px 0 2px 16px; font-style:italic; }
+.chat-a {
+    background:#f9fafb; border-left:3px solid #d1d5db;
+    padding:8px 14px; border-radius:0 6px 6px 0;
+    margin:2px 0 10px 16px; font-size:0.9rem; color:#111827;
+}
+
+/* Убираем стандартные иконки streamlit-метрик */
+[data-testid="stMetricDelta"] svg { display:none; }
+</style>
+""", unsafe_allow_html=True)
+
+# ── Шапка ────────────────────────────────────────────────────
+st.markdown("""
+<div class="app-header">
+  <p class="app-title">AI Startup Validator</p>
+  <p class="app-subtitle">Инструмент предварительной валидации бизнес-идей · Mom Test · Lean Startup</p>
+</div>
+""", unsafe_allow_html=True)
+
+# Счётчик запусков
 _remaining = get_remaining_runs()
 _limit_reached = _remaining == 0
 if _limit_reached:
     _reset_time = next_reset_info()
-    st.error(f"🚫 **Дневной лимит исчерпан** — {MAX_DAILY_RUNS}/{MAX_DAILY_RUNS} запусков использовано сегодня. Лимит сбросится через **{_reset_time}** ⏳")
+    st.error(f"Дневной лимит исчерпан — {MAX_DAILY_RUNS}/{MAX_DAILY_RUNS} запусков использовано. Лимит сбросится через **{_reset_time}**")
 elif _remaining <= 3:
-    st.warning(f"⚠️ Осталось запусков сегодня: **{_remaining}** из {MAX_DAILY_RUNS} — используйте разумно!")
+    st.warning(f"Осталось запусков сегодня: **{_remaining}** из {MAX_DAILY_RUNS}")
 else:
-    st.info(f"✅ Осталось запусков сегодня: **{_remaining}** из {MAX_DAILY_RUNS}")
+    st.caption(f"Осталось запусков сегодня: {_remaining} из {MAX_DAILY_RUNS}")
 
 # ═══════════════════════════════════════════════════════════════
-# Боковая панель — только статус, без ввода ключей
+# Боковая панель
 # ═══════════════════════════════════════════════════════════════
 
 with st.sidebar:
-    st.header("⚙️ Статус")
+    st.markdown("**Статус системы**")
 
     _api_key = os.environ.get("OPENAI_API_KEY", "")
     _model   = os.environ.get("OPENAI_MODEL", config.MODEL)
     _base    = os.environ.get("OPENAI_BASE_URL", config.BASE_URL)
 
     if _api_key and _api_key != "your_api_key_here":
-        st.success(f"✅ API ключ подключён")
-        st.caption(f"🤖 Модель: `{_model}`")
-        st.caption(f"🌐 Провайдер: `{_base}`")
-        # Статус пула ключей
+        st.success("API подключён")
+        st.caption(f"Модель: `{_model}`")
+        st.caption(f"Провайдер: `{_base}`")
         try:
             _pool = config.get_pool_status()
-            _pool_color = "🟢" if _pool["alive_keys"] == _pool["total_keys"] else "🟡" if _pool["alive_keys"] > 0 else "🔴"
-            st.caption(f"{_pool_color} Ключей: {_pool['alive_keys']}/{_pool['total_keys']} живых | Ошибок: {_pool['total_errors']}")
+            _status = "норма" if _pool["alive_keys"] == _pool["total_keys"] else "частично" if _pool["alive_keys"] > 0 else "все исчерпаны"
+            st.caption(f"Ключей: {_pool['alive_keys']}/{_pool['total_keys']} ({_status})")
         except Exception:
             pass
     else:
-        st.error("❌ API ключ не настроен")
+        st.error("API ключ не настроен")
         st.markdown(
-            "Откройте файл **`config.py`** и вставьте ваш API ключ:\n\n"
-            "```python\nAPI_KEY = \"ваш_ключ_здесь\"\n```\n\n"
-            "Получить бесплатный ключ Groq: [console.groq.com](https://console.groq.com/)"
+            "Получить бесплатный ключ: [console.groq.com](https://console.groq.com/)"
         )
 
     st.divider()
 
-    # ── Блок живых бенчмарков ──
-    st.markdown("📊 **Бенчмарки** (World Bank API + авторитетные отчёты)")
-    st.caption("🔄 Авто-обновление при каждом анализе | Кэш: 7 дней")
+    st.markdown("**Отраслевые бенчмарки**")
+    st.caption("World Bank API + авторитетные отчёты · Кэш: 7 дней")
 
-    _rt_info = st.session_state.get("rt_bench_info", "⏳ Будут загружены при запуске анализа")
+    _rt_info = st.session_state.get("rt_bench_info", "Загрузятся при запуске анализа")
     _bench_loaded = "realtime_benchmark" in st.session_state
     if _bench_loaded:
         st.success(_rt_info[:80] if len(_rt_info) > 80 else _rt_info)
     else:
-        st.info(_rt_info)
+        st.caption(_rt_info)
 
-    if st.button("🔄 Обновить бенчмарки вручную", use_container_width=True):
+    if st.button("Обновить бенчмарки", use_container_width=True):
         if not _api_key or _api_key == "your_api_key_here":
-            st.error("⚠️ Сначала настройте API ключ в config.py!")
+            st.error("Сначала настройте API ключ")
         else:
-            with st.spinner("🌐 Обновляем: World Bank GDP + парсинг отраслевых отчётов..."):
+            with st.spinner("Обновляем данные..."):
                 _bt = st.session_state.get("_last_bt", BusinessType.MARKETPLACE)
                 _ct = st.session_state.get("_last_country", "kazakhstan")
                 _desc = st.session_state.get("_last_desc", "")
@@ -139,10 +228,10 @@ if "report" not in st.session_state:
 # ═══════════════════════════════════════════════════════════════
 
 tab1, tab2, tab3, tab4 = st.tabs([
-    "📝 Ваша идея",
-    "🧑‍🤝‍🧑 AI Customer Discovery",
-    "💡 Рекомендации и оценка",
-    "💬 Оставить отзыв",
+    "Ваша идея",
+    "Customer Discovery",
+    "Результаты и оценка",
+    "Оставить отзыв",
 ])
 
 
@@ -151,7 +240,7 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # ═══════════════════════════════════════════════════════════════
 
 with tab1:
-    st.subheader("Опишите вашу бизнес-идею")
+    st.subheader("Описание бизнес-идеи")
 
     col_left, col_right = st.columns([3, 2])
 
@@ -172,7 +261,6 @@ with tab1:
             placeholder="Кто ваш клиент?",
         )
 
-        # Выбор типа бизнеса (показываем display_name)
         bt_options = list(BusinessType)
         bt_display = [BENCHMARKS[bt].display_name for bt in bt_options]
         bt_index = st.selectbox(
@@ -182,48 +270,44 @@ with tab1:
             help="Gig Economy / Freelance Platform — платформа комиссионного типа (как Upwork, Fiverr, YouDo)",
         )
         business_type = bt_options[bt_index]
-        # Для Gig Economy рекомендуем модель комиссии
         _gig_selected = business_type == BusinessType.GIG_ECONOMY
         if _gig_selected:
-            st.info("💡 **Gig Economy** — рекомендуемая модель монетизации: **Комиссия со сделок**. Платформа берёт % от каждой транзакции между заказчиком и исполнителем.")
+            st.info("Gig Economy — рекомендуемая модель монетизации: **Комиссия со сделок**.")
 
         country = st.selectbox(
             "Страна",
             options=["kazakhstan", "russia", "usa", "global"],
             format_func=lambda c: {
-                "kazakhstan": "🇰🇿 Казахстан",
-                "russia": "🇷🇺 Россия",
-                "usa": "🇺🇸 США",
-                "global": "🌍 Глобальный",
+                "kazakhstan": "Казахстан",
+                "russia": "Россия",
+                "usa": "США",
+                "global": "Глобальный рынок",
             }.get(c, c),
         )
-        
+
         language = st.selectbox(
             "Язык интервью",
             options=["Русский", "Қазақша"],
         )
 
-        # Сохраняем для кнопки бенчмарков в сайдбаре
         st.session_state["_last_bt"] = business_type
         st.session_state["_last_country"] = country
         st.session_state["_last_desc"] = description
 
     with col_right:
-        # ── Модель монетизации ────────────────────────────────
-        st.markdown("**💰 Модель монетизации**")
-        _default_rm_index = 2 if _gig_selected else 0  # Gig → COMMISSION по умолчанию
+        st.markdown("**Модель монетизации**")
+        _default_rm_index = 2 if _gig_selected else 0
         revenue_model_choice = st.radio(
             "Как платит пользователь?",
             options=list(RevenueModel),
             format_func=lambda m: {
-                RevenueModel.SUBSCRIPTION: "📅 Ежемесячная подписка",
-                RevenueModel.PAY_PER_USE:  "🎫 Оплата за использование",
-                RevenueModel.COMMISSION:   "💸 Комиссия со сделок (Gig / Marketplace)",
+                RevenueModel.SUBSCRIPTION: "Ежемесячная подписка",
+                RevenueModel.PAY_PER_USE:  "Оплата за использование",
+                RevenueModel.COMMISSION:   "Комиссия со сделок (Gig / Marketplace)",
             }[m],
             index=_default_rm_index,
         )
 
-        # ── Динамические поля в зависимости от модели ──
         price = 10.0
         price_per_use = 5.0
         avg_uses_per_month = 5.0
@@ -234,52 +318,48 @@ with tab1:
 
         if revenue_model_choice == RevenueModel.SUBSCRIPTION:
             price = st.number_input(
-                "💳 Цена подписки ($/мес)",
+                "Цена подписки ($/мес)",
                 min_value=0.1, step=1.0, value=10.0,
             )
-            st.info(f"ℹ️ Доход/пользователь/мес: **${price:.2f}**")
+            st.caption(f"Доход на пользователя в месяц: **${price:.2f}**")
 
         elif revenue_model_choice == RevenueModel.PAY_PER_USE:
             price_per_use = st.number_input(
-                "🎫 Цена за одно использование ($)",
+                "Цена за одно использование ($)",
                 min_value=0.01, step=0.5, value=5.0,
             )
             avg_uses_per_month = st.number_input(
-                "🔄 Средн. использований в мес (1 пользов.)",
+                "Среднее использований в месяц (1 пользователь)",
                 min_value=1.0, step=1.0, value=5.0,
             )
             eff = price_per_use * avg_uses_per_month
-            price = price_per_use  # храним price_per_use в price
-            st.info(f"ℹ️ Доход/пользователь/мес: **${eff:.2f}** ({avg_uses_per_month:.0f}×${price_per_use:.2f})")
+            price = price_per_use
+            st.caption(f"Доход на пользователя в месяц: **${eff:.2f}** ({avg_uses_per_month:.0f} × ${price_per_use:.2f})")
 
-        else:  # COMMISSION / GIG
+        else:
             if _gig_selected:
-                st.caption("💡 Gig: укажите среднюю стоимость заказа, % платформы и типичную активность исполнителя")
+                st.caption("Укажите среднюю стоимость заказа, % платформы и активность исполнителя")
             col_c1, col_c2 = st.columns(2)
             with col_c1:
-                _deal_label = "💵 Сред. стоимость заказа (₸)" if _gig_selected else "💵 Сред. чек сделки (₸)"
+                _deal_label = "Средняя стоимость заказа (₸)" if _gig_selected else "Средний чек сделки (₸)"
                 avg_deal_value = st.number_input(
                     _deal_label,
                     min_value=100.0, step=100.0, value=5000.0 if _gig_selected else 1500.0,
-                    help="Gig: сколько заказчик платит за один выполненный заказ",
                 )
-                _deals_label = "🔁 Заказов/мес (на 1 исполнителя)" if _gig_selected else "🔁 Сделок/мес/пользов."
+                _deals_label = "Заказов/мес (на 1 исполнителя)" if _gig_selected else "Сделок/мес/пользователь"
                 avg_deals_per_month = st.number_input(
                     _deals_label,
                     min_value=1.0, step=1.0, value=6.0 if _gig_selected else 4.0,
-                    help="Gig: среднее число завершённых заказов в месяц на активного исполнителя",
                 )
             with col_c2:
-                _comm_label = "% комиссии платформы (take rate)" if _gig_selected else "% комиссии платформы"
-                _comm_default = 15 if _gig_selected else 10
                 commission_pct = st.slider(
-                    _comm_label,
-                    min_value=1, max_value=35, value=_comm_default, step=1,
-                    help="Gig: Upwork берёт 20%, Fiverr ~31%, YouDo ~15%",
+                    "% комиссии платформы",
+                    min_value=1, max_value=35, value=15 if _gig_selected else 10, step=1,
+                    help="Upwork берёт 20%, Fiverr ~31%, YouDo ~15%",
                 )
                 commission_rate = commission_pct / 100.0
                 currency_to_usd = st.number_input(
-                    "💱 Курс (1 ₸ = ? $)",
+                    "Курс (1 ₸ = ? $)",
                     min_value=0.0001, step=0.0001,
                     value=0.0022, format="%.4f",
                 )
@@ -287,61 +367,48 @@ with tab1:
             earn_platform = avg_deal_value * commission_rate
             earn_worker = avg_deal_value - earn_platform
             eff_usd = avg_deal_value * currency_to_usd * commission_rate * avg_deals_per_month
-            _actor = "исполнитель" if _gig_selected else "продавец/получатель"
-            st.success(
-                f"📊 **Пример:** Заказ {avg_deal_value:.0f}₸ → "
-                f"{_actor} **{earn_worker:.0f}₸**, платформа **{earn_platform:.0f}₸** ({commission_pct}%)\n\n"
-                f"💰 **Доход платформы/исполнитель/мес:** ≈ **${eff_usd:.2f}** "
-                f"({avg_deals_per_month:.0f} заказов × {earn_platform:.0f}₸)"
+            _actor = "исполнитель" if _gig_selected else "продавец"
+            st.info(
+                f"Пример: заказ {avg_deal_value:.0f}₸ → "
+                f"{_actor} **{earn_worker:.0f}₸**, платформа **{earn_platform:.0f}₸** ({commission_pct}%)  \n"
+                f"Доход платформы на исполнителя в месяц: ≈ **${eff_usd:.2f}**"
             )
 
         st.markdown("---")
-        st.markdown("**💼 Финансовые параметры**")
+        st.markdown("**Финансовые параметры**")
         initial_capital = st.number_input(
-            "💼 Стартовый капитал ($)",
-            min_value=0.0,
-            step=1000.0,
-            value=10000.0,
+            "Стартовый капитал ($)",
+            min_value=0.0, step=1000.0, value=10000.0,
         )
         monthly_marketing_budget = st.number_input(
-            "📢 Маркетинговый бюджет ($/мес)",
-            min_value=0.0,
-            step=100.0,
-            value=500.0,
+            "Маркетинговый бюджет ($/мес)",
+            min_value=0.0, step=100.0, value=500.0,
         )
         monthly_operating_costs = st.number_input(
-            "🖥️ Операционные расходы ($/мес)",
-            min_value=0.0,
-            step=100.0,
-            value=300.0,
+            "Операционные расходы ($/мес)",
+            min_value=0.0, step=100.0, value=300.0,
         )
         market_size_estimate = st.number_input(
-            "🎯 TAM (кол-во потенциальных клиентов)",
-            min_value=1000,
-            step=10000,
-            value=100000,
+            "TAM (потенциальных клиентов)",
+            min_value=1000, step=10000, value=100000,
         )
-        
-        num_personas = st.number_input(
-            "👥 Количество респондентов",
-            min_value=1,
-            max_value=10,
-            value=5,
-            step=1,
-            help="Максимум 10 персон. Рекомендуем 5–7 для быстрого теста.",
-        )
-        st.caption(f"🔁 Будет сделано примерно **{int(num_personas) + 1}** API-вызовов (1 генерация персон + {int(num_personas)} интервью)")
 
-        # Информация о бенчмарке (реальные если есть, статичные иначе)
+        num_personas = st.number_input(
+            "Количество респондентов",
+            min_value=1, max_value=10, value=5, step=1,
+            help="Рекомендуем 5–7 для быстрого теста.",
+        )
+        st.caption(f"Будет выполнено ~{int(num_personas) + 1} API-запросов")
+
         active_bench = st.session_state.get("realtime_benchmark") or get_benchmark(business_type)
         bench_is_rt = "realtime_benchmark" in st.session_state
 
         st.markdown("---")
         st.markdown(
-            f"**📊 Бенчмарк: {active_bench.display_name}** "
-            + ("🟢 актуальный" if bench_is_rt else "🟡 статичный (2025)")
+            f"**Бенчмарк: {active_bench.display_name}** "
+            + ("· актуальный" if bench_is_rt else "· статичный (2025)")
         )
-        st.caption(f"Провал: {active_bench.failure_rate_12_months:.0%}")
+        st.caption(f"Провал за 12 мес: {active_bench.failure_rate_12_months:.0%}")
         st.caption(
             f"Конверсия: {active_bench.conversion_trial_to_paid.low:.0%} – "
             f"{active_bench.conversion_trial_to_paid.high:.0%}"
@@ -356,9 +423,8 @@ with tab1:
 
     col1, col2 = st.columns([3, 1])
     with col1:
-        # Блокируем кнопку если дневной лимит исчерпан
         _btn_disabled = _limit_reached
-        _btn_label = "🔬 Запустить валидацию" if not _btn_disabled else f"🚫 Лимит исчерпан — обновится через {next_reset_info()}"
+        _btn_label = "Запустить валидацию" if not _btn_disabled else f"Лимит исчерпан — обновится через {next_reset_info()}"
         start_btn = st.button(
             _btn_label,
             type="primary",
@@ -366,80 +432,67 @@ with tab1:
             disabled=_btn_disabled,
         )
     with col2:
-        if st.button("🗑 Очистить / Отменить", type="secondary", use_container_width=True):
+        if st.button("Очистить", type="secondary", use_container_width=True):
             st.session_state.clear()
             st.rerun()
 
     if start_btn:
-        # ── Проверка дневного лимита ──────────────────────────
         if get_remaining_runs() == 0:
             st.error(
-                f"🚫 **Дневной лимит исчерпан!**\n\n"
-                f"Сегодня уже было запущено **{MAX_DAILY_RUNS}** симуляций — это максимум для нашей группы.\n\n"
-                f"Приходите завтра — лимит сбросится автоматически в полночь. 🕛"
+                f"Дневной лимит исчерпан — сегодня запущено **{MAX_DAILY_RUNS}** симуляций.  \n"
+                f"Лимит сбросится автоматически в полночь."
             )
             st.stop()
 
-        # ── Проверка API ключа ────────────────────────────────
         _api_key_check = os.environ.get("OPENAI_API_KEY", "")
         if not _api_key_check or _api_key_check in ("вставьте_ваш_ключ_здесь", "your_api_key_here", ""):
-            st.error(
-                "❌ **API ключ не настроен!**\n\n"
-                "Без ключа симуляция невозможна. Обратитесь к организатору."
-            )
+            st.error("API ключ не настроен. Без ключа симуляция невозможна.")
             st.stop()
 
         errors = []
 
         def _is_gibberish(text: str) -> bool:
-            """Определяет мусорный ввод: повторяющиеся символы, слишком мало уникальных, нет пробелов."""
             t = text.strip()
             if not t:
                 return True
             unique_chars = len(set(t.lower()))
-            # Менее 5 уникальных символов в тексте длиннее 10 — явный мусор (ffffffff, 111111 и т.п.)
             if unique_chars < 5 and len(t) > 10:
                 return True
-            # Нет ни одного пробела и длина > 15 — скорее всего непрерывный мусор
             if " " not in t and len(t) > 15:
                 return True
-            # Один символ повторяется более 40% текста
             most_common_ratio = max(t.lower().count(c) for c in set(t.lower())) / len(t)
             if most_common_ratio > 0.4 and len(t) > 10:
                 return True
             return False
 
         if not description.strip() or len(description.strip()) < 20:
-            errors.append("📝 **Описание идеи** — опишите подробнее (минимум 20 символов). Без этого интервью не даст смысловых результатов.")
+            errors.append("**Описание идеи** — опишите подробнее (минимум 20 символов).")
         elif _is_gibberish(description):
-            errors.append("📝 **Описание идеи** — похоже на случайный ввод. Опишите реальную бизнес-идею: что это, для кого, какую проблему решает.")
+            errors.append("**Описание идеи** — похоже на случайный ввод.")
 
         if not target_audience.strip() or len(target_audience.strip()) < 5:
-            errors.append("👥 **Целевая аудитория** — укажите кто ваш клиент (например: «фрилансеры 25–40 лет» или «малый бизнес»).")
+            errors.append("**Целевая аудитория** — укажите кто ваш клиент.")
         elif _is_gibberish(target_audience):
-            errors.append("👥 **Целевая аудитория** — похоже на случайный ввод. Укажите реальную аудиторию.")
+            errors.append("**Целевая аудитория** — похоже на случайный ввод.")
 
         if not name.strip() or len(name.strip()) < 2:
-            errors.append("🏷 **Название продукта** — введите название.")
+            errors.append("**Название продукта** — введите название.")
         elif _is_gibberish(name):
-            errors.append("🏷 **Название продукта** — похоже на случайный ввод.")
+            errors.append("**Название продукта** — похоже на случайный ввод.")
 
         if errors:
             for e in errors:
                 st.error(e)
             st.stop()
 
-        # ── Занимаем слот запуска ─────────────────────────────
         if not consume_run():
             st.error(
-                f"🚫 **Дневной лимит исчерпан!**\n\n"
-                f"Пока вы заполняли форму, кто-то использовал последний слот. "
-                f"Сегодня было запущено **{MAX_DAILY_RUNS}** симуляций.\n\n"
-                f"Приходите завтра — лимит сбросится в полночь. 🕛"
+                f"Дневной лимит исчерпан — использовано **{MAX_DAILY_RUNS}** симуляций.  \n"
+                f"Лимит сбросится в полночь."
             )
             st.stop()
 
-        st.info(f"🎫 Запуск {current_count()}/{MAX_DAILY_RUNS} на сегодня")
+        st.caption(f"Запуск {current_count()}/{MAX_DAILY_RUNS} на сегодня")
 
         business_input = BusinessInput(
             name=name,
@@ -449,7 +502,6 @@ with tab1:
             country=country,
             num_personas=num_personas,
             language=language,
-            # ── Модель монетизации ──
             revenue_model=revenue_model_choice,
             price=price,
             price_per_use=price_per_use,
@@ -458,7 +510,6 @@ with tab1:
             commission_rate=commission_rate,
             avg_deals_per_month=avg_deals_per_month,
             currency_to_usd=currency_to_usd,
-            # ── Финансы ──
             initial_capital=initial_capital,
             monthly_marketing_budget=monthly_marketing_budget,
             monthly_operating_costs=monthly_operating_costs,
@@ -466,10 +517,9 @@ with tab1:
         )
 
         try:
-            # 0. Автоматический fetch реальных бенчмарков из сети
             _api_ready = bool(os.environ.get("OPENAI_API_KEY", ""))
             if _api_ready:
-                with st.spinner("🌐 Получаем данные: World Bank API + авторитетные отчёты..."):
+                with st.spinner("Загружаем актуальные бенчмарки (World Bank API)..."):
                     _bench_rt, _bench_src = fetch_realtime_benchmarks(
                         business_input.business_type,
                         business_input.country,
@@ -477,64 +527,50 @@ with tab1:
                     )
                     st.session_state["realtime_benchmark"] = _bench_rt
                     st.session_state["rt_bench_info"] = _bench_src
-                st.success(f"✅ Бенчмарки обновлены: {_bench_rt.source}")
+                st.success(f"Бенчмарки обновлены: {_bench_rt.source}")
             else:
-                st.warning("⚠️ API ключ не установлен — используются статичные бенчмарки 2025")
+                st.warning("API ключ не установлен — используются статичные бенчмарки 2025")
 
-            # 1. Генерация персон (с определением возрастного профиля ЦА)
             from personas import _detect_age_profile
             _age_profile = _detect_age_profile(business_input)
             _age_label_map = {"youth": "школьники 12–17 лет", "student": "студенты 17–25 лет", "adult": "взрослые 18–55 лет"}
-            st.info(f"👥 Возрастной профиль ЦА: **{_age_label_map.get(_age_profile['label'], '?')}**")
-            with st.spinner("⚙️ Генерация синтетических персон..."):
+            st.caption(f"Возрастной профиль ЦА: **{_age_label_map.get(_age_profile['label'], '?')}**")
+
+            with st.spinner("Генерация синтетических персон..."):
                 personas = generate_personas(business_input, count=business_input.num_personas)
-            st.success(f"✅ Сгенерировано {len(personas)} персон")
+            st.success(f"Сгенерировано {len(personas)} персон")
 
-            # 1.5 Поиск конкурентов и анализ рынка
-            with st.spinner("🌍 Исследование конкурентов и рынка..."):
+            with st.spinner("Исследование конкурентов и рынка..."):
                 market_research_report = analyze_market_competitors(business_input)
-            st.success(f"✅ Анализ конкурентов завершен ({market_research_report.competition_level.lower()} конкуренция)")
+            st.success(f"Анализ конкурентов завершён ({market_research_report.competition_level.lower()} конкуренция)")
 
-            # 2. AI-интервью (двухфазный Mom Test, последовательно)
-            # Проверяем наличие живых ключей БЕЗ потребления cooldown-слота
             _pool_check = config.get_pool_status()
             if _pool_check["total_keys"] == 0:
-                st.error(
-                    "**❌ API ключи не настроены!**\n\n"
-                    "Добавьте ключи через `OPENAI_API_KEY` в Streamlit Secrets или переменные окружения.\n\n"
-                    "Получить бесплатные ключи Groq: [console.groq.com](https://console.groq.com/)"
-                )
+                st.error("API ключи не настроены. Добавьте ключи через Streamlit Secrets.")
                 st.stop()
             if _pool_check["alive_keys"] == 0:
-                st.error(
-                    "**❌ Все API ключи исчерпали дневной лимит!**\n\n"
-                    "Попробуйте завтра — лимиты Groq сбрасываются в полночь."
-                )
+                st.error("Все API ключи исчерпали дневной лимит. Попробуйте завтра.")
                 st.stop()
 
             with st.spinner(
-                f"🤖 AI Customer Interviews (Mom Test, 2 фазы)... "
-                f"Опрашиваем {business_input.num_personas} персон последовательно — "
-                f"ориентировочно {business_input.num_personas * 8}–{business_input.num_personas * 15} сек."
+                f"Проводим AI-интервью (Mom Test, 2 фазы) — {business_input.num_personas} персон, "
+                f"~{business_input.num_personas * 8}–{business_input.num_personas * 15} сек..."
             ):
                 responses = run_all_interviews(
                     personas, business_input, market_context=market_research_report.summary,
                     age_profile=_age_profile
                 )
 
-            # 3. Агрегация результатов интервью
             aggregated = aggregate_interviews(responses)
-            st.success(f"✅ Интервью завершены: {aggregated.total_personas} ответов")
+            st.success(f"Интервью завершены: {aggregated.total_personas} ответов")
             if aggregated.fallback_count > 0:
                 valid_count = aggregated.total_personas - aggregated.fallback_count
                 st.warning(
-                    f"⚠️ **{aggregated.fallback_count} из {len(personas)} интервью завершились ошибкой LLM.** "
-                    f"Итоговые метрики рассчитаны только по {valid_count} валидным ответам. "
-                    f"Проверьте API ключ и название модели в настройках."
+                    f"{aggregated.fallback_count} из {len(personas)} интервью завершились ошибкой LLM. "
+                    f"Метрики рассчитаны по {valid_count} валидным ответам."
                 )
 
-            # 4. Юнит-экономика и симуляция Монте-Карло
-            with st.spinner("💰 Расчёт юнит-экономики и вероятностного сценария (Монте-Карло)..."):
+            with st.spinner("Расчёт юнит-экономики и симуляция Монте-Карло..."):
                 active_bench = st.session_state.get("realtime_benchmark") or get_benchmark(business_input.business_type)
                 _product_type = detect_product_type(business_input)
                 unit_economics = calculate_unit_economics(
@@ -544,7 +580,6 @@ with tab1:
                     business_input, unit_economics, product_type=_product_type
                 )
 
-            # 5. Экспертные инсайты
             insights = generate_insights(
                 business_input=business_input,
                 interview_results=aggregated,
@@ -553,7 +588,6 @@ with tab1:
                 market_research=market_research_report,
             )
 
-            # 6. Общая взвешенная оценка жизнеспособности (Overall Viability Score)
             score, subscores = calculate_overall_viability_score(
                 interview_results=aggregated,
                 unit_economics=unit_economics,
@@ -561,7 +595,6 @@ with tab1:
             )
             st.session_state["subscores"] = subscores
 
-            # 7. Сохранить отчёт
             st.session_state.report = ValidationReport(
                 business_input=business_input,
                 interview_results=aggregated,
@@ -576,26 +609,18 @@ with tab1:
 
         except QuotaExceededError as qe:
             st.error(
-                f"🚫 **API ключ исчерпал лимит!**\n\n"
-                f"{qe}\n\n"
-                f"**Что делать:**\n"
-                f"- Попробуйте запустить завтра (лимиты сбрасываются в полночь)\n"
-                f"- Или обратитесь к организатору для замены ключа"
+                f"API ключ исчерпал лимит.  \n{qe}  \n"
+                f"Попробуйте завтра или обратитесь к организатору."
             )
             st.stop()
 
         except Exception as e:
             err_str = str(e)
-            # Дополнительная защита — ловим quota-ошибки которые не стали QuotaExceededError
             quota_kw = ("quota", "exceeded", "billing", "resource_exhausted", "insufficient_quota")
             if any(kw in err_str.lower() for kw in quota_kw):
-                st.error(
-                    f"🚫 **API ключ исчерпал лимит токенов/запросов!**\n\n"
-                    f"Симуляция остановлена. Попробуйте завтра или смените ключ.\n\n"
-                    f"_Детали: {err_str[:200]}_"
-                )
+                st.error(f"API ключ исчерпал лимит токенов. Попробуйте завтра.  \n_{err_str[:200]}_")
             else:
-                st.error(f"❌ Ошибка во время валидации: {e}")
+                st.error(f"Ошибка во время валидации: {e}")
                 st.exception(e)
 
 
@@ -604,103 +629,89 @@ with tab1:
 # ═══════════════════════════════════════════════════════════════
 
 with tab2:
-    st.header("🧠 AI Customer Discovery")
-    st.caption(f"🤖 **Активная модель:** {get_llm_name()}")
+    st.header("Customer Discovery — результаты интервью")
+    st.caption(f"Активная модель: {get_llm_name()}")
 
     report: ValidationReport = st.session_state.report
 
     if report is None or report.interview_results is None:
-        st.info("👈 Сначала заполните данные и нажмите 'Запустить симуляцию' на первой вкладке.")
+        st.info("Заполните данные и нажмите «Запустить валидацию» на первой вкладке.")
         st.stop()
 
     ir = report.interview_results
-        
+
     if ir.fallback_count > 0:
         valid_count = ir.total_personas - ir.fallback_count
         st.warning(
-            f"⚠️ **Внимание:** {ir.fallback_count} из {ir.total_personas} интервью завершились ошибкой LLM. "
-            f"Метрики рассчитаны по {valid_count} валидным ответам. "
-            f"Персоны с ошибкой отмечены 🔴 ниже."
+            f"Внимание: {ir.fallback_count} из {ir.total_personas} интервью завершились ошибкой LLM. "
+            f"Метрики рассчитаны по {valid_count} валидным ответам."
         )
 
-    # ── Секция A: Сводка ──────────────────────────────────────
-    st.subheader("📋 Сводка AI Customer Discovery")
+    # ── Сводные метрики ───────────────────────────────────────
+    st.subheader("Сводка")
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("🎯 Острота проблемы", f"{ir.avg_problem_severity:.1f} / 10")
+        st.metric("Острота проблемы", f"{ir.avg_problem_severity:.1f} / 10")
     with col2:
-        st.metric("💳 Готовы купить", f"{ir.pct_would_buy * 100:.0f}%")
+        st.metric("Готовы купить", f"{ir.pct_would_buy * 100:.0f}%")
     with col3:
-        st.metric("⭐ Рекомендация (ср.)", f"{ir.avg_nps_score:.1f} / 10")
+        st.metric("Рекомендация (ср.)", f"{ir.avg_nps_score:.1f} / 10")
     with col4:
-        st.metric("📊 Solution Fit", f"{ir.avg_solution_fit:.1f} / 10")
+        st.metric("Solution Fit", f"{ir.avg_solution_fit:.1f} / 10")
 
     st.divider()
 
     col_pie, col_concerns = st.columns([1, 1])
 
-    # ── Секция B: Ценовое восприятие (Pie chart) ──────────────
     with col_pie:
-        st.subheader("💰 Ценовое восприятие")
+        st.markdown("**Ценовое восприятие**")
         fig_pie = go.Figure(data=[go.Pie(
             labels=["Дорого", "Нормально", "Дёшево"],
-            values=[
-                ir.pct_price_too_high,
-                ir.pct_price_ok,
-                ir.pct_price_too_low,
-            ],
+            values=[ir.pct_price_too_high, ir.pct_price_ok, ir.pct_price_too_low],
             marker_colors=["#e74c3c", "#2ecc71", "#3498db"],
-            hole=0.35,
+            hole=0.4,
         )])
         fig_pie.update_layout(
-            height=300,
+            height=280,
             margin=dict(t=10, b=10, l=10, r=10),
             showlegend=True,
+            font=dict(family="sans-serif"),
         )
         st.plotly_chart(fig_pie, use_container_width=True)
 
-    # ── Секция C: Топ-3 опасения ──────────────────────────────
     with col_concerns:
-        st.subheader("⚠️ Топ-3 опасения")
+        st.markdown("**Топ-3 опасения**")
         if ir.top_concerns:
             for concern in ir.top_concerns:
                 st.warning(concern)
         else:
-            st.info("Нет данных")
+            st.caption("Нет данных")
 
-        st.subheader("✨ Топ-3 желаемых фичи")
+        st.markdown("**Топ-3 желаемые функции**")
         if ir.top_desired_features:
             for feature in ir.top_desired_features:
                 st.info(feature)
         else:
-            st.info("Нет данных")
+            st.caption("Нет данных")
 
-    # ── Секция E: Детальные ответы персон ────────────────────
+    # ── Детальные ответы персон ───────────────────────────────
     st.divider()
-    st.subheader("👥 Детальные ответы персон")
+    st.subheader("Ответы персон")
 
-    _phase_labels = {1: "🔍 До знакомства с продуктом", 2: "💡 После знакомства с продуктом"}
-    _phase_colors = {1: "#1e3a5f", 2: "#1a3a1e"}
+    _phase_labels = {1: "Фаза 1 — До знакомства с продуктом", 2: "Фаза 2 — После знакомства с продуктом"}
 
     for resp in ir.responses:
-        buy_icon = '✅' if resp.would_buy else '❌'
-        error_icon = '🔴' if getattr(resp, 'is_error', False) else ''
-        with st.expander(f"{error_icon}**{resp.persona_name}** — {resp.persona_occupation} {buy_icon}"):
+        buy_label = "купит" if resp.would_buy else "не купит"
+        err_label = " · ошибка API" if getattr(resp, "is_error", False) else ""
+        with st.expander(f"{resp.persona_name} · {resp.persona_occupation} · {buy_label}{err_label}"):
 
-            # ── Ошибка API — показываем красный баннер, скрываем метрики ──
-            if getattr(resp, 'is_error', False):
+            if getattr(resp, "is_error", False):
                 st.error(
-                    f"**❌ Ответ не получен от LLM**\n\n"
-                    f"{resp.main_concern}\n\n"
-                    f"Метрики для этой персоны **недостоверны** и не отображаются. "
-                    f"Проверьте:\n"
-                    f"- Правильность API ключа\n"
-                    f"- Название модели (например: `openai/gpt-4o-mini`, `llama3-8b-8192`)\n"
-                    f"- Лимиты запросов у провайдера"
+                    f"Ответ не получен от LLM.  \n{resp.main_concern}  \n"
+                    f"Метрики для этой персоны недостоверны."
                 )
                 continue
 
-            # ── Диалог интервью ──────────────────────────────
             if resp.conversation:
                 current_phase = None
                 for turn in resp.conversation:
@@ -708,38 +719,30 @@ with tab2:
                     q     = turn.get("question", "")
                     a     = turn.get("answer", "")
 
-                    # Разделитель фаз
                     if phase != current_phase:
                         current_phase = phase
                         label = _phase_labels.get(phase, f"Фаза {phase}")
                         st.markdown(
-                            f"<div style='background:{_phase_colors.get(phase,'#1a1a2e')};"
-                            f"border-radius:6px;padding:6px 12px;margin:10px 0 6px 0;"
-                            f"font-size:0.8em;font-weight:600;color:#aaa'>{label}</div>",
+                            f"<div class='phase-header'>{label}</div>",
                             unsafe_allow_html=True,
                         )
 
                     if q:
                         st.markdown(
-                            f"<div style='color:#7eb8f7;font-size:0.85em;"
-                            f"margin:6px 0 2px 0'>🎤 {q}</div>",
+                            f"<div class='chat-q'>— {q}</div>",
                             unsafe_allow_html=True,
                         )
                     if a:
                         st.markdown(
-                            f"<div style='background:#1e1e2e;border-left:3px solid #555;"
-                            f"padding:8px 12px;border-radius:0 6px 6px 0;"
-                            f"margin:2px 0 8px 0;font-size:0.9em'>💬 {a}</div>",
+                            f"<div class='chat-a'>{a}</div>",
                             unsafe_allow_html=True,
                         )
                 st.divider()
             elif resp.raw_opinion:
-                # Fallback: если диалога нет — показываем raw_opinion как раньше
                 st.markdown(f"*«{resp.raw_opinion}»*")
                 st.divider()
 
-            # ── Итоговые метрики ─────────────────────────────
-            st.caption("📊 Итоговые оценки")
+            st.caption("Итоговые оценки")
             cols = st.columns(5)
             metrics = [
                 ("Острота проблемы", resp.problem_severity),
@@ -755,108 +758,119 @@ with tab2:
 
             st.markdown(
                 f"**Цена:** {resp.price_feedback} &nbsp;&nbsp; "
-                f"**Купит:** {'✅' if resp.would_buy else '❌'}"
+                f"**Купит:** {'да' if resp.would_buy else 'нет'}"
             )
             if resp.main_concern:
-                st.markdown(f"**⚠️ Опасение:** {resp.main_concern}")
+                st.markdown(f"**Опасение:** {resp.main_concern}")
             if resp.desired_feature:
-                st.markdown(f"**💡 Хочет фичу:** {resp.desired_feature}")
+                st.markdown(f"**Желаемая функция:** {resp.desired_feature}")
 
 
 # ═══════════════════════════════════════════════════════════════
-#  TAB 3 — Рекомендации и итоговая оценка
+#  TAB 3 — Результаты и оценка
 # ═══════════════════════════════════════════════════════════════
 
 with tab3:
     report = st.session_state.report
 
     if report is None:
-        st.info("ℹ️ Сначала запустите валидацию на вкладке «📝 Ваша идея»")
+        st.info("Сначала запустите валидацию на вкладке «Ваша идея»")
         st.stop()
 
-    # ── Секция 1: Overall Viability Score ─────────────────────
-    st.subheader("🏆 Инвестиционный скоринг жизнеспособности (Overall Viability Score)")
-    
+    # ── Overall Viability Score ───────────────────────────────
+    st.subheader("Общая оценка жизнеспособности (Overall Viability Score)")
+
     score = int(report.overall_score)
     col_score1, col_score2 = st.columns([1, 2])
-    
+
     with col_score1:
-        st.markdown(f"<h1 style='font-size: 3.5rem; margin-bottom: 0px;'>{score}<span style='font-size: 1.5rem; color: #888;'>/100</span></h1>", unsafe_allow_html=True)
-        st.progress(min(max(score / 100.0, 0.0), 1.0))
-        
+        # Определяем вердикт
         if score <= 25:
-            st.error("🔴 **Критический риск (Pivot Required)**\nПродукт требует пересмотра проблемы или целевой аудитории.")
+            verdict_class = "verdict-critical"
+            verdict_text  = "Критический риск — требуется пересмотр"
         elif score <= 50:
-            st.warning("🟠 **Высокий риск (High Risk)**\nСерьёзные расхождения в экономике или ценности решения.")
-        elif score <= 75:
-            st.info("🟡 **Умеренный риск (Early Traction Potential)**\nЕсть подтвержденный спрос, требуются точечные доработки.")
+            verdict_class = "verdict-warning"
+            verdict_text  = "Высокий риск — значительные доработки"
+        elif score <= 65:
+            verdict_class = "verdict-moderate"
+            verdict_text  = "Умеренный риск — необходима проверка"
         else:
-            st.success("🟢 **Перспективный проект (Strong PMF Signal)**\nСпрос и юнит-экономика сходятся. Готов к разработке MVP.")
+            verdict_class = "verdict-good"
+            verdict_text  = "Перспективная идея — рекомендуется пилот"
+
+        st.markdown(
+            f"<div class='score-card'>"
+            f"<div class='score-number'>{score}<span class='score-denom'>/100</span></div>"
+            f"<br><span class='{verdict_class}'>{verdict_text}</span>"
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+        st.progress(min(max(score / 100.0, 0.0), 1.0))
 
     with col_score2:
         subscores = st.session_state.get("subscores", {})
-        s_prob = subscores.get("problem_validation", 0.0)
-        s_fit = subscores.get("solution_fit", 0.0)
-        s_fin = subscores.get("financial_viability", 0.0)
-        penalties = subscores.get("penalties", 0.0)
-        
-        st.markdown("**Компоненты скоринга:**")
-        st.caption(f"🎯 **Валидация проблемы:** {s_prob:.1f} / 40.0")
-        st.progress(min(max(s_prob / 40.0, 0.0), 1.0))
-        
-        st.caption(f"💡 **Solution Fit & Спрос:** {s_fit:.1f} / 35.0")
-        st.progress(min(max(s_fit / 35.0, 0.0), 1.0))
-        
-        st.caption(f"💰 **Экономическая устойчивость:** {s_fin:.1f} / 25.0")
-        st.progress(min(max(s_fin / 25.0, 0.0), 1.0))
-        
-        if penalties > 0:
-            st.caption(f"⚠️ *Применены штрафы за критические риски (LTV<CAC, нет боли или короткий runway): -{penalties:.1f} б.*")
+        if subscores:
+            s_prob = subscores.get("problem_validation", 0.0)
+            s_fit  = subscores.get("solution_demand", 0.0)
+            s_fin  = subscores.get("financial_viability", 0.0)
+            penalties = subscores.get("penalties", 0.0)
+
+            st.markdown("**Компоненты скоринга**")
+            st.caption(f"Валидация проблемы: **{s_prob:.1f} / 40.0**")
+            st.progress(min(max(s_prob / 40.0, 0.0), 1.0))
+
+            st.caption(f"Solution Fit и спрос: **{s_fit:.1f} / 35.0**")
+            st.progress(min(max(s_fit / 35.0, 0.0), 1.0))
+
+            st.caption(f"Экономическая устойчивость: **{s_fin:.1f} / 25.0**")
+            st.progress(min(max(s_fin / 25.0, 0.0), 1.0))
+
+            if penalties > 0:
+                st.caption(f"Применены штрафы за критические риски: −{penalties:.1f} б.")
 
     st.divider()
 
-    # ── Секция 2: Юнит-экономика ──────────────────────────────
+    # ── Юнит-экономика ───────────────────────────────────────
     if report.unit_economics:
         ue = report.unit_economics
-        st.subheader("💰 Юнит-экономика и метрики масштабирования")
+        st.subheader("Юнит-экономика")
         st.caption("Расчёт на основе эффективного дохода, страновых коэффициентов и отраслевых бенчмарков")
 
         c1, c2, c3, c4 = st.columns(4)
         with c1:
-            st.metric("👤 LTV (Пожизненная ценность)", f"${ue.ltv:.2f}")
+            st.metric("LTV (пожизненная ценность)", f"${ue.ltv:.2f}")
         with c2:
-            st.metric("🎯 CAC (Стоимость привлечения)", f"${ue.cac:.2f}")
+            st.metric("CAC (стоимость привлечения)", f"${ue.cac:.2f}")
         with c3:
             ratio_delta = "Отлично (≥3.0x)" if ue.ltv_cac_ratio >= 3.0 else "Норма (1.5–3.0x)" if ue.ltv_cac_ratio >= 1.5 else "Убыточно (<1.0x)"
-            st.metric("⚖️ LTV : CAC", f"{ue.ltv_cac_ratio:.2f}x", delta=ratio_delta)
+            st.metric("LTV : CAC", f"{ue.ltv_cac_ratio:.2f}x", delta=ratio_delta)
         with c4:
-            st.metric("⏳ Окупаемость CAC (Payback)", f"{ue.cac_payback_months:.1f} мес.")
+            st.metric("Окупаемость CAC", f"{ue.cac_payback_months:.1f} мес.")
 
         c5, c6, c7, c8 = st.columns(4)
         with c5:
-            st.metric("🔥 Monthly Burn Rate", f"${ue.monthly_burn_rate:,.0f} / мес")
+            st.metric("Monthly Burn Rate", f"${ue.monthly_burn_rate:,.0f} / мес")
         with c6:
             r_label = f"{ue.runway_months} мес." if ue.runway_months < 900 else "∞"
-            st.metric("🛡️ Статический Runway", r_label)
+            st.metric("Runway (статический)", r_label)
         with c7:
             be_label = f"Месяц {ue.break_even_month}" if ue.break_even_month else "Не достигнута"
-            st.metric("🏁 Break-even (Безубыточность)", be_label)
+            st.metric("Break-even", be_label)
         with c8:
-            st.metric("📉 Базовый отток (Churn)", f"{ue.adjusted_churn * 100:.1f}%")
+            st.metric("Базовый отток (Churn)", f"{ue.adjusted_churn * 100:.1f}%")
 
-        # ── Дополнительные метрики кассового потока ──
         cf1, cf2, cf3 = st.columns(3)
         with cf1:
-            st.metric("🏦 Дно «кассовой ямы»", f"${ue.min_cash_balance:,.0f}", help="Минимальный остаток денег на счёте до выхода на самоокупаемость")
+            st.metric("Дно кассовой ямы", f"${ue.min_cash_balance:,.0f}", help="Минимальный остаток денег до выхода на самоокупаемость")
         with cf2:
-            st.metric("💸 Расход капитала до безубытка", f"${ue.peak_cash_drag:,.0f}", help="Сколько фактически сожжёт бизнес из стартового капитала до точки безубыточности")
+            st.metric("Расход капитала до безубытка", f"${ue.peak_cash_drag:,.0f}", help="Сколько сожжёт бизнес из стартового капитала")
         with cf3:
-            deficit_str = f"${ue.peak_capital_deficit:,.0f}" if ue.peak_capital_deficit > 0 else "✅ $0 (капитала хватает)"
-            st.metric("🚨 Дефицит капитала", deficit_str, help="Дополнительный капитал, необходимый для преодоления кассовой ямы")
+            deficit_str = f"${ue.peak_capital_deficit:,.0f}" if ue.peak_capital_deficit > 0 else "$0 (капитала хватает)"
+            st.metric("Дефицит капитала", deficit_str, help="Дополнительный капитал для преодоления кассовой ямы")
 
-        with st.expander("🔎 Детали бенчмарков и отраслевого контекста"):
+        with st.expander("Детали бенчмарков"):
             st.markdown(
-                f"- **Отраслевой LTV:CAC:** Медиана `{ue.benchmark_ltv_cac.median}x` (диапазон `{ue.benchmark_ltv_cac.low}x` – `{ue.benchmark_ltv_cac.high}x`)\n"
+                f"- **Отраслевой LTV:CAC:** медиана `{ue.benchmark_ltv_cac.median}x` (диапазон `{ue.benchmark_ltv_cac.low}x` – `{ue.benchmark_ltv_cac.high}x`)\n"
                 f"- **Отраслевой Churn:** `{ue.benchmark_churn.median * 100:.1f}%` в месяц\n"
                 f"- **Валовая маржа (Gross Margin):** `{ue.gross_margin * 100:.0f}%`\n"
                 f"- **Конверсия Trial-to-Paid:** `{ue.benchmark_conversion.low * 100:.1f}%` – `{ue.benchmark_conversion.high * 100:.1f}%`"
@@ -864,27 +878,24 @@ with tab3:
 
         st.divider()
 
-    # ── Секция 3: Симуляция Монте-Карло — Fan Chart ───────────────
+    # ── Монте-Карло Fan Chart ─────────────────────────────────
     if report.monte_carlo_results:
         mc = report.monte_carlo_results
         pt_label = {
-            "one_shot": "🔴 Разовая задача (Churn Cliff ожидается на 2–3 месяце)",
-            "recurring": "🟢 Постоянная потребность (отток снижается со временем)",
-            "periodic": "🟡 Периодический спрос (сезонные пики оттока)",
+            "one_shot":  "Разовая задача (Churn Cliff ожидается на 2–3 месяце)",
+            "recurring": "Постоянная потребность (отток снижается со временем)",
+            "periodic":  "Периодический спрос (сезонные пики оттока)",
         }.get(mc.product_type, mc.product_type)
 
-        st.subheader("📈 Вероятностный прогноз роста MRR (Fan Chart)")
+        st.subheader("Вероятностный прогноз роста MRR — Fan Chart")
         st.caption(
-            f"**Тип спроса продукта:** {pt_label} | "
-            f"{mc.num_simulations} симуляций · {mc.num_months} месяцев · "
-            f"Когортный отток · CAC Escalation · Шоковые события"
+            f"Тип спроса: {pt_label} · "
+            f"{mc.num_simulations} симуляций · {mc.num_months} месяцев"
         )
 
         months_x = list(range(mc.num_months + 1))
         fig_mc = go.Figure()
 
-        # ── Слой 1: Облако из 200 индивидуальных траекторий ────────
-        # Красные — сценарии банкротства (MRR → 0), синие — выжившие
         if mc.sample_trajectories:
             for traj in mc.sample_trajectories:
                 is_bankrupt = traj[-1] < (report.unit_economics.monthly_burn_rate * 0.1
@@ -898,7 +909,6 @@ with tab3:
                     hoverinfo="skip",
                 ))
 
-        # ── Слой 2: Заливка коридора P10–P90 ───────────────────────
         fig_mc.add_trace(go.Scatter(
             x=months_x + months_x[::-1],
             y=mc.mrr_p90 + mc.mrr_p10[::-1],
@@ -909,8 +919,6 @@ with tab3:
             name="Коридор вероятности (P10–P90)",
             hoverinfo="skip",
         ))
-
-        # ── Слой 3: Граничные линии P10 и P90 ──────────────────────
         fig_mc.add_trace(go.Scatter(
             x=months_x, y=mc.mrr_p90,
             mode="lines",
@@ -923,8 +931,6 @@ with tab3:
             line=dict(color="rgba(231,76,60,0.9)", width=1.8, dash="dot"),
             name=f"Пессимистичный P10 (${mc.mrr_p10[-1]:,.0f})",
         ))
-
-        # ── Слой 4: Медиана P50 — главная линия ────────────────────
         fig_mc.add_trace(go.Scatter(
             x=months_x, y=mc.mrr_p50,
             mode="lines",
@@ -932,13 +938,12 @@ with tab3:
             name=f"Медианный прогноз P50 (${mc.mrr_p50[-1]:,.0f})",
         ))
 
-        # ── Burn Rate — линия безубыточности ───────────────────────
         if report.unit_economics:
             br = report.unit_economics.monthly_burn_rate
             fig_mc.add_hline(
                 y=br,
                 line_dash="dot", line_color="#f39c12", line_width=1.5,
-                annotation_text=f"Burn Rate ${br:,.0f}/мес (точка безубыточности)",
+                annotation_text=f"Burn Rate ${br:,.0f}/мес",
                 annotation_position="bottom right",
                 annotation_font_color="#f39c12",
             )
@@ -958,50 +963,50 @@ with tab3:
         )
         st.plotly_chart(fig_mc, use_container_width=True)
 
-        # ── Метрики под графиком ────────────────────────────────────
         mc1, mc2, mc3, mc4 = st.columns(4)
         with mc1:
             bk_color = "inverse" if mc.bankruptcy_probability > 50 else "off"
-            st.metric("🎲 Риск банкротства (24 мес)", f"{mc.bankruptcy_probability:.1f}%",
-                      delta="⚠️ Высокий риск" if mc.bankruptcy_probability > 50 else "✅ Умеренный",
+            st.metric("Риск банкротства (24 мес)", f"{mc.bankruptcy_probability:.1f}%",
+                      delta="Высокий риск" if mc.bankruptcy_probability > 50 else "Умеренный",
                       delta_color=bk_color)
         with mc2:
             be_label = f"Месяц {mc.median_break_even_month}" if mc.median_break_even_month else "Не достигнута"
-            st.metric("🏁 Медианная безубыточность", be_label)
+            st.metric("Медианная безубыточность", be_label)
         with mc3:
-            st.metric("🚀 Вероятность $10K+ MRR", f"{mc.prob_reach_10k_mrr:.1f}%")
+            st.metric("Вероятность $10K+ MRR", f"{mc.prob_reach_10k_mrr:.1f}%")
         with mc4:
-            st.metric("👥 Вероятность 1 000+ клиентов", f"{mc.prob_reach_1k_users:.1f}%")
+            st.metric("Вероятность 1 000+ клиентов", f"{mc.prob_reach_1k_users:.1f}%")
 
-        # ── Траекторный стресс-анализ капитала ──
         if getattr(mc, "stress_capital_p10", 0) > 0:
-            st.markdown("**🛡️ Стресс-тест ликвидности (Траекторный анализ на 10 000 сценариев)**")
+            st.markdown("**Стресс-тест ликвидности (10 000 сценариев)**")
             sc1, sc2, sc3 = st.columns(3)
             with sc1:
-                st.metric("📉 Дно кассовой ямы P10 (стресс)", f"${mc.pathwise_min_balance_p10:,.0f}",
-                          help="Худшие 10% сценариев: баланс просаживается до этого значения")
+                st.metric("Дно кассовой ямы P10 (стресс)", f"${mc.pathwise_min_balance_p10:,.0f}",
+                          help="Худшие 10% сценариев")
             with sc2:
-                st.metric("📊 Дно кассовой ямы P50 (медиана)", f"${mc.pathwise_min_balance_p50:,.0f}",
-                          help="Медианный минимальный баланс среди всех сценариев")
+                st.metric("Дно кассовой ямы P50 (медиана)", f"${mc.pathwise_min_balance_p50:,.0f}")
             with sc3:
-                st.metric("🛡️ Капитал для 90% выживаемости", f"${mc.stress_capital_p10:,.0f}",
-                          help="Совокупный капитал, гарантирующий сохранение положительного баланса в 90% сценариев")
+                st.metric("Капитал для 90% выживаемости", f"${mc.stress_capital_p10:,.0f}")
 
         st.divider()
 
-    # ── Секция 4: Конкурентный анализ ─────────────────────────
+    # ── Конкурентный анализ ───────────────────────────────────
     if report.market_research:
         mr = report.market_research
-        st.subheader("🔍 Анализ конкурентной среды и позиционирование")
+        st.subheader("Анализ конкурентной среды")
 
-        c_badge_color = "🔴" if mr.competition_level in ("Высокая", "Олигополия / Доминирование гигантов") else "🟡" if mr.competition_level == "Умеренная" else "🟢"
-        st.markdown(f"**Плотность рынка:** {c_badge_color} `{mr.competition_level}`")
+        competition_map = {
+            "Высокая": "высокая",
+            "Олигополия / Доминирование гигантов": "олигополия",
+            "Умеренная": "умеренная",
+        }
+        c_level = competition_map.get(mr.competition_level, mr.competition_level.lower())
+        st.markdown(f"**Плотность рынка:** `{c_level}`")
         if mr.summary:
             st.info(mr.summary)
 
-        # Показываем веб-источники если они есть (реальный интернет-поиск)
         if getattr(mr, "web_sources", None):
-            with st.expander("🌐 Источники (реальный поиск в интернете)", expanded=False):
+            with st.expander("Источники (интернет-поиск)"):
                 for src_url in mr.web_sources:
                     st.markdown(f"- [{src_url}]({src_url})")
 
@@ -1011,46 +1016,45 @@ with tab3:
                 comp_rows.append({
                     "Конкурент": c.name,
                     "Категория": c.category,
-                    "Преимущества (Сила)": c.strengths,
-                    "Уязвимости (Слабости)": c.weaknesses,
+                    "Преимущества": c.strengths,
+                    "Уязвимости": c.weaknesses,
                     "Ценовая модель": c.price_point,
                 })
             df_comp = pd.DataFrame(comp_rows)
             st.dataframe(df_comp, use_container_width=True, hide_index=True)
 
-            # Карточки конкурентов с ценами крупнее
-            st.markdown("#### 💰 Ценовое сравнение конкурентов")
+            st.markdown("**Ценовое сравнение конкурентов**")
             price_cols = st.columns(min(len(mr.competitors), 4))
             for i, (col, comp) in enumerate(zip(price_cols, mr.competitors)):
                 with col:
-                    price_str = comp.price_point or "Н/Д"
-                    cat_icon = "🔴" if "Прямой" in comp.category else "🟡" if "Косвенный" in comp.category else "⚪"
+                    price_str = comp.price_point or "н/д"
+                    cat_label = "Прямой" if "Прямой" in comp.category else "Косвенный" if "Косвенный" in comp.category else "Иной"
                     st.metric(
-                        label=f"{cat_icon} {comp.name[:25]}",
+                        label=f"{comp.name[:25]} · {cat_label}",
                         value=price_str[:40],
-                        help=f"{comp.category}\n\n✅ {comp.strengths}\n\n❌ {comp.weaknesses}",
+                        help=f"{comp.category}\n\n+ {comp.strengths}\n\n− {comp.weaknesses}",
                     )
 
         if mr.differentiation_strategy:
-            st.success(f"💡 **Рекомендуемая стратегия дифференциации (УТП):**\n\n{mr.differentiation_strategy}")
+            st.success(f"**Рекомендуемая стратегия дифференциации (УТП):**  \n{mr.differentiation_strategy}")
 
         if mr.entry_barriers:
             st.markdown("**Барьеры входа на рынок:**")
             for b in mr.entry_barriers:
-                st.markdown(f"- 🧱 {b}")
+                st.markdown(f"- {b}")
 
         st.divider()
 
-    # ── Секция 5: Рекомендации и критические риски ─────────────
-    st.subheader("💡 Экспертные инсайты и рекомендации")
+    # ── Инсайты и рекомендации ────────────────────────────────
+    st.subheader("Экспертные инсайты и рекомендации")
 
     if report.insights:
         for insight in report.insights:
-            msg = f"**{insight.title}**\n\n{insight.message}"
+            msg = f"**{insight.title}**  \n{insight.message}"
             if insight.recommendation:
-                msg += f"\n\n*Рекомендация: {insight.recommendation}*"
+                msg += f"  \n*Рекомендация: {insight.recommendation}*"
             if insight.benchmark_ref:
-                msg += f"\n\n_Бенчмарк: {insight.benchmark_ref}_"
+                msg += f"  \n_Бенчмарк: {insight.benchmark_ref}_"
 
             if insight.severity == "critical":
                 st.error(msg)
@@ -1061,15 +1065,15 @@ with tab3:
             else:
                 st.info(msg)
     else:
-        st.info("Инсайты не сгенерированы")
+        st.caption("Инсайты не сгенерированы")
 
     st.divider()
 
-    # ── Секция 6: Экспорт полного отчета ──────────────────────
-    st.subheader("💾 Экспорт инвестиционного отчета")
+    # ── Экспорт ───────────────────────────────────────────────
+    st.subheader("Экспорт отчёта")
     report_json = report.model_dump_json(indent=2)
     st.download_button(
-        label="📥 Скачать полный инвестиционный отчет (JSON)",
+        label="Скачать полный отчёт (JSON)",
         data=report_json,
         file_name=f"startup_validation_{report.business_input.name or 'report'}.json",
         mime="application/json",
@@ -1081,10 +1085,9 @@ with tab3:
 # ═══════════════════════════════════════════════════════════════
 
 with tab4:
-    st.header("💬 Оставить отзыв")
-    st.caption("Ваш отзыв поможет улучшить инструмент — он придёт напрямую автору")
+    st.header("Оставить отзыв")
+    st.caption("Ваш отзыв поможет улучшить инструмент")
 
-    # Получаем данные об идее из отчёта если есть
     _report_for_fb: "ValidationReport" = st.session_state.get("report")
     _idea_name_fb  = ""
     _idea_score_fb = None
@@ -1099,23 +1102,23 @@ with tab4:
             "Ваша оценка",
             options=[1, 2, 3, 4, 5],
             value=5,
-            format_func=lambda x: {1: "1 ⭐", 2: "2 ⭐⭐", 3: "3 ⭐⭐⭐", 4: "4 ⭐⭐⭐⭐", 5: "5 ⭐⭐⭐⭐⭐"}[x],
+            format_func=lambda x: {1: "1 — плохо", 2: "2 — ниже среднего", 3: "3 — нормально", 4: "4 — хорошо", 5: "5 — отлично"}[x],
         )
 
         _text = st.text_area(
             "Ваш отзыв",
-            placeholder="Что понравилось? Что можно улучшить? Был ли результат полезен для вашей идеи?",
+            placeholder="Что понравилось? Что можно улучшить? Был ли результат полезен?",
             height=150,
             max_chars=1000,
         )
 
-        _submitted = st.form_submit_button("📨 Отправить отзыв", type="primary", use_container_width=True)
+        _submitted = st.form_submit_button("Отправить отзыв", type="primary", use_container_width=True)
 
     if _submitted:
         if not _text.strip():
-            st.warning("✏️ Напишите текст отзыва перед отправкой")
+            st.warning("Напишите текст отзыва перед отправкой")
         elif len(_text.strip()) < 5:
-            st.warning("✏️ Отзыв слишком короткий — напишите хотя бы пару слов")
+            st.warning("Отзыв слишком короткий")
         else:
             with st.spinner("Отправляем..."):
                 _ok = send_feedback(
@@ -1125,10 +1128,9 @@ with tab4:
                     idea_score=_idea_score_fb,
                 )
             if _ok:
-                st.success("✅ Спасибо за отзыв! Он уже у автора 🙏")
+                st.success("Спасибо за отзыв!")
                 st.balloons()
             else:
-                # Telegram/email не настроен или ошибка — сохраняем локально
                 import datetime as _dt
                 _fb_entry = {
                     "time":    str(_dt.datetime.now()),
@@ -1142,30 +1144,24 @@ with tab4:
                     with open(_fb_log, "a", encoding="utf-8") as _f:
                         import json as _json
                         _f.write(_json.dumps(_fb_entry, ensure_ascii=False) + "\n")
-                    st.success("✅ Отзыв сохранён! (Отзыв записан локально)")
+                    st.success("Отзыв сохранён локально")
                 except Exception:
-                    st.info("✅ Отзыв получен! Спасибо.")
+                    st.info("Отзыв получен. Спасибо.")
 
     st.divider()
 
-    # Подсказка для организатора
     if not is_email_configured():
-        with st.expander("⚙️ Для организатора: как настроить получение отзывов на email"):
+        with st.expander("Для организатора: настройка получения отзывов"):
             st.markdown("""
 **Шаг 1.** Включите двухфакторную аутентификацию на Gmail:
-
-[myaccount.google.com/security](https://myaccount.google.com/security) → «Двухэтапная аутентификация» → Включить
+[myaccount.google.com/security](https://myaccount.google.com/security)
 
 **Шаг 2.** Создайте «Пароль приложения»:
-
 [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
-→ Введите название «Startup Validator» → нажмите «Создать»
-→ Скопируйте **16-значный пароль** (вида `xxxx xxxx xxxx xxxx`)
+Введите название «Startup Validator» → нажмите «Создать» → скопируйте 16-значный пароль.
 
 **Шаг 3.** В Streamlit Cloud → Settings → Secrets добавьте:
 ```toml
 EMAIL_APP_PASSWORD = "xxxx xxxx xxxx xxxx"
 ```
-
-После этого все отзывы будут приходить на указанный email 📧
 """)
