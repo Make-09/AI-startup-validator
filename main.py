@@ -62,6 +62,31 @@ st.markdown("""
 /* Убираем padding сверху */
 .block-container { padding-top: 1.5rem; }
 
+/* Баннер "Анализ завершён" */
+.done-banner {
+    background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
+    border: 1.5px solid #6ee7b7;
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.done-banner-icon { font-size: 1.5rem; }
+.done-banner-text { font-size: 0.95rem; font-weight: 600; color: #065f46; }
+.done-banner-sub  { font-size: 0.8rem; color: #047857; font-weight: 400; }
+
+/* Прогресс-шаги */
+.step-row { display:flex; align-items:center; gap:10px; margin:6px 0; }
+.step-dot-done    { width:10px;height:10px;border-radius:50%;background:#10b981;flex-shrink:0; }
+.step-dot-active  { width:10px;height:10px;border-radius:50%;background:#3b82f6;flex-shrink:0;animation:pulse 1s infinite; }
+.step-dot-pending { width:10px;height:10px;border-radius:50%;background:#d1d5db;flex-shrink:0; }
+.step-text-done    { font-size:0.85rem;color:#065f46; }
+.step-text-active  { font-size:0.85rem;color:#1d4ed8;font-weight:600; }
+.step-text-pending { font-size:0.85rem;color:#9ca3af; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
 /* Шапка */
 .app-header {
     border-bottom: 2px solid #e0e0e0;
@@ -222,6 +247,38 @@ with st.sidebar:
 # ═══════════════════════════════════════════════════════════════
 if "report" not in st.session_state:
     st.session_state.report = None
+
+# ── Авто-переключение на вкладку "Результаты" после анализа ──
+if st.session_state.get("_go_to_results"):
+    st.session_state["_go_to_results"] = False
+    # JS: находим кнопку вкладки по тексту и кликаем на неё
+    import streamlit.components.v1 as _components
+    _components.html("""
+    <script>
+    setTimeout(function() {
+        var tabs = window.parent.document.querySelectorAll('button[role="tab"]');
+        for (var i = 0; i < tabs.length; i++) {
+            if (tabs[i].innerText.includes('Результаты')) {
+                tabs[i].click();
+                break;
+            }
+        }
+    }, 300);
+    </script>
+    """, height=0)
+
+# ── Баннер "Анализ завершён" ──────────────────────────────────
+if st.session_state.get("_show_done_banner") and st.session_state.report is not None:
+    _score = int(st.session_state.report.overall_score)
+    st.markdown(f"""
+    <div class="done-banner">
+        <div class="done-banner-icon">✓</div>
+        <div>
+            <div class="done-banner-text">Анализ завершён — Overall Score: {_score}/100</div>
+            <div class="done-banner-sub">Результаты доступны на вкладке «Результаты и оценка»</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════════════
 #  ВКЛАДКИ
@@ -517,33 +574,53 @@ with tab1:
         )
 
         try:
+            # ── Прогресс-шаги ─────────────────────────────────────
+            STEPS = [
+                "Загрузка актуальных бенчмарков",
+                "Генерация персон",
+                "Анализ конкурентов",
+                "AI-интервью (Mom Test)",
+                "Расчёт экономики и Монте-Карло",
+            ]
+
+            def _progress_ui(current: int):
+                """Показывает прогресс-шаги (current = индекс активного шага)."""
+                html = "<div style='margin:12px 0 16px 0'>"
+                for i, label in enumerate(STEPS):
+                    if i < current:
+                        html += f"<div class='step-row'><div class='step-dot-done'></div><div class='step-text-done'>✓ {label}</div></div>"
+                    elif i == current:
+                        html += f"<div class='step-row'><div class='step-dot-active'></div><div class='step-text-active'>{label}...</div></div>"
+                    else:
+                        html += f"<div class='step-row'><div class='step-dot-pending'></div><div class='step-text-pending'>{label}</div></div>"
+                html += "</div>"
+                return html
+
+            _progress_placeholder = st.empty()
+
+            # Шаг 0: Бенчмарки
+            _progress_placeholder.markdown(_progress_ui(0), unsafe_allow_html=True)
             _api_ready = bool(os.environ.get("OPENAI_API_KEY", ""))
             if _api_ready:
-                with st.spinner("Загружаем актуальные бенчмарки (World Bank API)..."):
-                    _bench_rt, _bench_src = fetch_realtime_benchmarks(
-                        business_input.business_type,
-                        business_input.country,
-                        business_input.description,
-                    )
-                    st.session_state["realtime_benchmark"] = _bench_rt
-                    st.session_state["rt_bench_info"] = _bench_src
-                st.success(f"Бенчмарки обновлены: {_bench_rt.source}")
-            else:
-                st.warning("API ключ не установлен — используются статичные бенчмарки 2025")
+                _bench_rt, _bench_src = fetch_realtime_benchmarks(
+                    business_input.business_type,
+                    business_input.country,
+                    business_input.description,
+                )
+                st.session_state["realtime_benchmark"] = _bench_rt
+                st.session_state["rt_bench_info"] = _bench_src
 
+            # Шаг 1: Персоны
+            _progress_placeholder.markdown(_progress_ui(1), unsafe_allow_html=True)
             from personas import _detect_age_profile
             _age_profile = _detect_age_profile(business_input)
-            _age_label_map = {"youth": "школьники 12–17 лет", "student": "студенты 17–25 лет", "adult": "взрослые 18–55 лет"}
-            st.caption(f"Возрастной профиль ЦА: **{_age_label_map.get(_age_profile['label'], '?')}**")
+            personas = generate_personas(business_input, count=business_input.num_personas)
 
-            with st.spinner("Генерация синтетических персон..."):
-                personas = generate_personas(business_input, count=business_input.num_personas)
-            st.success(f"Сгенерировано {len(personas)} персон")
+            # Шаг 2: Конкуренты
+            _progress_placeholder.markdown(_progress_ui(2), unsafe_allow_html=True)
+            market_research_report = analyze_market_competitors(business_input)
 
-            with st.spinner("Исследование конкурентов и рынка..."):
-                market_research_report = analyze_market_competitors(business_input)
-            st.success(f"Анализ конкурентов завершён ({market_research_report.competition_level.lower()} конкуренция)")
-
+            # Шаг 3: Интервью
             _pool_check = config.get_pool_status()
             if _pool_check["total_keys"] == 0:
                 st.error("API ключи не настроены. Добавьте ключи через Streamlit Secrets.")
@@ -552,33 +629,31 @@ with tab1:
                 st.error("Все API ключи исчерпали дневной лимит. Попробуйте завтра.")
                 st.stop()
 
-            with st.spinner(
-                f"Проводим AI-интервью (Mom Test, 2 фазы) — {business_input.num_personas} персон, "
-                f"~{business_input.num_personas * 8}–{business_input.num_personas * 15} сек..."
-            ):
-                responses = run_all_interviews(
-                    personas, business_input, market_context=market_research_report.summary,
-                    age_profile=_age_profile
-                )
-
+            _age_label_map = {"youth": "школьники 12–17 лет", "student": "студенты 17–25 лет", "adult": "взрослые 18–55 лет"}
+            _progress_placeholder.markdown(
+                _progress_ui(3) +
+                f"<div style='font-size:0.8rem;color:#6b7280;margin-top:4px'>"
+                f"Опрашиваем {business_input.num_personas} персон · "
+                f"~{business_input.num_personas * 8}–{business_input.num_personas * 15} сек · "
+                f"Аудитория: {_age_label_map.get(_age_profile['label'], '?')}</div>",
+                unsafe_allow_html=True,
+            )
+            responses = run_all_interviews(
+                personas, business_input, market_context=market_research_report.summary,
+                age_profile=_age_profile
+            )
             aggregated = aggregate_interviews(responses)
-            st.success(f"Интервью завершены: {aggregated.total_personas} ответов")
-            if aggregated.fallback_count > 0:
-                valid_count = aggregated.total_personas - aggregated.fallback_count
-                st.warning(
-                    f"{aggregated.fallback_count} из {len(personas)} интервью завершились ошибкой LLM. "
-                    f"Метрики рассчитаны по {valid_count} валидным ответам."
-                )
 
-            with st.spinner("Расчёт юнит-экономики и симуляция Монте-Карло..."):
-                active_bench = st.session_state.get("realtime_benchmark") or get_benchmark(business_input.business_type)
-                _product_type = detect_product_type(business_input)
-                unit_economics = calculate_unit_economics(
-                    business_input, active_bench, aggregated, product_type=_product_type
-                )
-                monte_carlo_res = run_monte_carlo_simulation(
-                    business_input, unit_economics, product_type=_product_type
-                )
+            # Шаг 4: Экономика
+            _progress_placeholder.markdown(_progress_ui(4), unsafe_allow_html=True)
+            active_bench = st.session_state.get("realtime_benchmark") or get_benchmark(business_input.business_type)
+            _product_type = detect_product_type(business_input)
+            unit_economics = calculate_unit_economics(
+                business_input, active_bench, aggregated, product_type=_product_type
+            )
+            monte_carlo_res = run_monte_carlo_simulation(
+                business_input, unit_economics, product_type=_product_type
+            )
 
             insights = generate_insights(
                 business_input=business_input,
@@ -595,6 +670,16 @@ with tab1:
             )
             st.session_state["subscores"] = subscores
 
+            # Скрываем прогресс-шаги — показываем "готово"
+            _progress_placeholder.empty()
+
+            if aggregated.fallback_count > 0:
+                valid_count = aggregated.total_personas - aggregated.fallback_count
+                st.warning(
+                    f"{aggregated.fallback_count} из {len(personas)} интервью завершились ошибкой LLM. "
+                    f"Метрики рассчитаны по {valid_count} валидным ответам."
+                )
+
             st.session_state.report = ValidationReport(
                 business_input=business_input,
                 interview_results=aggregated,
@@ -604,6 +689,10 @@ with tab1:
                 insights=insights,
                 overall_score=score,
             )
+
+            # Флаги для авто-перехода и баннера
+            st.session_state["_go_to_results"] = True
+            st.session_state["_show_done_banner"] = True
 
             st.rerun()
 
