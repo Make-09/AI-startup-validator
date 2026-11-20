@@ -275,37 +275,103 @@ div[data-testid="stMarkdownContainer"] p {
     color: #334155 !important;
 }
 
-/* ── Кнопки — БЕЛЫЕ ── */
-.stButton > button {
-    border-radius: 8px !important;
+/* ── Кнопки — современный премиальный SaaS стиль (не игрушечный) ── */
+.stButton > button,
+button[kind="secondary"],
+[data-testid="baseButton-secondary"] {
+    border-radius: 10px !important;
     font-weight: 600 !important;
-    font-size: 0.88rem !important;
-    padding: 0.5rem 1rem !important;
-    transition: all 0.15s ease !important;
+    font-size: 0.90rem !important;
+    min-height: 44px !important;
+    padding: 0.6rem 1.3rem !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
     background-color: #FFFFFF !important;
-    color: #0F172A !important;
-    border: 1px solid #CBD5E1 !important;
+    background: #FFFFFF !important;
+    color: #1E293B !important;
+    border: 1.5px solid #CBD5E1 !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
+    letter-spacing: 0.2px !important;
 }
-.stButton > button:hover {
-    background-color: #EFF6FF !important;
-    border-color: #2563EB !important;
-    color: #2563EB !important;
+.stButton > button:hover,
+button[kind="secondary"]:hover,
+[data-testid="baseButton-secondary"]:hover {
+    background-color: #F0F9FF !important;
+    background: #F0F9FF !important;
+    border-color: #38BDF8 !important;
+    color: #0284C7 !important;
+    box-shadow: 0 4px 14px rgba(56, 189, 248, 0.18) !important;
+    transform: translateY(-1px) !important;
 }
-.stButton > button[kind="primary"] {
+.stButton > button:active,
+button[kind="secondary"]:active,
+[data-testid="baseButton-secondary"]:active {
+    transform: translateY(0.5px) !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Главная кнопка действия (Запустить валидацию / Отправить) — элегантный свежий лазурный градиент */
+.stButton > button[kind="primary"],
+button[kind="primary"],
+[data-testid="baseButton-primary"],
+button[data-testid="stBaseButton-primary"] {
+    background: linear-gradient(135deg, #38BDF8 0%, #2563EB 55%, #1D4ED8 100%) !important;
     background-color: #2563EB !important;
-    color: #000000 !important;
-    border: 1px solid #1D4ED8 !important;
+    color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    border-radius: 10px !important;
     font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    min-height: 46px !important;
+    padding: 0.65rem 1.6rem !important;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.28), 0 1px 3px rgba(37, 99, 235, 0.15) !important;
+    letter-spacing: 0.3px !important;
+    text-shadow: 0 1px 2px rgba(15, 23, 42, 0.25) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 .stButton > button[kind="primary"] p,
-.stButton > button[kind="primary"] span {
-    color: #000000 !important;
+.stButton > button[kind="primary"] span,
+button[kind="primary"] p,
+button[kind="primary"] span,
+[data-testid="baseButton-primary"] p,
+[data-testid="baseButton-primary"] span {
+    color: #FFFFFF !important;
     font-weight: 700 !important;
+    letter-spacing: 0.3px !important;
+    text-shadow: 0 1px 2px rgba(15, 23, 42, 0.25) !important;
 }
-.stButton > button[kind="primary"]:hover {
-    background-color: #1D4ED8 !important;
-    border-color: #1D4ED8 !important;
-    color: #000000 !important;
+.stButton > button[kind="primary"]:hover,
+button[kind="primary"]:hover,
+[data-testid="baseButton-primary"]:hover {
+    background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 50%, #2563EB 100%) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 6px 22px rgba(37, 99, 235, 0.38) !important;
+    transform: translateY(-1.5px) !important;
+    filter: brightness(1.04) !important;
+}
+.stButton > button[kind="primary"]:active,
+button[kind="primary"]:active,
+[data-testid="baseButton-primary"]:active {
+    transform: translateY(0.5px) !important;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.22) !important;
+}
+
+/* Download button */
+[data-testid="stDownloadButton"] > button {
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    min-height: 44px !important;
+    background-color: #FFFFFF !important;
+    color: #1E293B !important;
+    border: 1.5px solid #CBD5E1 !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
+}
+[data-testid="stDownloadButton"] > button:hover {
+    background-color: #F0F9FF !important;
+    border-color: #38BDF8 !important;
+    color: #0284C7 !important;
+    box-shadow: 0 4px 14px rgba(56, 189, 248, 0.18) !important;
+    transform: translateY(-1px) !important;
 }
 
 /* ── Метрики ── */
@@ -573,9 +639,10 @@ section[data-testid="stSidebar"],
 [data-testid="stMetric"]:nth-child(3) { animation-delay:120ms; }
 [data-testid="stMetric"]:nth-child(4) { animation-delay:180ms; }
 
-/* ── Dark mode — всё то же самое, никаких тёмных фонов ── */
-@media (prefers-color-scheme: dark) {
+/* ── Dark mode и [data-theme="dark"] — полный принудительный светлый режим везде ── */
+@media (prefers-color-scheme: dark), [data-theme="dark"] {
     html, body, .stApp,
+    [data-theme="dark"] .stApp,
     [data-testid="stAppViewContainer"],
     [data-testid="stMain"],
     section[data-testid="stMain"],
@@ -583,28 +650,41 @@ section[data-testid="stSidebar"],
     div[data-testid="stVerticalBlock"],
     div[data-testid="stHorizontalBlock"] {
         background: transparent !important;
+        background-color: transparent !important;
         color: #334155 !important;
     }
     p, span, li, label { color: #334155 !important; }
     h1, h2, h3, h4, strong { color: #0F172A !important; }
     .hero-card, .comp-card, .score-card, .empty-state-card {
-        background: rgba(255,255,255,0.90) !important;
+        background: rgba(255,255,255,0.92) !important;
+        border-color: rgba(226, 232, 240, 0.8) !important;
     }
     .hero-title, .hero-desc, .hero-pill-title, .hero-pill-sub { color: #0F172A !important; }
-    .hero-pill { background: rgba(241,245,249,0.90) !important; }
-    [data-testid="stMetric"] { background: rgba(255,255,255,0.88) !important; }
+    .hero-pill { background: rgba(241,245,249,0.90) !important; border-color: rgba(226, 232, 240, 0.85) !important; }
+    [data-testid="stMetric"] { background: rgba(255,255,255,0.90) !important; border-color: rgba(226, 232, 240, 0.8) !important; }
     [data-testid="stMetricLabel"] { color: #64748B !important; }
     [data-testid="stMetricValue"] { color: #0F172A !important; }
-    .stButton > button {
-        background-color: rgba(255,255,255,0.95) !important;
-        color: #0F172A !important;
+    .stButton > button,
+    button[kind="secondary"],
+    [data-testid="baseButton-secondary"] {
+        background-color: #FFFFFF !important;
+        background: #FFFFFF !important;
+        color: #1E293B !important;
         border-color: #CBD5E1 !important;
     }
     .stButton > button[kind="primary"],
+    button[kind="primary"],
+    [data-testid="baseButton-primary"] {
+        background: linear-gradient(135deg, #38BDF8 0%, #2563EB 55%, #1D4ED8 100%) !important;
+        color: #FFFFFF !important;
+        border: 1px solid rgba(255, 255, 255, 0.35) !important;
+        font-weight: 700 !important;
+    }
     .stButton > button[kind="primary"] p,
-    .stButton > button[kind="primary"] span {
-        background-color: #2563EB !important;
-        color: #000000 !important;
+    .stButton > button[kind="primary"] span,
+    button[kind="primary"] p,
+    button[kind="primary"] span {
+        color: #FFFFFF !important;
         font-weight: 700 !important;
     }
     div[data-testid="stTextInput"] input,
@@ -803,7 +883,24 @@ _comp_meta.html("""
     }
     animate();
 
-    function fixPlotlyBg() {
+    function enforceLightAndFixBg() {
+        try {
+            window.parent.localStorage.setItem('stActiveTheme', '{"name":"Light"}');
+            window.parent.localStorage.setItem('theme', 'Light');
+            window.localStorage.setItem('stActiveTheme', '{"name":"Light"}');
+        } catch(e) {}
+
+        if (doc.documentElement.getAttribute('data-theme') !== 'light') {
+            doc.documentElement.setAttribute('data-theme', 'light');
+        }
+        if (doc.body.getAttribute('data-theme') !== 'light') {
+            doc.body.setAttribute('data-theme', 'light');
+        }
+        var darkContainers = doc.querySelectorAll('[data-theme="dark"]');
+        darkContainers.forEach(function(el) {
+            el.setAttribute('data-theme', 'light');
+        });
+
         var iframes = doc.querySelectorAll('.stPlotlyChart iframe');
         iframes.forEach(function(iframe) {
             try {
@@ -829,7 +926,7 @@ _comp_meta.html("""
             el.style.setProperty('color', '#0F172A', 'important');
         });
     }
-    setInterval(fixPlotlyBg, 400);
+    setInterval(enforceLightAndFixBg, 350);
 })();
 </script>
 """, height=0, width=0)
