@@ -160,32 +160,51 @@ div[data-baseweb="tab-border"] {
 }
 
 /* Стеклянная дорожка-капсула Apple Segmented Control (iOS Liquid Glass) */
+[data-testid="stTabs"] {
+    overflow: visible !important;
+}
+
+[data-testid="stTabs"] > div:first-child,
+div[data-baseweb="tab-bar"],
+div[data-baseweb="tab-border"] {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+    margin-bottom: 1.5rem !important;
+    padding: 0 !important;
+}
+
+/* Принудительно гасим любую синюю полоску и бордеры внутри stTabs */
+[data-testid="stTabs"] * {
+    border-bottom-color: transparent !important;
+}
+
 div[role="tablist"],
 [data-testid="stTabs"] [role="tablist"],
 div[data-baseweb="tab-list"],
 [data-baseweb="tab-list"] {
     position: relative !important;
-    display: inline-flex !important;
+    display: flex !important;
     align-items: center !important;
-    padding: 4px !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    padding: 5px !important;
     border-radius: 999px !important;
     
     /* Эффект матового стекла Apple */
-    background: rgba(255, 255, 255, 0.38) !important;
+    background: rgba(255, 255, 255, 0.40) !important;
     backdrop-filter: blur(20px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
     
     /* Тонкий стеклянный бортик и объемная тень */
-    border: 1px solid rgba(255, 255, 255, 0.65) !important;
+    border: 1px solid rgba(255, 255, 255, 0.75) !important;
     box-shadow: 
       0 8px 32px rgba(31, 38, 135, 0.07),
       inset 0 1px 1px rgba(255, 255, 255, 0.8),
       inset 0 -1px 2px rgba(0, 0, 0, 0.04) !important;
       
-    overflow-x: auto !important;
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-    max-width: 100% !important;
+    overflow: visible !important;
     border-bottom: none !important;
 }
 
@@ -196,20 +215,28 @@ div[data-baseweb="tab-list"]::-webkit-scrollbar {
     height: 0 !important;
 }
 
-/* Полностью скрываем синюю полоску подчеркивания и любые полоски-индикаторы */
+/* Полное уничтожение синей полоски подчеркивания и индикаторов BaseWeb */
+[data-baseweb="tab-highlight"],
 div[data-baseweb="tab-highlight"],
 div[data-baseweb="tab-border"],
-[role="tablist"] > div:not([role="tab"]):not(#apple-tab-glider) {
+[data-testid="stTabs"] [data-baseweb="tab-highlight"],
+[role="tablist"] div[style*="height: 2px"],
+[role="tablist"] div[style*="height:2px"],
+[role="tablist"] div[style*="rgb(37, 99, 235)"],
+[role="tablist"] div[style*="position: absolute"],
+[data-testid="stTabs"] *::after,
+[data-testid="stTabs"] *::before {
     display: none !important;
-    height: 0 !important;
-    width: 0 !important;
+    height: 0px !important;
+    width: 0px !important;
     opacity: 0 !important;
     visibility: hidden !important;
     background: transparent !important;
+    background-color: transparent !important;
     border: none !important;
 }
 
-/* Полностью убираем белую плашку с кнопкой-стрелкой прокрутки справа на мобилках */
+/* Полностью убираем белую плашку с кнопкой-стрелкой прокрутки справа */
 [data-testid="stTabs"] button:not([role="tab"]),
 [data-baseweb="tab-scroll-forward"],
 [data-baseweb="tab-scroll-backward"],
@@ -230,36 +257,14 @@ button[aria-label*="previous" i] {
     pointer-events: none !important;
 }
 
-/* Плавающая активная стеклянная пилюля Apple (glider) */
-#apple-tab-glider,
-.segment-glider {
-    position: absolute !important;
-    top: 4px !important;
-    left: 4px !important;
-    height: calc(100% - 8px) !important;
-    border-radius: 999px !important;
-    z-index: 1 !important;
-    pointer-events: none !important;
-    
-    /* Стеклянный блик активного элемента */
-    background: linear-gradient(
-      180deg, 
-      rgba(255, 255, 255, 0.95) 0%, 
-      rgba(255, 255, 255, 0.78) 100%
-    ) !important;
-    box-shadow: 
-      0 3px 10px rgba(0, 0, 0, 0.08),
-      0 1px 2px rgba(0, 0, 0, 0.04),
-      inset 0 1px 0 rgba(255, 255, 255, 1) !important;
-      
-    /* Пружинящая анимация как в iOS */
-    transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1), 
-                width 0.38s cubic-bezier(0.32, 0.72, 0, 1) !important;
-}
-
-/* Сами вкладки — прозрачные кнопки поверх стеклянной пилюли */
+/* Кнопки-вкладки — равномерно распределяются по всей капсуле */
 button[role="tab"],
 button[data-baseweb="tab"] {
+    flex: 1 1 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
     position: relative !important;
     z-index: 2 !important;
     appearance: none !important;
@@ -271,21 +276,21 @@ button[data-baseweb="tab"] {
     background: transparent !important;
     background-color: transparent !important;
     
-    padding: 8px 18px !important;
+    padding: 8px 14px !important;
     border-radius: 999px !important;
-    font-size: 14px !important;
+    font-size: 0.88rem !important;
     font-weight: 500 !important;
     color: #475569 !important;
     cursor: pointer !important;
     white-space: nowrap !important;
     user-select: none !important;
-    transition: color 0.25s ease, transform 0.15s ease !important;
+    transition: all 0.25s cubic-bezier(0.32, 0.72, 0, 1) !important;
 }
 
 button[role="tab"]:hover,
 button[data-baseweb="tab"]:hover {
     color: #0F172A !important;
-    background: transparent !important;
+    background: rgba(255, 255, 255, 0.35) !important;
     border: none !important;
     outline: none !important;
     box-shadow: none !important;
@@ -296,7 +301,6 @@ button[data-baseweb="tab"]:active {
     transform: scale(0.96) !important;
 }
 
-/* Убираем синюю рамку фокуса раз и навсегда */
 button[role="tab"]:focus,
 button[role="tab"]:focus-visible,
 button[data-baseweb="tab"]:focus,
@@ -307,17 +311,25 @@ button[data-baseweb="tab"]:focus-visible {
     border-bottom: none !important;
 }
 
-/* Активный текст */
+/* Активная вкладка — парящая стеклянная пилюля Apple (Liquid Glass Pill) */
 button[role="tab"][aria-selected="true"],
 button[data-baseweb="tab"][aria-selected="true"] {
+    background: linear-gradient(
+      180deg, 
+      rgba(255, 255, 255, 0.98) 0%, 
+      rgba(255, 255, 255, 0.82) 100%
+    ) !important;
+    background-color: rgba(255, 255, 255, 0.92) !important;
     color: #0F172A !important;
-    font-weight: 600 !important;
-    background: transparent !important;
-    background-color: transparent !important;
+    font-weight: 700 !important;
+    border-radius: 999px !important;
     border: none !important;
     border-bottom: none !important;
     outline: none !important;
-    box-shadow: none !important;
+    box-shadow: 
+      0 4px 14px rgba(0, 0, 0, 0.08),
+      0 1px 3px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 1) !important;
 }
 
 button[role="tab"][aria-selected="true"] p,
@@ -325,7 +337,7 @@ button[role="tab"][aria-selected="true"] span,
 button[data-baseweb="tab"][aria-selected="true"] p,
 button[data-baseweb="tab"][aria-selected="true"] span {
     color: #0F172A !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
 }
 
 @media (max-width: 640px) {
@@ -335,8 +347,8 @@ button[data-baseweb="tab"][aria-selected="true"] span {
     }
     button[role="tab"],
     button[data-baseweb="tab"] {
-        padding: 6px 12px !important;
-        font-size: 12.5px !important;
+        padding: 6px 8px !important;
+        font-size: 11.5px !important;
     }
 }
 
@@ -1248,21 +1260,27 @@ _comp_meta.html("""
             
             var isSel = tab.getAttribute('aria-selected') === 'true';
             if (isSel) {
+                tab.style.setProperty('background', 'linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.82) 100%)', 'important');
                 tab.style.setProperty('color', '#0F172A', 'important');
-                tab.style.setProperty('font-weight', '600', 'important');
+                tab.style.setProperty('font-weight', '700', 'important');
+                tab.style.setProperty('box-shadow', '0 4px 14px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 1)', 'important');
             } else {
+                tab.style.setProperty('background', 'transparent', 'important');
                 tab.style.setProperty('color', '#475569', 'important');
                 tab.style.setProperty('font-weight', '500', 'important');
+                tab.style.setProperty('box-shadow', 'none', 'important');
             }
         });
 
-        // Скрываем синюю полоску и белые кнопки прокрутки табов
-        var tabExtras = doc.querySelectorAll('[data-baseweb="tab-scroll-forward"], [data-baseweb="tab-scroll-backward"], [data-baseweb="tab-highlight"], [data-baseweb="tab-border"], [data-baseweb="tab-bar"] > button, [data-testid="stTabs"] button:not([role="tab"])');
+        // Уничтожаем любую синюю полоску и белые кнопки прокрутки табов
+        var tabExtras = doc.querySelectorAll('[data-baseweb="tab-scroll-forward"], [data-baseweb="tab-scroll-backward"], [data-baseweb="tab-highlight"], [data-baseweb="tab-border"], [data-baseweb="tab-bar"] > button, [data-testid="stTabs"] button:not([role="tab"]), [data-testid="stTabs"] div[style*="height: 2px"], [data-testid="stTabs"] div[style*="height:2px"], [data-testid="stTabs"] div[style*="rgb(37, 99, 235)"]');
         tabExtras.forEach(function(el) {
             el.style.setProperty('display', 'none', 'important');
             el.style.setProperty('width', '0px', 'important');
             el.style.setProperty('height', '0px', 'important');
             el.style.setProperty('opacity', '0', 'important');
+            el.style.setProperty('background', 'transparent', 'important');
+            el.style.setProperty('border', 'none', 'important');
         });
     }
     setInterval(enforceLightAndFixBg, 350);
