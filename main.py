@@ -293,12 +293,19 @@ div[data-testid="stMarkdownContainer"] p {
 }
 .stButton > button[kind="primary"] {
     background-color: #2563EB !important;
-    color: #FFFFFF !important;
-    border: 1px solid #2563EB !important;
+    color: #000000 !important;
+    border: 1px solid #1D4ED8 !important;
+    font-weight: 700 !important;
+}
+.stButton > button[kind="primary"] p,
+.stButton > button[kind="primary"] span {
+    color: #000000 !important;
+    font-weight: 700 !important;
 }
 .stButton > button[kind="primary"]:hover {
     background-color: #1D4ED8 !important;
     border-color: #1D4ED8 !important;
+    color: #000000 !important;
 }
 
 /* ── Метрики ── */
@@ -593,19 +600,24 @@ section[data-testid="stSidebar"],
         color: #0F172A !important;
         border-color: #CBD5E1 !important;
     }
-    .stButton > button[kind="primary"] {
+    .stButton > button[kind="primary"],
+    .stButton > button[kind="primary"] p,
+    .stButton > button[kind="primary"] span {
         background-color: #2563EB !important;
-        color: #FFFFFF !important;
+        color: #000000 !important;
+        font-weight: 700 !important;
     }
     div[data-testid="stTextInput"] input,
     div[data-testid="stTextArea"] textarea,
     div[data-testid="stNumberInput"] input,
+    div[data-baseweb="select"],
     div[data-baseweb="select"] > div,
     div[data-baseweb="select"] > div > div,
     div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
-        background-color: rgba(255, 255, 255, 0.92) !important;
+        background-color: #FFFFFF !important;
+        background: #FFFFFF !important;
         color: #0F172A !important;
-        border: 1px solid rgba(203, 213, 225, 0.90) !important;
+        border: 1px solid #CBD5E1 !important;
         border-radius: 8px !important;
     }
     div[data-baseweb="select"] span { color: #0F172A !important; }
@@ -1425,10 +1437,10 @@ with tab2:
 
         st.subheader("Сводка")
         _sc1, _sc2, _sc3, _sc4 = st.columns(4)
-        _sc1.metric("Острота проблемы", "— / 10")
-        _sc2.metric("Готовы купить", "—%")
-        _sc3.metric("Рекомендация (ср.)", "— / 10")
-        _sc4.metric("Solution Fit", "— / 10")
+        _sc1.metric("Острота проблемы", "– / 10")
+        _sc2.metric("Готовы купить", "–%")
+        _sc3.metric("Рекомендация (ср.)", "– / 10")
+        _sc4.metric("Solution Fit", "– / 10")
 
         st.divider()
         _col_pie, _col_con = st.columns([1, 1])
@@ -1451,17 +1463,17 @@ with tab2:
                 annotations=[dict(
                     text="<b>Ожидание<br>данных</b>",
                     x=0.5, y=0.5, font_size=13,
-                    showarrow=False, font_color="#94A3B8"
+                    showarrow=False, font_color="#0F172A"
                 )],
             )
             st.plotly_chart(_fig_sk, use_container_width=True)
         with _col_con:
             st.markdown("**Топ-3 опасения**")
-            for _t in ["— Ключевые барьеры перехода", "— Скрытые риски и недоверие", "— Ценовые возражения"]:
-                st.markdown(f'<div style="color:#94A3B8;font-size:0.88rem;padding:4px 0">{_t}</div>', unsafe_allow_html=True)
+            for _t in ["– Ключевые барьеры перехода", "– Скрытые риски и недоверие", "– Ценовые возражения"]:
+                st.markdown(f'<div style="color:#64748B;font-size:0.88rem;padding:4px 0">{_t}</div>', unsafe_allow_html=True)
             st.markdown("**Топ-3 желаемые функции**")
-            for _t in ["— MVP-требования", "— Функционал с WTP", "— Формат интеграции"]:
-                st.markdown(f'<div style="color:#94A3B8;font-size:0.88rem;padding:4px 0">{_t}</div>', unsafe_allow_html=True)
+            for _t in ["– MVP-требования", "– Функционал с WTP", "– Формат интеграции"]:
+                st.markdown(f'<div style="color:#64748B;font-size:0.88rem;padding:4px 0">{_t}</div>', unsafe_allow_html=True)
 
     else:
         _ir = _ir_report.interview_results
@@ -1624,38 +1636,34 @@ with tab3:
         with _c1:
             st.markdown(
                 "<div class='score-card'>"
-                "<div class='score-number' style='color:#CBD5E1;font-size:1.8rem'>—<span class='score-denom' style='font-size:0.95rem'>/100</span></div>"
+                "<div class='score-number' style='color:#64748B;font-size:1.8rem'>–<span class='score-denom' style='font-size:0.95rem'>/100</span></div>"
                 "<div style='margin-top:14px'><span class='badge-warning'>Ожидание симуляции</span></div>"
                 "</div>",
                 unsafe_allow_html=True,
             )
-            st.progress(0.0)
         with _c2:
             st.markdown("**Компоненты скоринга**")
-            st.caption("Валидация проблемы: **— / 40.0**")
-            st.progress(0.0)
-            st.caption("Solution Fit и спрос: **— / 35.0**")
-            st.progress(0.0)
-            st.caption("Экономическая устойчивость: **— / 25.0**")
-            st.progress(0.0)
+            st.caption("Валидация проблемы: **– / 40.0**")
+            st.caption("Solution Fit и спрос: **– / 35.0**")
+            st.caption("Экономическая устойчивость: **– / 25.0**")
 
         st.divider()
         st.subheader("Юнит-экономика")
         st.caption("Расчёт на основе эффективного дохода, страновых коэффициентов и отраслевых бенчмарков")
         _m1, _m2, _m3, _m4 = st.columns(4)
-        _m1.metric("LTV (пожизненная ценность)", "—")
-        _m2.metric("CAC (стоимость привлечения)", "—")
-        _m3.metric("LTV : CAC", "—")
-        _m4.metric("Окупаемость CAC", "—")
+        _m1.metric("LTV (пожизненная ценность)", "–")
+        _m2.metric("CAC (стоимость привлечения)", "–")
+        _m3.metric("LTV : CAC", "–")
+        _m4.metric("Окупаемость CAC", "–")
         _m5, _m6, _m7, _m8 = st.columns(4)
-        _m5.metric("Monthly Burn Rate", "—")
-        _m6.metric("Runway (статический)", "—")
-        _m7.metric("Break-even", "—")
-        _m8.metric("Базовый отток (Churn)", "—")
+        _m5.metric("Monthly Burn Rate", "–")
+        _m6.metric("Runway (статический)", "–")
+        _m7.metric("Break-even", "–")
+        _m8.metric("Базовый отток (Churn)", "–")
         _m9, _m10, _m11 = st.columns(3)
-        _m9.metric("Дно кассовой ямы", "—")
-        _m10.metric("Расход капитала до безубытка", "—")
-        _m11.metric("Дефицит капитала", "—")
+        _m9.metric("Дно кассовой ямы", "–")
+        _m10.metric("Расход капитала до безубытка", "–")
+        _m11.metric("Дефицит капитала", "–")
 
         st.divider()
         st.subheader("Вероятностный прогноз роста MRR — Fan Chart")
@@ -2103,21 +2111,3 @@ with tab4:
                     st.success("Отзыв сохранён локально")
                 except Exception:
                     st.info("Отзыв получен. Спасибо.")
-
-    st.divider()
-
-    if not is_email_configured():
-        with st.expander("Для организатора: настройка получения отзывов"):
-            st.markdown("""
-**Шаг 1.** Включите двухфакторную аутентификацию на Gmail:
-[myaccount.google.com/security](https://myaccount.google.com/security)
-
-**Шаг 2.** Создайте «Пароль приложения»:
-[myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
-Введите название «Startup Validator» → нажмите «Создать» → скопируйте 16-значный пароль.
-
-**Шаг 3.** В Streamlit Cloud → Settings → Secrets добавьте:
-```toml
-EMAIL_APP_PASSWORD = "xxxx xxxx xxxx xxxx"
-```
-""")
