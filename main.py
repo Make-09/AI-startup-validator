@@ -245,7 +245,7 @@ button[data-testid="stTab"] {
     flex: 1 1 0 !important;
     min-width: 0 !important;
     height: 38px !important;
-    padding: 0 16px !important;
+    padding: 0 24px !important;
     margin: 0 !important;
     border-radius: 999px !important;
     border: none !important;
@@ -266,13 +266,13 @@ button[data-testid="stTab"] {
 button[role="tab"]:first-child,
 button[role="tab"]:first-of-type,
 button[data-testid="stTab"]:first-child {
-    padding-left: 20px !important;
+    padding-left: 28px !important;
 }
 
 button[role="tab"]:last-child,
 button[role="tab"]:last-of-type,
 button[data-testid="stTab"]:last-child {
-    padding-right: 20px !important;
+    padding-right: 28px !important;
 }
 
 button[role="tab"] *,
@@ -1267,11 +1267,12 @@ _comp_meta.html("""
                 slider.style.setProperty('z-index', '0', 'important');
             }
 
-            // Позиционируем слайдер по активной вкладке
+            // Позиционируем слайдер по активной вкладке с дополнительным запасом по ширине (padding)
             var activeTab = tablist.querySelector('button[role="tab"][aria-selected="true"], button[data-baseweb="tab"][aria-selected="true"], [data-testid="stTab"][aria-selected="true"], [data-selected="true"]');
             if (activeTab && slider) {
-                var targetX = activeTab.offsetLeft;
-                var targetW = activeTab.offsetWidth;
+                var extraPadX = 8;
+                var targetX = activeTab.offsetLeft - extraPadX;
+                var targetW = activeTab.offsetWidth + (extraPadX * 2);
                 var targetH = activeTab.offsetHeight;
                 var targetTop = activeTab.offsetTop;
                 if (targetW > 0) {
@@ -1307,12 +1308,12 @@ _comp_meta.html("""
             tab.style.setProperty('flex', '1 1 0', 'important');
             tab.style.setProperty('min-width', '0px', 'important');
             tab.style.setProperty('height', '38px', 'important');
-            tab.style.setProperty('padding', '0 16px', 'important');
+            tab.style.setProperty('padding', '0 24px', 'important');
             if (idx === 0) {
-                tab.style.setProperty('padding-left', '22px', 'important');
+                tab.style.setProperty('padding-left', '28px', 'important');
             }
             if (idx === arr.length - 1) {
-                tab.style.setProperty('padding-right', '22px', 'important');
+                tab.style.setProperty('padding-right', '28px', 'important');
             }
             tab.style.setProperty('display', 'inline-flex', 'important');
             tab.style.setProperty('align-items', 'center', 'important');
@@ -1329,8 +1330,9 @@ _comp_meta.html("""
                     setTimeout(function() {
                         var sl = doc.getElementById('apple-tab-slider');
                         if (sl && tab && tab.offsetWidth > 0) {
-                            sl.style.setProperty('transform', 'translateX(' + tab.offsetLeft + 'px)', 'important');
-                            sl.style.setProperty('width', tab.offsetWidth + 'px', 'important');
+                            var extraPadX = 8;
+                            sl.style.setProperty('transform', 'translateX(' + (tab.offsetLeft - extraPadX) + 'px)', 'important');
+                            sl.style.setProperty('width', (tab.offsetWidth + extraPadX * 2) + 'px', 'important');
                         }
                     }, 0);
                 });
