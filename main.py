@@ -75,11 +75,10 @@ st.markdown("""
 
 /* ── Прозрачный фон везде ── */
 html, body,
-.stApp, [class*="st-"],
+.stApp,
 [data-testid="stAppViewContainer"],
 [data-testid="stMain"],
 section[data-testid="stMain"],
-.block-container,
 div[data-testid="stVerticalBlock"],
 div[data-testid="stHorizontalBlock"] {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
@@ -158,57 +157,78 @@ div[data-testid="stTabsContent"] {
     padding: 8px 0 !important;
 }
 
-/* ── Поля ввода и селекты — единый чистый светлый glassmorphism (все поля одинаково заполнены) ── */
+/* ── Поля ввода и селекты — 100% единый белый непрозрачный фон (#FFFFFF) на всех устройствах ── */
 div[data-testid="stTextInput"] input,
 div[data-testid="stTextArea"] textarea,
-div[data-testid="stNumberInput"] input,
-div[data-baseweb="select"] > div,
-div[data-baseweb="select"] > div > div,
-div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
-    background-color: rgba(255, 255, 255, 0.92) !important;
-    border: 1px solid rgba(203, 213, 225, 0.90) !important;
+div[data-testid="stNumberInput"] input {
+    background-color: #FFFFFF !important;
+    background: #FFFFFF !important;
+    border: 1px solid #CBD5E1 !important;
     border-radius: 8px !important;
     color: #0F172A !important;
     font-size: 0.92rem !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
-}
-div[data-baseweb="select"] span {
-    color: #0F172A !important;
     font-weight: 500 !important;
-    font-size: 0.92rem !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
 }
-div[data-baseweb="select"] svg {
-    fill: #64748B !important;
-}
-div[data-testid="stTextInput"] input::placeholder,
-div[data-testid="stTextArea"] textarea::placeholder {
-    color: #94A3B8 !important;
-}
+
 div[data-testid="stTextInput"] > div,
 div[data-testid="stTextArea"] > div,
 div[data-testid="stNumberInput"] > div {
     background-color: transparent !important;
+    background: transparent !important;
     border-color: transparent !important;
 }
+
+/* Выпадающие списки (st.selectbox) — точно такой же белый плотный фон #FFFFFF */
+div[data-testid="stSelectbox"] > div,
+div[data-testid="stSelectbox"] [data-baseweb="select"],
+div[data-testid="stSelectbox"] [data-baseweb="select"] > div,
+div[data-testid="stSelectbox"] [data-baseweb="select"] > div > div,
+[data-baseweb="select"],
+[data-baseweb="select"] > div,
+[data-baseweb="select"] > div > div {
+    background-color: #FFFFFF !important;
+    background: #FFFFFF !important;
+    border-color: #CBD5E1 !important;
+    border-radius: 8px !important;
+    min-height: 42px !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
+}
+
+div[data-testid="stSelectbox"] [data-baseweb="select"] span,
+[data-baseweb="select"] span,
+[data-baseweb="select"] div {
+    color: #0F172A !important;
+    font-weight: 500 !important;
+    font-size: 0.92rem !important;
+}
+
+div[data-testid="stSelectbox"] svg,
+[data-baseweb="select"] svg {
+    fill: #64748B !important;
+}
+
+div[data-testid="stTextInput"] input::placeholder,
+div[data-testid="stTextArea"] textarea::placeholder {
+    color: #94A3B8 !important;
+}
+
 div[data-testid="stTextInput"] input:focus,
 div[data-testid="stTextArea"] textarea:focus,
 div[data-baseweb="select"] > div:focus-within {
     border-color: #2563EB !important;
-    background-color: #FFFFFF !important;
     box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18) !important;
 }
 
-/* ── Dropdown выпадающее меню — светлый glassmorphism ── */
+/* ── Dropdown выпадающее меню — светлый чистый список ── */
 [data-baseweb="popover"] [role="listbox"],
 [data-baseweb="menu"],
 ul[data-baseweb="menu"] {
     background-color: #FFFFFF !important;
+    background: #FFFFFF !important;
     color: #0F172A !important;
     border: 1px solid #CBD5E1 !important;
     border-radius: 8px !important;
-    backdrop-filter: blur(16px) !important;
     box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12) !important;
 }
 [data-baseweb="option"] {
@@ -781,8 +801,23 @@ _comp_meta.html("""
                 }
             } catch(e) {}
         });
+
+        // Железобетонная фиксация белого фона для ВСЕХ полей ввода и выпадающих списков
+        var selects = doc.querySelectorAll('[data-baseweb="select"] > div, [data-baseweb="select"], div[data-testid="stSelectbox"] [data-baseweb="select"] > div');
+        selects.forEach(function(el) {
+            el.style.setProperty('background-color', '#FFFFFF', 'important');
+            el.style.setProperty('background', '#FFFFFF', 'important');
+            el.style.setProperty('border-color', '#CBD5E1', 'important');
+        });
+        var inputs = doc.querySelectorAll('div[data-testid="stTextInput"] input, div[data-testid="stTextArea"] textarea, div[data-testid="stNumberInput"] input');
+        inputs.forEach(function(el) {
+            el.style.setProperty('background-color', '#FFFFFF', 'important');
+            el.style.setProperty('background', '#FFFFFF', 'important');
+            el.style.setProperty('border-color', '#CBD5E1', 'important');
+            el.style.setProperty('color', '#0F172A', 'important');
+        });
     }
-    setInterval(fixPlotlyBg, 1000);
+    setInterval(fixPlotlyBg, 400);
 })();
 </script>
 """, height=0, width=0)
