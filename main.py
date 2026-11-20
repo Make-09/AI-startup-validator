@@ -143,14 +143,122 @@ h1, h2, h3, h4, h5, h6,
     color: #0F172A !important;
 }
 
-/* ── Вкладки ── */
+/* ── Вкладки в стиле Apple Glass Segmented Control ── */
+[data-testid="stTabs"] {
+    overflow: visible !important;
+}
+
+[data-testid="stTabs"] > div:first-child,
+div[data-baseweb="tab-bar"] {
+    background: transparent !important;
+    border-bottom: none !important;
+    margin-bottom: 1.25rem !important;
+    padding: 0 !important;
+}
+
+div[data-baseweb="tab-list"] {
+    display: inline-flex !important;
+    background: rgba(226, 232, 240, 0.55) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.75) !important;
+    border-radius: 14px !important;
+    padding: 4px !important;
+    gap: 4px !important;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.6) !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    max-width: 100% !important;
+}
+div[data-baseweb="tab-list"]::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Полностью скрываем синюю полоску подчеркивания и рамки BaseWeb */
+div[data-baseweb="tab-highlight"],
+div[data-baseweb="tab-border"] {
+    display: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+/* Полностью убираем белую плашку с кнопкой-стрелкой прокрутки справа на мобилках */
+[data-baseweb="tab-scroll-forward"],
+[data-baseweb="tab-scroll-backward"],
+[data-baseweb="tab-bar"] > button,
+[data-baseweb="tab-list"] + button,
+[data-baseweb="tab-list"] ~ button,
+button[aria-label*="scroll" i],
+button[aria-label*="next" i],
+button[aria-label*="previous" i] {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Сами вкладки — кнопки */
 button[data-baseweb="tab"] {
     background-color: transparent !important;
-    color: #64748B !important;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: none !important;
+    border-radius: 10px !important;
+    padding: 7px 16px !important;
+    color: #475569 !important;
+    font-weight: 500 !important;
+    font-size: 0.88rem !important;
+    letter-spacing: -0.1px !important;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    white-space: nowrap !important;
+    cursor: pointer !important;
 }
+button[data-baseweb="tab"]:hover {
+    color: #0F172A !important;
+    background: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* Активная вкладка — стеклянный переключатель как у Apple (Glass Pill) */
 button[data-baseweb="tab"][aria-selected="true"] {
-    color: #2563EB !important;
-    border-bottom: 2px solid #2563EB !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    color: #0F172A !important;
+    font-weight: 700 !important;
+    border-radius: 10px !important;
+    border-bottom: none !important;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12), 0 1px 2px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+}
+button[data-baseweb="tab"][aria-selected="true"] p,
+button[data-baseweb="tab"][aria-selected="true"] span {
+    color: #0F172A !important;
+    font-weight: 700 !important;
+}
+
+@media (max-width: 640px) {
+    div[data-baseweb="tab-list"] {
+        padding: 3px !important;
+        gap: 2px !important;
+        border-radius: 12px !important;
+    }
+    button[data-baseweb="tab"] {
+        padding: 6px 10px !important;
+        font-size: 0.80rem !important;
+        border-radius: 8px !important;
+    }
+    button[data-baseweb="tab"][aria-selected="true"] {
+        border-radius: 8px !important;
+    }
 }
 
 /* Tab panel — без лишней рамки (рамка уже на block-container) */
@@ -747,8 +855,14 @@ section[data-testid="stSidebar"],
     ul[data-baseweb="menu"] { background-color: #FFFFFF !important; color: #0F172A !important; border: 1px solid #CBD5E1 !important; }
     div[data-testid="stTabsContent"] { background: transparent !important; }
     .chat-a { background: rgba(248,250,252,0.90) !important; color: #0F172A !important; }
-    button[data-baseweb="tab"] { color: #334155 !important; }
-    button[data-baseweb="tab"][aria-selected="true"] { color: #1D4ED8 !important; }
+    button[data-baseweb="tab"] { color: #475569 !important; border-bottom: none !important; }
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background: rgba(255, 255, 255, 0.92) !important;
+        color: #0F172A !important;
+        font-weight: 700 !important;
+        border-bottom: none !important;
+        box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12) !important;
+    }
     .app-title { color: #0F172A !important; text-shadow: none !important; filter: none !important; }
     .app-subtitle { color: #334155 !important; text-shadow: none !important; filter: none !important; }
     div[data-testid="stTextInput"] label,
@@ -815,9 +929,11 @@ _comp_meta.html("""
         /* Шапка — строгий чистый текст БЕЗ glow/теней */
         '.app-title { color: #0F172A !important; text-shadow: none !important; filter: none !important; }',
         '.app-subtitle { color: #334155 !important; text-shadow: none !important; filter: none !important; }',
-        /* Вкладки — чистый текст */
-        'button[data-baseweb="tab"] { color: #334155 !important; font-weight: 500 !important; }',
-        'button[data-baseweb="tab"][aria-selected="true"] { color: #1D4ED8 !important; font-weight: 700 !important; border-bottom-color: #2563EB !important; }',
+        /* Вкладки — стеклянный переключатель Apple */
+        'div[data-baseweb="tab-highlight"], div[data-baseweb="tab-border"] { display: none !important; height: 0 !important; width: 0 !important; opacity: 0 !important; }',
+        '[data-baseweb="tab-scroll-forward"], [data-baseweb="tab-scroll-backward"], [data-baseweb="tab-bar"] > button { display: none !important; width: 0 !important; height: 0 !important; }',
+        'button[data-baseweb="tab"] { color: #475569 !important; font-weight: 500 !important; border-bottom: none !important; border-radius: 10px !important; }',
+        'button[data-baseweb="tab"][aria-selected="true"] { background: rgba(255, 255, 255, 0.92) !important; color: #0F172A !important; font-weight: 700 !important; border-bottom: none !important; box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12) !important; border-radius: 10px !important; }',
         '[data-testid="stTabs"] > div:first-child { background: transparent !important; }',
         /* Plotly iframe — прозрачный */
         '.stPlotlyChart iframe { background: transparent !important; }',
@@ -981,6 +1097,15 @@ _comp_meta.html("""
             el.style.setProperty('background', '#FFFFFF', 'important');
             el.style.setProperty('border-color', '#CBD5E1', 'important');
             el.style.setProperty('color', '#0F172A', 'important');
+        });
+
+        // Скрываем синюю полоску и белые кнопки прокрутки табов
+        var tabExtras = doc.querySelectorAll('[data-baseweb="tab-scroll-forward"], [data-baseweb="tab-scroll-backward"], [data-baseweb="tab-highlight"], [data-baseweb="tab-border"], [data-baseweb="tab-bar"] > button');
+        tabExtras.forEach(function(el) {
+            el.style.setProperty('display', 'none', 'important');
+            el.style.setProperty('width', '0px', 'important');
+            el.style.setProperty('height', '0px', 'important');
+            el.style.setProperty('opacity', '0', 'important');
         });
     }
     setInterval(enforceLightAndFixBg, 350);
