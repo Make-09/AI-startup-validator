@@ -1140,28 +1140,69 @@ with tab2:
     st.header("Customer Discovery — результаты интервью")
     st.caption("Глубинные двухфазные интервью по методологии Mom Test с репрезентативной выборкой клиентов")
 
-    report: ValidationReport = st.session_state.report
+    _ir_report: "ValidationReport" = st.session_state.report
+    _ir = _ir_report.interview_results if _ir_report else None
 
-    if report is None or report.interview_results is None:
+    if _ir is None:
+        # ── Skeleton: показываем структуру без данных ──
         st.markdown("""
         <div class="empty-state-card">
-          <div class="empty-state-title">Данные Customer Discovery ещё не сформированы</div>
+          <div class="empty-state-title">Customer Discovery ещё не проводился</div>
           <div class="empty-state-desc">
-            Для генерации профилей клиентов, проведения двухфазных интервью по методологии Mom Test и оценки платежеспособного спроса перейдите на вкладку <strong>«Ваша идея»</strong> и запустите валидацию.
+            Перейдите на вкладку <strong>«Ваша идея»</strong>, заполните параметры и нажмите
+            «Запустить валидацию». После анализа здесь появятся результаты двухфазных интервью,
+            профили персон, ценовое восприятие и скоринг готовности к покупке.
           </div>
         </div>
         """, unsafe_allow_html=True)
-        st.stop()
+
+        st.subheader("Сводка")
+        _sc1, _sc2, _sc3, _sc4 = st.columns(4)
+        _sc1.metric("Острота проблемы", "— / 10")
+        _sc2.metric("Готовы купить", "—%")
+        _sc3.metric("Рекомендация (ср.)", "— / 10")
+        _sc4.metric("Solution Fit", "— / 10")
+
+        st.divider()
+        _col_pie, _col_con = st.columns([1, 1])
+        with _col_pie:
+            st.markdown("**Ценовое восприятие**")
+            _fig_sk = go.Figure(data=[go.Pie(
+                labels=["Дорого", "Нормально", "Дёшево"],
+                values=[1, 1, 1],
+                marker_colors=["#E2E8F0", "#CBD5E1", "#F1F5F9"],
+                hole=0.55,
+                textinfo="none",
+                hoverinfo="skip",
+            )])
+            _fig_sk.update_layout(
+                height=220,
+                margin=dict(t=10, b=10, l=10, r=10),
+                showlegend=False,
+                paper_bgcolor="#FFFFFF",
+                plot_bgcolor="#FFFFFF",
+                annotations=[dict(
+                    text="<b>Ожидание<br>данных</b>",
+                    x=0.5, y=0.5, font_size=13,
+                    showarrow=False, font_color="#94A3B8"
+                )],
+            )
+            st.plotly_chart(_fig_sk, use_container_width=True)
+        with _col_con:
+            st.markdown("**Топ-3 опасения**")
+            for _t in ["— Ключевые барьеры перехода", "— Скрытые риски и недоверие", "— Ценовые возражения"]:
+                st.markdown(f'<div style="color:#94A3B8;font-size:0.88rem;padding:4px 0">{_t}</div>', unsafe_allow_html=True)
+            st.markdown("**Топ-3 желаемые функции**")
+            for _t in ["— MVP-требования", "— Функционал с WTP", "— Формат интеграции"]:
+                st.markdown(f'<div style="color:#94A3B8;font-size:0.88rem;padding:4px 0">{_t}</div>', unsafe_allow_html=True)
 
     else:
+        _ir = _ir_report.interview_results
 
-
-        ir = report.interview_results
-
-        if ir.fallback_count > 0:
-            valid_count = ir.total_personas - ir.fallback_count
+        if _ir.fallback_count > 0:
+            valid_count = _ir.total_personas - _ir.fallback_count
             st.warning(
-                f"Внимание: {ir.fallback_count} из {ir.total_personas} интервью завершились ошибкой LLM. "
+                f"Внимание: {_ir.fallback_count} из {_ir.total_personas} интервью завершились ошибкой LLM. "
                 f"Метрики рассчитаны по {valid_count} валидным ответам."
             )
 
@@ -1169,13 +1210,13 @@ with tab2:
         st.subheader("Сводка")
         col1, col2, col3, col4 = st.columns(4)
         with col1:
-            st.metric("Острота проблемы", f"{ir.avg_problem_severity:.1f} / 10")
+            st.metric("Острота проблемы", f"{_ir.avg_problem_severity:.1f} / 10")
         with col2:
-            st.metric("Готовы купить", f"{ir.pct_would_buy * 100:.0f}%")
+            st.metric("Готовы купить", f"{_ir.pct_would_buy * 100:.0f}%")
         with col3:
-            st.metric("Рекомендация (ср.)", f"{ir.avg_nps_score:.1f} / 10")
+            st.metric("Рекомендация (ср.)", f"{_ir.avg_nps_score:.1f} / 10")
         with col4:
-            st.metric("Solution Fit", f"{ir.avg_solution_fit:.1f} / 10")
+            st.metric("Solution Fit", f"{_ir.avg_solution_fit:.1f} / 10")
 
         st.divider()
 
@@ -1184,11 +1225,7 @@ with tab2:
         with col_pie:
             st.markdown("**Ценовое восприятие**")
             labels = ["Дорого", "Нормально", "Дёшево"]
-            values = [ir.pct_price_too_high, ir.pct_price_ok, ir.pct_price_too_low]
-            # Монохромная строгая палитра в стилистике B2B SaaS:
-            # Дорого: Slate 800 (#1E293B), Нормально: Brand Blue (#2563EB), Дёшево: Slate 400 (#94A3B8)
-            marker_colors = ["#1E293B", "#2563EB", "#94A3B8"]
-            # Цвета строго по дизайн-системе: Slate 900, Royal Blue, Slate 500
+            values = [_ir.pct_price_too_high, _ir.pct_price_ok, _ir.pct_price_too_low]
             marker_colors = ["#0F172A", "#2563EB", "#64748B"]
             fig_pie = go.Figure(data=[go.Pie(
                 labels=labels,
@@ -1221,22 +1258,24 @@ with tab2:
 
         with col_concerns:
             st.markdown("**Топ-3 опасения**")
-            if ir.top_concerns:
-                for concern in ir.top_concerns:
+            if _ir.top_concerns:
+                for concern in _ir.top_concerns:
                     st.warning(concern)
+            else:
                 st.caption("Нет данных")
 
             st.markdown("**Топ-3 желаемые функции**")
-            if ir.top_desired_features:
-                for feature in ir.top_desired_features:
+            if _ir.top_desired_features:
+                for feature in _ir.top_desired_features:
                     st.info(feature)
+            else:
                 st.caption("Нет данных")
 
         # ── Детальные ответы персон ───────────────────────────────
         st.divider()
         st.subheader("Ответы персон")
 
-        for resp in ir.responses:
+        for resp in _ir.responses:
             buy_status = "Купит" if resp.would_buy else "Не купит"
             err_status = " · Ошибка API" if getattr(resp, "is_error", False) else ""
             header_title = f"{resp.persona_name} · {resp.persona_occupation} · {buy_status}{err_status}"
@@ -1298,22 +1337,123 @@ with tab2:
 # ═══════════════════════════════════════════════════════════════
 
 with tab3:
-    report = st.session_state.report
+    _r3 = st.session_state.report
 
-    if report is None:
+    if _r3 is None:
+        # ── Skeleton ──
         st.markdown("""
         <div class="empty-state-card">
           <div class="empty-state-title">Инвестиционный отчёт ещё не сформирован</div>
           <div class="empty-state-desc">
-            Для расчёта скоринга жизнеспособности (Overall Viability Score), когортной юнит-экономики (LTV, CAC, Runway, Payback) и симуляции Монте-Карло перейдите на вкладку <strong>«Ваша идея»</strong> и запустите валидацию.
+            Перейдите на вкладку <strong>«Ваша идея»</strong> и запустите валидацию — здесь появятся
+            Overall Viability Score, юнит-экономика (LTV, CAC, Runway, Payback) и симуляция Монте-Карло на 24 месяца.
           </div>
         </div>
         """, unsafe_allow_html=True)
-        st.stop()
+
+        st.subheader("Общая оценка жизнеспособности (Overall Viability Score)")
+        _c1, _c2 = st.columns([1, 2])
+        with _c1:
+            st.markdown(
+                "<div class='score-card'>"
+                "<div class='score-number' style='color:#CBD5E1'>—<span class='score-denom'>/100</span></div>"
+                "<div style='margin-top:14px'><span class='badge-warning'>Ожидание симуляции</span></div>"
+                "</div>",
+                unsafe_allow_html=True,
+            )
+            st.progress(0.0)
+        with _c2:
+            st.markdown("**Компоненты скоринга**")
+            st.caption("Валидация проблемы: **— / 40.0**")
+            st.progress(0.0)
+            st.caption("Solution Fit и спрос: **— / 35.0**")
+            st.progress(0.0)
+            st.caption("Экономическая устойчивость: **— / 25.0**")
+            st.progress(0.0)
+
+        st.divider()
+        st.subheader("Юнит-экономика")
+        st.caption("Расчёт на основе эффективного дохода, страновых коэффициентов и отраслевых бенчмарков")
+        _m1, _m2, _m3, _m4 = st.columns(4)
+        _m1.metric("LTV (пожизненная ценность)", "—")
+        _m2.metric("CAC (стоимость привлечения)", "—")
+        _m3.metric("LTV : CAC", "—")
+        _m4.metric("Окупаемость CAC", "—")
+        _m5, _m6, _m7, _m8 = st.columns(4)
+        _m5.metric("Monthly Burn Rate", "—")
+        _m6.metric("Runway (статический)", "—")
+        _m7.metric("Break-even", "—")
+        _m8.metric("Базовый отток (Churn)", "—")
+        _m9, _m10, _m11 = st.columns(3)
+        _m9.metric("Дно кассовой ямы", "—")
+        _m10.metric("Расход капитала до безубытка", "—")
+        _m11.metric("Дефицит капитала", "—")
+
+        st.divider()
+        st.subheader("Вероятностный прогноз роста MRR — Fan Chart")
+        st.caption("10 000 симуляций · 24 месяца · когортный отток · стресс-тест ликвидности")
+        _fig_empty = go.Figure()
+        _fig_empty.add_trace(go.Scatter(
+            x=list(range(25)), y=[0]*25,
+            mode="lines",
+            line=dict(color="#E2E8F0", dash="dot", width=1.5),
+            name="Базовая линия",
+        ))
+        _fig_empty.update_layout(
+            title=dict(text="Коридор вероятности (P10–P90) сформируется после запуска анализа",
+                       font=dict(size=13, color="#94A3B8")),
+            xaxis=dict(title="Месяц", gridcolor="#F1F5F9"),
+            yaxis=dict(title="MRR (USD)", gridcolor="#F1F5F9"),
+            height=300,
+            margin=dict(l=20, r=20, t=50, b=20),
+            paper_bgcolor="#FFFFFF",
+            plot_bgcolor="#FFFFFF",
+        )
+        st.plotly_chart(_fig_empty, use_container_width=True)
+        _mc1, _mc2, _mc3, _mc4 = st.columns(4)
+        _mc1.metric("Риск банкротства (24 мес)", "—")
+        _mc2.metric("Медианная безубыточность", "—")
+        _mc3.metric("Вероятность $10K+ MRR", "—")
+        _mc4.metric("Вероятность 1 000+ клиентов", "—")
+
+        st.divider()
+        st.subheader("Анализ конкурентной среды")
+        st.caption("Поиск прямых и косвенных конкурентов с оценкой сильных и слабых сторон.")
+        for _cn, _ct, _cd in [
+            ("Конкурент 1", "Прямой конкурент", "comp-badge-direct"),
+            ("Конкурент 2", "Косвенный аналог", "comp-badge-indirect"),
+        ]:
+            st.markdown(f"""
+            <div class="comp-card" style="opacity:0.45">
+              <div class="comp-header">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <span class="comp-name" style="color:#94A3B8">{_cn}</span>
+                  <span class="{_cd}">{_ct}</span>
+                </div>
+              </div>
+              <div class="comp-grid">
+                <div>
+                  <div class="comp-section-title" style="color:#0D9488;">Ключевые преимущества</div>
+                  <div class="comp-section-body" style="color:#CBD5E1;">Формируется после анализа...</div>
+                </div>
+                <div>
+                  <div class="comp-section-title" style="color:#E11D48;">Слабые стороны</div>
+                  <div class="comp-section-body" style="color:#CBD5E1;">Формируется после анализа...</div>
+                </div>
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.divider()
+        st.subheader("Экспертные инсайты и рекомендации")
+        st.markdown(
+            '<div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:16px 20px;'
+            'color:#94A3B8;font-size:0.9rem;">Инсайты инвестиционного комитета появятся после симуляции.</div>',
+            unsafe_allow_html=True,
+        )
 
     else:
-
-
+        report = _r3
 
         # ── Overall Viability Score ───────────────────────────────
         st.subheader("Общая оценка жизнеспособности (Overall Viability Score)")
@@ -1322,7 +1462,6 @@ with tab3:
         col_score1, col_score2 = st.columns([1, 2])
 
         with col_score1:
-            # Определяем вердикт
             if score <= 25:
                 verdict_class = "badge-danger"
                 verdict_text  = "Критический риск — требуется пересмотр"
@@ -1332,13 +1471,14 @@ with tab3:
             elif score <= 65:
                 verdict_class = "badge-warning"
                 verdict_text  = "Умеренный риск — необходима проверка"
+            else:
                 verdict_class = "badge-success"
                 verdict_text  = "Перспективная идея — рекомендуется пилот"
 
             st.markdown(
                 f"<div class='score-card'>"
                 f"<div class='score-number'>{score}<span class='score-denom'>/100</span></div>"
-                f"<br><span class='{verdict_class}'>{verdict_text}</span>"
+                f"<div style='margin-top:14px'><span class='{verdict_class}'>{verdict_text}</span></div>"
                 f"</div>",
                 unsafe_allow_html=True,
             )
@@ -1437,7 +1577,7 @@ with tab3:
                 for traj in mc.sample_trajectories:
                     is_bankrupt = traj[-1] < (report.unit_economics.monthly_burn_rate * 0.1
                                                if report.unit_economics else 50.0)
-                    color = "rgba(220,53,69,0.04)" if is_bankrupt else "rgba(99,110,250,0.04)"
+                    color = "rgba(225,29,72,0.04)" if is_bankrupt else "rgba(37,99,235,0.04)"
                     fig_mc.add_trace(go.Scatter(
                         x=months_x, y=traj,
                         mode="lines",
@@ -1487,31 +1627,18 @@ with tab3:
 
             fig_mc.update_layout(
                 title=dict(
-                    text="Динамика Monthly Recurring Revenue — 24 месяца<br>"
-                         "<span style='font-size:11px;font-weight:400;color:#64748B'>Гуще = вероятнее | Красные линии = сценарии банкротства</span>",
+                    text="Динамика Monthly Recurring Revenue — 24 месяца",
                     font=dict(family="Inter, sans-serif", size=14, color="#0F172A"),
                 ),
-                xaxis=dict(
-                    title=dict(text="Месяц", font=dict(family="Inter, sans-serif", size=12, color="#64748B")),
-                    gridcolor="#E2E8F0",
-                    tickfont=dict(family="JetBrains Mono, monospace", size=11, color="#64748B"),
-                ),
-                yaxis=dict(
-                    title=dict(text="MRR (USD)", font=dict(family="Inter, sans-serif", size=12, color="#64748B")),
-                    gridcolor="#E2E8F0",
-                    tickfont=dict(family="JetBrains Mono, monospace", size=11, color="#64748B"),
-                ),
+                xaxis=dict(title="Месяц", gridcolor="#E2E8F0",
+                           tickfont=dict(family="JetBrains Mono, monospace", size=11, color="#64748B")),
+                yaxis=dict(title="MRR (USD)", gridcolor="#E2E8F0",
+                           tickfont=dict(family="JetBrains Mono, monospace", size=11, color="#64748B")),
                 height=420,
                 margin=dict(l=20, r=20, t=60, b=20),
                 hovermode="x unified",
-                legend=dict(
-                    orientation="h",
-                    yanchor="bottom",
-                    y=1.02,
-                    xanchor="right",
-                    x=1,
-                    font=dict(family="Inter, sans-serif", size=11, color="#475569")
-                ),
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1,
+                            font=dict(family="Inter, sans-serif", size=11, color="#475569")),
                 paper_bgcolor="#FFFFFF",
                 plot_bgcolor="#FFFFFF",
             )
@@ -1620,7 +1747,9 @@ with tab3:
                     st.warning(msg)
                 elif insight.severity == "success":
                     st.success(msg)
+                else:
                     st.info(msg)
+        else:
             st.caption("Инсайты не сгенерированы")
 
         st.divider()
