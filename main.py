@@ -60,32 +60,118 @@ st.set_page_config(
 st.markdown("""
 <style>
 /* Убираем padding сверху */
-.block-container { padding-top: 1.5rem; }
+.block-container { padding-top: 1.5rem; max-width: 1200px; }
+
+/* Стильный Hero-блок */
+.hero-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 22px 26px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+.hero-badge {
+    display: inline-block;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    margin-bottom: 8px;
+    border: 1px solid #bae6fd;
+}
+.hero-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.3px;
+}
+.hero-desc {
+    font-size: 0.88rem;
+    color: #475569;
+    line-height: 1.55;
+    margin-bottom: 16px;
+}
+.hero-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+.hero-pill {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+.hero-pill-num {
+    font-weight: 800;
+    color: #2563eb;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+}
+.hero-pill-title {
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 0.82rem;
+    margin-bottom: 2px;
+}
+.hero-pill-sub {
+    font-size: 0.74rem;
+    color: #64748b;
+    line-height: 1.35;
+}
 
 /* Баннер "Анализ завершён" */
 .done-banner {
-    background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
-    border: 1.5px solid #6ee7b7;
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 1.5px solid #34d399;
     border-radius: 10px;
     padding: 14px 20px;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
 }
-.done-banner-icon { font-size: 1.5rem; }
-.done-banner-text { font-size: 0.95rem; font-weight: 600; color: #065f46; }
-.done-banner-sub  { font-size: 0.8rem; color: #047857; font-weight: 400; }
+.done-banner-icon {
+    font-size: 1.3rem;
+    background: #10b981;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+.done-banner-text { font-size: 0.95rem; font-weight: 700; color: #065f46; }
+.done-banner-sub  { font-size: 0.8rem; color: #047857; font-weight: 500; }
+
+/* Пресеты */
+.preset-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+}
 
 /* Прогресс-шаги */
-.step-row { display:flex; align-items:center; gap:10px; margin:6px 0; }
+.step-row { display:flex; align-items:center; gap:10px; margin:7px 0; }
 .step-dot-done    { width:10px;height:10px;border-radius:50%;background:#10b981;flex-shrink:0; }
-.step-dot-active  { width:10px;height:10px;border-radius:50%;background:#3b82f6;flex-shrink:0;animation:pulse 1s infinite; }
-.step-dot-pending { width:10px;height:10px;border-radius:50%;background:#d1d5db;flex-shrink:0; }
-.step-text-done    { font-size:0.85rem;color:#065f46; }
-.step-text-active  { font-size:0.85rem;color:#1d4ed8;font-weight:600; }
-.step-text-pending { font-size:0.85rem;color:#9ca3af; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.step-dot-active  { width:10px;height:10px;border-radius:50%;background:#2563eb;flex-shrink:0;animation:pulse 1s infinite; }
+.step-dot-pending { width:10px;height:10px;border-radius:50%;background:#cbd5e1;flex-shrink:0; }
+.step-text-done    { font-size:0.85rem;color:#065f46;font-weight:500; }
+.step-text-active  { font-size:0.85rem;color:#1d4ed8;font-weight:700; }
+.step-text-pending { font-size:0.85rem;color:#94a3b8; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
 
 /* Шапка */
 .app-header {
@@ -195,52 +281,50 @@ else:
 # ═══════════════════════════════════════════════════════════════
 
 with st.sidebar:
-    st.markdown("**Статус системы**")
-
-    _api_key = os.environ.get("OPENAI_API_KEY", "")
-    _model   = os.environ.get("OPENAI_MODEL", config.MODEL)
-    _base    = os.environ.get("OPENAI_BASE_URL", config.BASE_URL)
-
-    if _api_key and _api_key != "your_api_key_here":
-        st.success("API подключён")
-        st.caption(f"Модель: `{_model}`")
-        st.caption(f"Провайдер: `{_base}`")
-        try:
-            _pool = config.get_pool_status()
-            _status = "норма" if _pool["alive_keys"] == _pool["total_keys"] else "частично" if _pool["alive_keys"] > 0 else "все исчерпаны"
-            st.caption(f"Ключей: {_pool['alive_keys']}/{_pool['total_keys']} ({_status})")
-        except Exception:
-            pass
-    else:
-        st.error("API ключ не настроен")
-        st.markdown(
-            "Получить бесплатный ключ: [console.groq.com](https://console.groq.com/)"
-        )
+    st.markdown("### О методологии")
+    st.markdown("""
+**Трехконтурная валидация:**
+1. **The Mom Test (Роб Фитцпатрик)**:  
+   Двухфазные интервью. Вопросы о прошлом опыте и фактических расходах, исключающие ложную вежливость.
+2. **Юнит-экономика и когорты**:  
+   Расчёт метрик LTV, CAC, Runway, точки безубыточности и риска Churn Cliff.
+3. **Симуляция Монте-Карло**:  
+   10 000 итераций вероятностной траектории роста MRR и оценка риска кассовой ямы на 24 месяца.
+    """)
 
     st.divider()
 
-    st.markdown("**Отраслевые бенчмарки**")
-    st.caption("World Bank API + авторитетные отчёты · Кэш: 7 дней")
+    st.markdown("### Шкала жизнеспособности")
+    st.markdown("""
+- **65 – 100 б.** · Перспективная идея (низкий риск, целесообразен запуск MVP)
+- **50 – 64 б.** · Умеренный риск (требуются доработки гипотез)
+- **0 – 49 б.** · Критический риск (рекомендован Pivot модели)
+    """)
 
-    _rt_info = st.session_state.get("rt_bench_info", "Загрузятся при запуске анализа")
-    _bench_loaded = "realtime_benchmark" in st.session_state
-    if _bench_loaded:
-        st.success(_rt_info[:80] if len(_rt_info) > 80 else _rt_info)
-    else:
+    st.divider()
+
+    st.markdown("### О проекте")
+    st.caption(
+        "Научно-исследовательский проект.\n\n"
+        "Конкурс научных соревнований «Дарын».\n\n"
+        "Секция: Прикладная информатика и экономика."
+    )
+
+    with st.expander("Отраслевые бенчмарки"):
+        st.caption("Источники: World Bank API, отраслевые медианы 2025–2026.")
+        _rt_info = st.session_state.get("rt_bench_info", "Синхронизируются при запуске валидации.")
         st.caption(_rt_info)
-
-    if st.button("Обновить бенчмарки", use_container_width=True):
-        if not _api_key or _api_key == "your_api_key_here":
-            st.error("Сначала настройте API ключ")
-        else:
-            with st.spinner("Обновляем данные..."):
-                _bt = st.session_state.get("_last_bt", BusinessType.MARKETPLACE)
-                _ct = st.session_state.get("_last_country", "kazakhstan")
-                _desc = st.session_state.get("_last_desc", "")
-                bench_rt, rt_info = fetch_realtime_benchmarks(_bt, _ct, _desc)
-                st.session_state["realtime_benchmark"] = bench_rt
-                st.session_state["rt_bench_info"] = rt_info
-            st.rerun()
+        if st.button("Синхронизировать бенчмарки", use_container_width=True):
+            _api_key = os.environ.get("OPENAI_API_KEY", "")
+            if _api_key and _api_key != "your_api_key_here":
+                with st.spinner("Синхронизация с макроэкономическими базами..."):
+                    _bt = st.session_state.get("_last_bt", BusinessType.MARKETPLACE)
+                    _ct = st.session_state.get("_last_country", "kazakhstan")
+                    _desc = st.session_state.get("_last_desc", "")
+                    bench_rt, rt_info = fetch_realtime_benchmarks(_bt, _ct, _desc)
+                    st.session_state["realtime_benchmark"] = bench_rt
+                    st.session_state["rt_bench_info"] = rt_info
+                st.rerun()
 
 # ═══════════════════════════════════════════════════════════════
 # Инициализация session_state
@@ -297,32 +381,119 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # ═══════════════════════════════════════════════════════════════
 
 with tab1:
-    st.subheader("Описание бизнес-идеи")
+    # ── Стильный презентационный Hero-блок ──
+    st.markdown("""
+    <div class="hero-card">
+      <div class="hero-badge">Lean Startup & Mom Test Framework</div>
+      <div class="hero-title">AI-симуляция предварительной валидации бизнес-идей</div>
+      <div class="hero-desc">
+        Комплексная проверка гипотез через глубинное интервьюирование синтетических клиентов, 
+        стресс-тестирование юнит-экономики и 10 000 симуляций Монте-Карло на горизонте 24 месяцев.
+      </div>
+      <div class="hero-grid">
+        <div class="hero-pill">
+          <div class="hero-pill-num">01 · CustDev без лести</div>
+          <div class="hero-pill-title">Методология Mom Test</div>
+          <div class="hero-pill-sub">Исследование реального прошлого опыта и трат респондентов до презентации решения.</div>
+        </div>
+        <div class="hero-pill">
+          <div class="hero-pill-num">02 · Рыночные реалии</div>
+          <div class="hero-pill-title">Адаптация под рынок РК</div>
+          <div class="hero-pill-sub">Интеграция макроданных World Bank и локальных платежных моделей (тенге / доллар).</div>
+        </div>
+        <div class="hero-pill">
+          <div class="hero-pill-num">03 · Риск-менеджмент</div>
+          <div class="hero-pill-title">10 000 сценариев Монте-Карло</div>
+          <div class="hero-pill-sub">Прогнозирование кассовых ям, выживаемости и динамики ежемесячной выручки (MRR).</div>
+        </div>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ── Демо-кейсы для быстрой демонстрации (в 1 клик для жюри/гостей) ──
+    if "_demo_preset" in st.session_state:
+        _d = st.session_state.pop("_demo_preset")
+        if _d == "tutornow":
+            st.session_state["_f_name"] = "TutorNow"
+            st.session_state["_f_desc"] = "Маркетплейс проверенных онлайн-репетиторов по школьным предметам и подготовке к ЕНТ/IELTS с гарантией возврата средств за первое занятие."
+            st.session_state["_f_aud"] = "Родители школьников 8-11 классов и абитуриенты в Казахстане"
+            st.session_state["_f_bt"] = BusinessType.EDTECH
+            st.session_state["_f_rm"] = RevenueModel.COMMISSION
+            st.session_state["_f_deal"] = 4500.0
+            st.session_state["_f_deals_m"] = 5.0
+            st.session_state["_f_comm"] = 15
+            st.session_state["_f_cap"] = 8000.0
+            st.session_state["_f_mkt"] = 400.0
+            st.session_state["_f_ops"] = 250.0
+            st.session_state["_f_tam"] = 120000
+        elif _d == "qazaqcraft":
+            st.session_state["_f_name"] = "QazaqCraft"
+            st.session_state["_f_desc"] = "Маркетплейс изделий ручной работы, национальной сувенирной продукции и ремесленных товаров Казахстана с быстрой доставкой по СНГ."
+            st.session_state["_f_aud"] = "Туристы, корпоративные клиенты и ценители аутентичных изделий"
+            st.session_state["_f_bt"] = BusinessType.MARKETPLACE
+            st.session_state["_f_rm"] = RevenueModel.COMMISSION
+            st.session_state["_f_deal"] = 8500.0
+            st.session_state["_f_deals_m"] = 4.0
+            st.session_state["_f_comm"] = 12
+            st.session_state["_f_cap"] = 10000.0
+            st.session_state["_f_mkt"] = 500.0
+            st.session_state["_f_ops"] = 350.0
+            st.session_state["_f_tam"] = 90000
+        elif _d == "docflow":
+            st.session_state["_f_name"] = "DocFlow AI"
+            st.session_state["_f_desc"] = "SaaS платформа автоматической проверки договоров на юридические риски и соответствие законодательству РК с помощью ИИ."
+            st.session_state["_f_aud"] = "Юристы, бухгалтеры и руководители малого и среднего бизнеса"
+            st.session_state["_f_bt"] = BusinessType.SAAS_B2B
+            st.session_state["_f_rm"] = RevenueModel.SUBSCRIPTION
+            st.session_state["_f_price"] = 25.0
+            st.session_state["_f_cap"] = 7000.0
+            st.session_state["_f_mkt"] = 350.0
+            st.session_state["_f_ops"] = 200.0
+            st.session_state["_f_tam"] = 65000
+
+    st.markdown("**Демонстрационные сценарии:**")
+    d_col1, d_col2, d_col3 = st.columns(3)
+    if d_col1.button("TutorNow · EdTech маркетплейс", use_container_width=True):
+        st.session_state["_demo_preset"] = "tutornow"
+        st.rerun()
+    if d_col2.button("QazaqCraft · Маркетплейс РК", use_container_width=True):
+        st.session_state["_demo_preset"] = "qazaqcraft"
+        st.rerun()
+    if d_col3.button("DocFlow AI · B2B SaaS", use_container_width=True):
+        st.session_state["_demo_preset"] = "docflow"
+        st.rerun()
+
+    st.markdown("<div style='height: 10px'></div>", unsafe_allow_html=True)
+    st.subheader("Параметры бизнес-идеи")
 
     col_left, col_right = st.columns([3, 2])
 
     with col_left:
         name = st.text_input(
             "Название продукта",
-            value="",
+            value=st.session_state.get("_f_name", ""),
             placeholder="Например: QuickCV — AI для резюме",
         )
         description = st.text_area(
             "Описание идеи",
+            value=st.session_state.get("_f_desc", ""),
             height=100,
             placeholder="Что делает продукт? Какую проблему решает?",
         )
         target_audience = st.text_input(
             "Целевая аудитория",
-            value="",
+            value=st.session_state.get("_f_aud", ""),
             placeholder="Кто ваш клиент?",
         )
 
         bt_options = list(BusinessType)
         bt_display = [BENCHMARKS[bt].display_name for bt in bt_options]
+        default_bt = st.session_state.get("_f_bt", BusinessType.MARKETPLACE)
+        default_bt_idx = bt_options.index(default_bt) if default_bt in bt_options else 0
         bt_index = st.selectbox(
             "Тип бизнеса",
             options=range(len(bt_options)),
+            index=default_bt_idx,
             format_func=lambda i: bt_display[i],
             help="Gig Economy / Freelance Platform — платформа комиссионного типа (как Upwork, Fiverr, YouDo)",
         )
@@ -353,16 +524,18 @@ with tab1:
 
     with col_right:
         st.markdown("**Модель монетизации**")
-        _default_rm_index = 2 if _gig_selected else 0
+        rm_options = list(RevenueModel)
+        default_rm = st.session_state.get("_f_rm", RevenueModel.COMMISSION if _gig_selected else RevenueModel.SUBSCRIPTION)
+        default_rm_idx = rm_options.index(default_rm) if default_rm in rm_options else (2 if _gig_selected else 0)
         revenue_model_choice = st.radio(
             "Как платит пользователь?",
-            options=list(RevenueModel),
+            options=rm_options,
             format_func=lambda m: {
                 RevenueModel.SUBSCRIPTION: "Ежемесячная подписка",
                 RevenueModel.PAY_PER_USE:  "Оплата за использование",
                 RevenueModel.COMMISSION:   "Комиссия со сделок (Gig / Marketplace)",
             }[m],
-            index=_default_rm_index,
+            index=default_rm_idx,
         )
 
         price = 10.0
@@ -376,18 +549,18 @@ with tab1:
         if revenue_model_choice == RevenueModel.SUBSCRIPTION:
             price = st.number_input(
                 "Цена подписки ($/мес)",
-                min_value=0.1, step=1.0, value=10.0,
+                min_value=0.1, step=1.0, value=float(st.session_state.get("_f_price", 10.0)),
             )
             st.caption(f"Доход на пользователя в месяц: **${price:.2f}**")
 
         elif revenue_model_choice == RevenueModel.PAY_PER_USE:
             price_per_use = st.number_input(
                 "Цена за одно использование ($)",
-                min_value=0.01, step=0.5, value=5.0,
+                min_value=0.01, step=0.5, value=float(st.session_state.get("_f_price_use", 5.0)),
             )
             avg_uses_per_month = st.number_input(
                 "Среднее использований в месяц (1 пользователь)",
-                min_value=1.0, step=1.0, value=5.0,
+                min_value=1.0, step=1.0, value=float(st.session_state.get("_f_uses_m", 5.0)),
             )
             eff = price_per_use * avg_uses_per_month
             price = price_per_use
@@ -401,17 +574,17 @@ with tab1:
                 _deal_label = "Средняя стоимость заказа (₸)" if _gig_selected else "Средний чек сделки (₸)"
                 avg_deal_value = st.number_input(
                     _deal_label,
-                    min_value=100.0, step=100.0, value=5000.0 if _gig_selected else 1500.0,
+                    min_value=100.0, step=100.0, value=float(st.session_state.get("_f_deal", 5000.0 if _gig_selected else 1500.0)),
                 )
                 _deals_label = "Заказов/мес (на 1 исполнителя)" if _gig_selected else "Сделок/мес/пользователь"
                 avg_deals_per_month = st.number_input(
                     _deals_label,
-                    min_value=1.0, step=1.0, value=6.0 if _gig_selected else 4.0,
+                    min_value=1.0, step=1.0, value=float(st.session_state.get("_f_deals_m", 6.0 if _gig_selected else 4.0)),
                 )
             with col_c2:
                 commission_pct = st.slider(
                     "% комиссии платформы",
-                    min_value=1, max_value=35, value=15 if _gig_selected else 10, step=1,
+                    min_value=1, max_value=35, value=int(st.session_state.get("_f_comm", 15 if _gig_selected else 10)), step=1,
                     help="Upwork берёт 20%, Fiverr ~31%, YouDo ~15%",
                 )
                 commission_rate = commission_pct / 100.0
@@ -435,19 +608,19 @@ with tab1:
         st.markdown("**Финансовые параметры**")
         initial_capital = st.number_input(
             "Стартовый капитал ($)",
-            min_value=0.0, step=1000.0, value=10000.0,
+            min_value=0.0, step=1000.0, value=float(st.session_state.get("_f_cap", 10000.0)),
         )
         monthly_marketing_budget = st.number_input(
             "Маркетинговый бюджет ($/мес)",
-            min_value=0.0, step=100.0, value=500.0,
+            min_value=0.0, step=100.0, value=float(st.session_state.get("_f_mkt", 500.0)),
         )
         monthly_operating_costs = st.number_input(
             "Операционные расходы ($/мес)",
-            min_value=0.0, step=100.0, value=300.0,
+            min_value=0.0, step=100.0, value=float(st.session_state.get("_f_ops", 300.0)),
         )
         market_size_estimate = st.number_input(
             "TAM (потенциальных клиентов)",
-            min_value=1000, step=10000, value=100000,
+            min_value=1000, step=10000, value=int(st.session_state.get("_f_tam", 100000)),
         )
 
         num_personas = st.number_input(
@@ -719,7 +892,7 @@ with tab1:
 
 with tab2:
     st.header("Customer Discovery — результаты интервью")
-    st.caption(f"Активная модель: {get_llm_name()}")
+    st.caption("Глубинные двухфазные интервью с репрезентативной выборкой синтетических клиентов")
 
     report: ValidationReport = st.session_state.report
 
