@@ -58,6 +58,7 @@ st.set_page_config(
 
 # ── Глобальный CSS — B2B SaaS Дизайн-система ──────────────
 st.markdown("""
+<meta name="color-scheme" content="light only">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -492,14 +493,63 @@ h1, h2, h3, h4 {
     border-color: #94A3B8 !important;
 }
 
-/* ── Сайдбар ── */
-[data-testid="stSidebar"] {
-    background-color: #FFFFFF !important;
-    border-right: 1px solid #E2E8F0 !important;
-}
+/* ── Скрываем сайдбар полностью ── */
+[data-testid="stSidebarNav"] { display: none !important; }
+button[data-testid="collapsedControl"] { display: none !important; }
+section[data-testid="stSidebar"] { display: none !important; }
+[data-testid="stSidebar"] { display: none !important; }
 
 /* Убираем стрелочки delta у метрик */
 [data-testid="stMetricDelta"] svg { display:none; }
+
+/* ── Entrance animations ── */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.hero-card        { animation: fadeUp 0.4s ease-out both; }
+.empty-state-card { animation: fadeUp 0.35s ease-out both; }
+[data-testid="stMetric"] { animation: fadeUp 0.3s ease-out both; }
+.comp-card        { animation: fadeUp 0.35s ease-out both; }
+.score-card       { animation: fadeUp 0.4s ease-out both; }
+.done-banner      { animation: fadeUp 0.3s ease-out both; }
+[data-testid="stMetric"]:nth-child(1) { animation-delay: 0ms; }
+[data-testid="stMetric"]:nth-child(2) { animation-delay: 60ms; }
+[data-testid="stMetric"]:nth-child(3) { animation-delay: 120ms; }
+[data-testid="stMetric"]:nth-child(4) { animation-delay: 180ms; }
+
+/* ── Принудительная светлая тема при dark-mode ОС/браузера ── */
+@media (prefers-color-scheme: dark) {
+    html, body, [class*="st-"], .stApp,
+    [data-testid="stAppViewContainer"],
+    [data-testid="stHeader"],
+    [data-testid="stSidebar"],
+    [data-testid="stMain"],
+    section[data-testid="stMain"],
+    .block-container {
+        background-color: #F8FAFC !important;
+        color: #334155 !important;
+    }
+    [data-testid="stMetric"] { background: #FFFFFF !important; border-color: #E2E8F0 !important; }
+    [data-testid="stMetricLabel"] { color: #64748B !important; }
+    [data-testid="stMetricValue"] { color: #0F172A !important; }
+    .hero-card, .comp-card, .score-card, .empty-state-card { background: #FFFFFF !important; border-color: #E2E8F0 !important; }
+    .chat-a { background: #F8FAFC !important; color: #0F172A !important; }
+    button[data-baseweb="tab"] { background-color: transparent !important; color: #64748B !important; }
+    button[data-baseweb="tab"][aria-selected="true"] { color: #2563EB !important; }
+    div[data-testid="stTextInput"] input,
+    div[data-testid="stTextArea"] textarea,
+    div[data-testid="stNumberInput"] input { background-color: #FFFFFF !important; color: #0F172A !important; border-color: #CBD5E1 !important; }
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMarkdownContainer"] span,
+    [data-testid="stMarkdownContainer"] li { color: #334155 !important; }
+    [data-testid="stMarkdownContainer"] h1,
+    [data-testid="stMarkdownContainer"] h2,
+    [data-testid="stMarkdownContainer"] h3 { color: #0F172A !important; }
+    .hero-title, .comp-name, .score-number, .empty-state-title, .done-banner-text { color: #0F172A !important; }
+    .app-title { color: #0F172A !important; }
+    h1, h2, h3, h4 { color: #0F172A !important; }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -521,56 +571,6 @@ elif _remaining <= 3:
     st.warning(f"Осталось запусков сегодня: **{_remaining}** из {MAX_DAILY_RUNS}")
 else:
     st.caption(f"Осталось запусков сегодня: {_remaining} из {MAX_DAILY_RUNS}")
-
-# ═══════════════════════════════════════════════════════════════
-# Боковая панель
-# ═══════════════════════════════════════════════════════════════
-
-with st.sidebar:
-    st.markdown("### О методологии")
-    st.markdown("""
-**Трехконтурная валидация:**
-1. **The Mom Test (Роб Фитцпатрик)**:  
-   Двухфазные интервью. Вопросы о прошлом опыте и фактических расходах, исключающие ложную вежливость.
-2. **Юнит-экономика и когорты**:  
-   Расчёт метрик LTV, CAC, Runway, точки безубыточности и риска Churn Cliff.
-3. **Симуляция Монте-Карло**:  
-   10 000 итераций вероятностной траектории роста MRR и оценка риска кассовой ямы на 24 месяца.
-    """)
-
-    st.divider()
-
-    st.markdown("### Шкала жизнеспособности")
-    st.markdown("""
-- **65 – 100 б.** · Перспективная идея (низкий риск, целесообразен запуск MVP)
-- **50 – 64 б.** · Умеренный риск (требуются доработки гипотез)
-- **0 – 49 б.** · Критический риск (рекомендован Pivot модели)
-    """)
-
-    st.divider()
-
-    st.markdown("### О проекте")
-    st.caption(
-        "Научно-исследовательский проект.\n\n"
-        "Конкурс научных соревнований «Дарын».\n\n"
-        "Секция: Прикладная информатика и экономика."
-    )
-
-    with st.expander("Отраслевые бенчмарки"):
-        st.caption("Источники: World Bank API, отраслевые медианы 2025–2026.")
-        _rt_info = st.session_state.get("rt_bench_info", "Синхронизируются при запуске валидации.")
-        st.caption(_rt_info)
-        if st.button("Синхронизировать бенчмарки", use_container_width=True):
-            _api_key = os.environ.get("OPENAI_API_KEY", "")
-            if _api_key and _api_key != "your_api_key_here":
-                with st.spinner("Синхронизация с макроэкономическими базами..."):
-                    _bt = st.session_state.get("_last_bt", BusinessType.MARKETPLACE)
-                    _ct = st.session_state.get("_last_country", "kazakhstan")
-                    _desc = st.session_state.get("_last_desc", "")
-                    bench_rt, rt_info = fetch_realtime_benchmarks(_bt, _ct, _desc)
-                    st.session_state["realtime_benchmark"] = bench_rt
-                    st.session_state["rt_bench_info"] = rt_info
-                st.rerun()
 
 # ═══════════════════════════════════════════════════════════════
 # Инициализация session_state
