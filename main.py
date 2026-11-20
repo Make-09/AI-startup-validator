@@ -158,51 +158,94 @@ div[data-testid="stTabsContent"] {
     padding: 8px 0 !important;
 }
 
-/* ── Поля ввода — БЕЛЫЕ принудительно ── */
+/* ── Поля ввода — светлый glassmorphism ── */
 div[data-testid="stTextInput"] input,
 div[data-testid="stTextArea"] textarea,
 div[data-testid="stNumberInput"] input {
-    background-color: rgba(255, 255, 255, 0.95) !important;
+    background-color: rgba(255, 255, 255, 0.88) !important;
     color: #0F172A !important;
-    border: 1px solid #CBD5E1 !important;
+    border: 1px solid rgba(203, 213, 225, 0.80) !important;
     border-radius: 8px !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+}
+div[data-testid="stTextInput"] input::placeholder,
+div[data-testid="stTextArea"] textarea::placeholder {
+    color: #94A3B8 !important;
 }
 div[data-testid="stTextInput"] > div,
 div[data-testid="stTextArea"] > div,
 div[data-testid="stNumberInput"] > div {
-    background-color: rgba(255, 255, 255, 0.95) !important;
+    background-color: rgba(255, 255, 255, 0.88) !important;
+    border-color: rgba(203, 213, 225, 0.80) !important;
     border-radius: 8px !important;
 }
 div[data-testid="stTextInput"] input:focus,
 div[data-testid="stTextArea"] textarea:focus {
     border-color: #2563EB !important;
-    box-shadow: 0 0 0 1px #2563EB !important;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15) !important;
 }
 
-/* ── Dropdown ── */
+/* ── Dropdown — светлый glassmorphism ── */
 [data-baseweb="select"] > div,
 [data-baseweb="select"] > div > div {
-    background-color: rgba(255, 255, 255, 0.95) !important;
+    background-color: rgba(255, 255, 255, 0.90) !important;
     color: #0F172A !important;
-    border-color: #CBD5E1 !important;
+    border-color: rgba(203, 213, 225, 0.80) !important;
+    border-radius: 8px !important;
 }
 [data-baseweb="popover"] [role="listbox"],
 [data-baseweb="menu"],
 ul[data-baseweb="menu"] {
-    background-color: #FFFFFF !important;
+    background-color: rgba(255, 255, 255, 0.97) !important;
     color: #0F172A !important;
-    border: 1px solid #E2E8F0 !important;
+    border: 1px solid rgba(203,213,225,0.80) !important;
     border-radius: 8px !important;
-    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12) !important;
+    backdrop-filter: blur(16px) !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12) !important;
 }
 [data-baseweb="option"] {
-    background-color: #FFFFFF !important;
+    background-color: transparent !important;
     color: #0F172A !important;
 }
 [data-baseweb="option"]:hover,
 [data-baseweb="option"][aria-selected="true"] {
-    background-color: #EFF6FF !important;
-    color: #2563EB !important;
+    background-color: rgba(37, 99, 235, 0.08) !important;
+    color: #1D4ED8 !important;
+}
+
+/* ── Метки полей (labels) — читаемые тёмные ── */
+div[data-testid="stTextInput"] label,
+div[data-testid="stTextArea"] label,
+div[data-testid="stNumberInput"] label,
+div[data-testid="stSelectbox"] label,
+div[data-testid="stRadio"] label,
+div[data-testid="stSlider"] label {
+    color: #0F172A !important;
+    font-weight: 600 !important;
+    font-size: 0.88rem !important;
+}
+
+/* ── Радио-кнопки (Модель монетизации) — читаемые тёмные ── */
+div[data-testid="stRadio"] > div label,
+div[data-testid="stRadio"] span {
+    color: #0F172A !important;
+    font-size: 0.88rem !important;
+}
+div[data-testid="stRadio"] p {
+    color: #334155 !important;
+    font-size: 0.82rem !important;
+}
+
+/* ── Заголовки секций (Модель монетизации, Финансовые параметры) ── */
+div[data-testid="stMarkdownContainer"] strong {
+    color: #0F172A !important;
+    font-size: 1.0rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.2px !important;
+}
+div[data-testid="stMarkdownContainer"] p {
+    color: #334155 !important;
 }
 
 /* ── Кнопки — БЕЛЫЕ ── */
@@ -466,6 +509,20 @@ button[data-testid="collapsedControl"],
 section[data-testid="stSidebar"],
 [data-testid="stSidebar"] { display: none !important; }
 
+/* ── Plotly / Chart контейнеры — прозрачный фон ── */
+.stPlotlyChart,
+[data-testid="stPlotlyChart"],
+.stPlotlyChart > div,
+.stPlotlyChart iframe,
+.js-plotly-plot,
+.plot-container,
+.plotly,
+.svg-container { background: transparent !important; background-color: transparent !important; }
+/* SVG внутри Plotly */
+.stPlotlyChart svg { background: transparent !important; }
+/* Iframe Plotly — фон белый вместо тёмного */
+.stPlotlyChart iframe { background: rgba(255,255,255,0.0) !important; }
+
 /* ── Entrance animations ── */
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(10px); }
@@ -534,6 +591,15 @@ section[data-testid="stSidebar"],
     button[data-baseweb="tab"][aria-selected="true"] { color: #2563EB !important; }
     .app-title { color: #0F172A !important; }
     .app-subtitle { color: #64748B !important; }
+    div[data-testid="stTextInput"] label,
+    div[data-testid="stTextArea"] label,
+    div[data-testid="stNumberInput"] label,
+    div[data-testid="stSelectbox"] label,
+    div[data-testid="stRadio"] label { color: #0F172A !important; }
+    div[data-testid="stRadio"] > div label,
+    div[data-testid="stRadio"] span { color: #0F172A !important; }
+    div[data-testid="stMarkdownContainer"] strong { color: #0F172A !important; text-shadow: none !important; }
+    div[data-testid="stMarkdownContainer"] p { color: #334155 !important; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -566,13 +632,13 @@ _comp_meta.html("""
 
     var colors = ['#93C5FD','#60A5FA','#BFDBFE','#7DD3FC','#A5B4FC','#BAE6FD'];
     var blobs = [];
-    for (var i = 0; i < 11; i++) {
+    for (var i = 0; i < 16; i++) {
         blobs.push({
             x: Math.random() * w,
             y: Math.random() * h,
-            vx: (Math.random() - 0.5) * 0.65,
-            vy: (Math.random() - 0.5) * 0.65,
-            r: 70 + Math.random() * 100,
+            vx: (Math.random() - 0.5) * 0.78,
+            vy: (Math.random() - 0.5) * 0.78,
+            r: 59.5 + Math.random() * 85,
             color: colors[i % colors.length]
         });
     }
@@ -595,6 +661,52 @@ _comp_meta.html("""
         requestAnimationFrame(animate);
     }
     animate();
+})();
+</script>
+""", height=0, width=0)
+
+# ── Эффект: текст в шапке анимированный с цветовым акцентом ──
+import streamlit.components.v1 as _comp_blend
+_comp_blend.html("""
+<script>
+(function() {
+    var doc = window.parent.document;
+    if (doc.getElementById('blend-style-tag')) return;
+
+    var style = doc.createElement('style');
+    style.id = 'blend-style-tag';
+    style.textContent = [
+        /* Шапка — тёмный читаемый текст с мягкой тенью */
+        '.app-title { color: #0F172A !important; text-shadow: 0 1px 12px rgba(255,255,255,0.8), 0 2px 4px rgba(255,255,255,0.6) !important; }',
+        '.app-subtitle { color: #334155 !important; text-shadow: 0 1px 8px rgba(255,255,255,0.7) !important; }',
+        /* Вкладки — тёмный текст, читаемые */
+        'button[data-baseweb="tab"] { color: #334155 !important; font-weight: 500 !important; }',
+        'button[data-baseweb="tab"][aria-selected="true"] { color: #1D4ED8 !important; font-weight: 700 !important; border-bottom-color: #2563EB !important; }',
+        /* Tab-bar контейнер прозрачный */
+        '[data-testid="stTabs"] > div:first-child { background: transparent !important; }',
+        /* Plotly iframe — прозрачный */
+        '.stPlotlyChart iframe { background: transparent !important; }',
+        '.stPlotlyChart { background: transparent !important; }',
+        /* Метрики — принудительно белые */
+        '[data-testid="stMetric"] { background: rgba(255,255,255,0.90) !important; }',
+        '[data-testid="stMetricLabel"] p { color: #64748B !important; }',
+        '[data-testid="stMetricValue"] { color: #0F172A !important; }',
+    ].join(' ');
+    doc.head.appendChild(style);
+
+    /* Plotly iframes — делаем прозрачными через JS */
+    function fixPlotlyBg() {
+        var iframes = doc.querySelectorAll('.stPlotlyChart iframe');
+        iframes.forEach(function(iframe) {
+            try {
+                iframe.style.background = 'transparent';
+                if (iframe.contentDocument && iframe.contentDocument.body) {
+                    iframe.contentDocument.body.style.background = 'transparent';
+                }
+            } catch(e) {}
+        });
+    }
+    setInterval(fixPlotlyBg, 1000);
 })();
 </script>
 """, height=0, width=0)
@@ -807,6 +919,40 @@ with tab1:
             "Язык интервью",
             options=["Русский", "Қазақша"],
         )
+
+        # ── Информационная карточка — заполняет пустоту ──
+        st.markdown("""
+<div style="
+    margin-top: 20px;
+    background: rgba(37, 99, 235, 0.12);
+    border: 1px solid rgba(96, 165, 250, 0.35);
+    border-radius: 12px;
+    padding: 16px 18px;
+    backdrop-filter: blur(10px);
+">
+  <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#93C5FD;margin-bottom:10px;">
+    💡 Как это работает
+  </div>
+  <div style="font-size:0.82rem;color:rgba(255,255,255,0.80);line-height:1.6;">
+    <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;">
+      <span style="color:#60A5FA;font-weight:700;min-width:18px;">1.</span>
+      <span>Заполни параметры идеи и нажми <strong style="color:#93C5FD;">«Запустить»</strong></span>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;">
+      <span style="color:#60A5FA;font-weight:700;min-width:18px;">2.</span>
+      <span>AI проведёт <strong style="color:#93C5FD;">Mom Test</strong>-интервью с синтетическими клиентами</span>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;">
+      <span style="color:#60A5FA;font-weight:700;min-width:18px;">3.</span>
+      <span>Получи оценку по <strong style="color:#93C5FD;">10 000 сценариям</strong> Монте-Карло</span>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:8px;">
+      <span style="color:#60A5FA;font-weight:700;min-width:18px;">4.</span>
+      <span>Итоговый скоринг <strong style="color:#93C5FD;">0–100 баллов</strong> с рекомендациями</span>
+    </div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
 
         st.session_state["_last_bt"] = business_type
         st.session_state["_last_country"] = country
