@@ -147,7 +147,8 @@ h1, h2, h3, h4, h5, h6,
 [data-testid="stTabs"] > div:first-child,
 div[data-baseweb="tab-bar"],
 div[data-baseweb="tab-border"],
-div[data-baseweb="tab-highlight"] {
+div[data-baseweb="tab-highlight"],
+[data-testid="stTabsHeader"] {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
@@ -158,14 +159,17 @@ div[data-baseweb="tab-border"],
 [data-testid="stTabs"] [data-baseweb="tab-highlight"],
 [data-testid="stTabs"] div[style*="height: 2px"],
 [data-testid="stTabs"] div[style*="height:2px"],
+[data-testid="stTabs"] div[style*="height: 3px"],
+[data-testid="stTabs"] div[style*="height:3px"],
 [data-testid="stTabs"] div[style*="rgb(37, 99, 235)"],
-[data-testid="stTabs"] *::after,
-[data-testid="stTabs"] *::before {
+.react-aria-SelectionIndicator,
+[data-testid="stTabs"] .react-aria-SelectionIndicator {
     display: none !important;
     height: 0 !important;
     opacity: 0 !important;
     border-bottom: none !important;
     background: transparent !important;
+    visibility: hidden !important;
 }
 
 /* Скрываем стрелки прокрутки вкладок */
@@ -175,42 +179,65 @@ div[data-baseweb="tab-border"],
     display: none !important;
 }
 
-/* Капсула-контейнер */
+/* Apple Segmented Control — трек-контейнер */
 div[role="tablist"],
-div[data-baseweb="tab-list"] {
+div[data-baseweb="tab-list"],
+[data-testid="stTabsHeader"] {
+    position: relative !important;
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 6px !important;
+    gap: 4px !important;
     width: 100% !important;
-    padding: 5px !important;
-    border-radius: 999px !important;
-    background: rgba(255, 255, 255, 0.42) !important;
-    backdrop-filter: blur(20px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.8) !important;
-    box-shadow:
-        0 8px 28px rgba(15, 23, 42, 0.07),
-        inset 0 1px 1px rgba(255, 255, 255, 0.9) !important;
-    overflow-x: auto !important;
+    padding: 3px !important;
+    border-radius: 12px !important;
+    background: rgba(118, 118, 128, 0.12) !important;
+    backdrop-filter: blur(25px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+    border: 0.5px solid rgba(0, 0, 0, 0.04) !important;
+    box-shadow: inset 0 0.5px 1px rgba(0, 0, 0, 0.06) !important;
+    overflow: hidden !important;
     scrollbar-width: none !important;
+    z-index: 1 !important;
 }
+
 div[role="tablist"]::-webkit-scrollbar,
 div[data-baseweb="tab-list"]::-webkit-scrollbar {
     display: none !important;
 }
 
-/* Каждая вкладка */
+/* Фирменный скользящий бегунок Apple (Slider / Glider) */
+#apple-tab-slider {
+    position: absolute !important;
+    top: 3px !important;
+    left: 0 !important;
+    height: calc(100% - 6px) !important;
+    border-radius: 9px !important;
+    background: #FFFFFF !important;
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.12),
+        0 1px 2px rgba(0, 0, 0, 0.08),
+        0 0 0 0.5px rgba(0, 0, 0, 0.04) !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+    transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+    will-change: transform, width !important;
+}
+
+/* Вкладки — прозрачные кнопки над скользящим бегунком */
 button[role="tab"],
-button[data-baseweb="tab"] {
+button[data-baseweb="tab"],
+button[data-testid="stTab"] {
+    position: relative !important;
+    z-index: 2 !important;
     flex: 1 1 0 !important;
-    min-width: fit-content !important;
-    height: 38px !important;
-    padding: 0 16px !important;
+    min-width: 0 !important;
+    height: 34px !important;
+    padding: 0 12px !important;
     margin: 0 !important;
-    border-radius: 999px !important;
-    border: 1px solid transparent !important;
+    border-radius: 9px !important;
+    border: none !important;
     background: transparent !important;
     box-shadow: none !important;
     outline: none !important;
@@ -218,83 +245,107 @@ button[data-baseweb="tab"] {
     align-items: center !important;
     justify-content: center !important;
     white-space: nowrap !important;
-    transition:
-        background 0.25s cubic-bezier(0.32, 0.72, 0, 1),
-        color 0.2s ease,
-        box-shadow 0.25s cubic-bezier(0.32, 0.72, 0, 1),
-        transform 0.15s ease !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    transition: color 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
 }
 
 button[role="tab"] p,
 button[role="tab"] span,
 button[data-baseweb="tab"] p,
-button[data-baseweb="tab"] span {
+button[data-baseweb="tab"] span,
+button[data-testid="stTab"] p,
+button[data-testid="stTab"] span {
     margin: 0 !important;
     padding: 0 !important;
-    line-height: 1.2 !important;
-    font-size: 0.88rem !important;
+    line-height: 1 !important;
+    font-size: 0.86rem !important;
     font-weight: 500 !important;
-    color: #475569 !important;
-    transition: none !important; /* чтобы текст не дёргался от пузырей */
+    color: #64748B !important;
+    transition: color 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), font-weight 0.2s ease !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
 }
 
-button[role="tab"]:hover,
-button[data-baseweb="tab"]:hover {
-    background: rgba(255, 255, 255, 0.45) !important;
-}
+/* Ховер на вкладке */
 button[role="tab"]:hover p,
-button[role="tab"]:hover span {
-    color: #0F172A !important;
+button[role="tab"]:hover span,
+button[data-baseweb="tab"]:hover p,
+button[data-baseweb="tab"]:hover span,
+button[data-testid="stTab"]:hover p,
+button[data-testid="stTab"]:hover span {
+    color: #1E293B !important;
 }
 
 button[role="tab"]:focus,
 button[role="tab"]:focus-visible,
 button[data-baseweb="tab"]:focus,
-button[data-baseweb="tab"]:focus-visible {
+button[data-baseweb="tab"]:focus-visible,
+button[data-testid="stTab"]:focus,
+button[data-testid="stTab"]:focus-visible {
     outline: none !important;
     box-shadow: none !important;
-    border-color: transparent !important;
+    border: none !important;
 }
 
-/* Активная вкладка — стеклянная пилюля */
-button[role="tab"][aria-selected="true"],
-button[data-baseweb="tab"][aria-selected="true"] {
-    background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.98) 0%,
-        rgba(255, 255, 255, 0.82) 100%
-    ) !important;
-    border: 1px solid rgba(255, 255, 255, 0.95) !important;
-    box-shadow:
-        0 4px 12px rgba(15, 23, 42, 0.08),
-        0 1px 2px rgba(15, 23, 42, 0.05),
-        inset 0 1px 0 rgba(255, 255, 255, 1) !important;
-}
-
+/* Активный текст — четкий, глубокий черный/тёмный Apple SF */
 button[role="tab"][aria-selected="true"] p,
 button[role="tab"][aria-selected="true"] span,
+button[role="tab"][data-selected="true"] p,
+button[role="tab"][data-selected="true"] span,
+button[role="tab"][data-selected] p,
+button[role="tab"][data-selected] span,
 button[data-baseweb="tab"][aria-selected="true"] p,
-button[data-baseweb="tab"][aria-selected="true"] span {
+button[data-baseweb="tab"][aria-selected="true"] span,
+button[data-testid="stTab"][aria-selected="true"] p,
+button[data-testid="stTab"][aria-selected="true"] span,
+button[data-testid="stTab"][data-selected="true"] p,
+button[data-testid="stTab"][data-selected="true"] span {
     color: #0F172A !important;
     font-weight: 600 !important;
 }
 
+/* Активная кнопка полностью прозрачна — фон задаёт скользящий бегунок Apple */
+button[role="tab"][aria-selected="true"],
+button[role="tab"][data-selected="true"],
+button[role="tab"][data-selected],
+button[data-baseweb="tab"][aria-selected="true"],
+button[data-testid="stTab"][aria-selected="true"],
+button[data-testid="stTab"][data-selected="true"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
 @media (max-width: 640px) {
     div[role="tablist"],
-    div[data-baseweb="tab-list"] {
-        padding: 3px !important;
-        gap: 3px !important;
+    div[data-baseweb="tab-list"],
+    [data-testid="stTabsHeader"] {
+        padding: 2px !important;
+        gap: 2px !important;
+        border-radius: 10px !important;
+    }
+    #apple-tab-slider {
+        top: 2px !important;
+        height: calc(100% - 4px) !important;
+        border-radius: 8px !important;
     }
     button[role="tab"],
-    button[data-baseweb="tab"] {
-        padding: 0 8px !important;
-        height: 34px !important;
+    button[data-baseweb="tab"],
+    button[data-testid="stTab"] {
+        padding: 0 4px !important;
+        height: 32px !important;
+        border-radius: 8px !important;
     }
     button[role="tab"] p,
     button[role="tab"] span,
     button[data-baseweb="tab"] p,
-    button[data-baseweb="tab"] span {
-        font-size: 0.78rem !important;
+    button[data-baseweb="tab"] span,
+    button[data-testid="stTab"] p,
+    button[data-testid="stTab"] span {
+        font-size: 0.74rem !important;
     }
 }
 
@@ -965,10 +1016,10 @@ _comp_meta.html("""
         /* Шапка — строгий чистый текст БЕЗ glow/теней */
         '.app-title { color: #0F172A !important; text-shadow: none !important; filter: none !important; }',
         '.app-subtitle { color: #334155 !important; text-shadow: none !important; filter: none !important; }',
-        /* Вкладки — стеклянный переключатель Apple */
-        'div[data-baseweb="tab-highlight"], div[data-baseweb="tab-border"] { display: none !important; height: 0 !important; width: 0 !important; opacity: 0 !important; }',
+        /* Вкладки — Apple Segmented Control со скользящим бегунком */
+        'div[data-baseweb="tab-highlight"], div[data-baseweb="tab-border"], .react-aria-SelectionIndicator, [data-testid="stTabs"] .react-aria-SelectionIndicator { display: none !important; height: 0 !important; width: 0 !important; opacity: 0 !important; }',
         '[data-baseweb="tab-scroll-forward"], [data-baseweb="tab-scroll-backward"], [data-baseweb="tab-bar"] > button, [data-testid="stTabs"] button:not([role="tab"]) { display: none !important; width: 0 !important; height: 0 !important; }',
-        'button[role="tab"][aria-selected="true"], button[data-baseweb="tab"][aria-selected="true"] { background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.82) 100%) !important; border: 1px solid rgba(255, 255, 255, 0.95) !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1) !important; }',
+        'button[role="tab"], button[data-baseweb="tab"], button[data-testid="stTab"] { background: transparent !important; border: none !important; box-shadow: none !important; }',
         '[data-testid="stTabs"] > div:first-child { background: transparent !important; border-bottom: none !important; }',
         /* Plotly iframe — прозрачный */
         '.stPlotlyChart iframe { background: transparent !important; }',
@@ -1134,32 +1185,64 @@ _comp_meta.html("""
             el.style.setProperty('color', '#0F172A', 'important');
         });
 
-        // Стилизация табов Apple Glass Segmented Control через DOM
-        var tablist = doc.querySelector('[role="tablist"], [data-baseweb="tab-list"]');
+        // Стилизация табов Apple Segmented Control со скользящим бегунком
+        var tablist = doc.querySelector('[role="tablist"], [data-baseweb="tab-list"], [data-testid="stTabsHeader"]');
         if (tablist) {
+            tablist.style.setProperty('position', 'relative', 'important');
             tablist.style.setProperty('display', 'flex', 'important');
             tablist.style.setProperty('flex-direction', 'row', 'important');
             tablist.style.setProperty('align-items', 'center', 'important');
             tablist.style.setProperty('justify-content', 'space-between', 'important');
             tablist.style.setProperty('width', '100%', 'important');
-            tablist.style.setProperty('gap', '6px', 'important');
-            tablist.style.setProperty('padding', '5px', 'important');
-            tablist.style.setProperty('border-radius', '999px', 'important');
-            tablist.style.setProperty('background', 'rgba(255, 255, 255, 0.42)', 'important');
-            tablist.style.setProperty('backdrop-filter', 'blur(20px) saturate(180%)', 'important');
-            tablist.style.setProperty('-webkit-backdrop-filter', 'blur(20px) saturate(180%)', 'important');
-            tablist.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.8)', 'important');
-            tablist.style.setProperty('box-shadow', '0 8px 28px rgba(15, 23, 42, 0.07), inset 0 1px 1px rgba(255, 255, 255, 0.9)', 'important');
+            tablist.style.setProperty('gap', '4px', 'important');
+            tablist.style.setProperty('padding', '3px', 'important');
+            tablist.style.setProperty('border-radius', '12px', 'important');
+            tablist.style.setProperty('background', 'rgba(118, 118, 128, 0.12)', 'important');
+            tablist.style.setProperty('backdrop-filter', 'blur(25px) saturate(180%)', 'important');
+            tablist.style.setProperty('-webkit-backdrop-filter', 'blur(25px) saturate(180%)', 'important');
+            tablist.style.setProperty('border', '0.5px solid rgba(0, 0, 0, 0.04)', 'important');
+            tablist.style.setProperty('box-shadow', 'inset 0 0.5px 1px rgba(0, 0, 0, 0.06)', 'important');
             tablist.style.setProperty('border-bottom', 'none', 'important');
+            tablist.style.setProperty('overflow', 'hidden', 'important');
             
-            // Удаляем старый лишний ползунок, если был создан
-            var gliderOld = doc.getElementById('apple-tab-glider');
-            if (gliderOld) gliderOld.remove();
+            // Создаем или получаем слайдер Apple
+            var slider = doc.getElementById('apple-tab-slider');
+            if (!slider) {
+                slider = doc.createElement('div');
+                slider.id = 'apple-tab-slider';
+                slider.style.setProperty('position', 'absolute', 'important');
+                slider.style.setProperty('top', '3px', 'important');
+                slider.style.setProperty('left', '0px', 'important');
+                slider.style.setProperty('border-radius', '9px', 'important');
+                slider.style.setProperty('background', '#FFFFFF', 'important');
+                slider.style.setProperty('box-shadow', '0 3px 8px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.04)', 'important');
+                slider.style.setProperty('z-index', '1', 'important');
+                slider.style.setProperty('pointer-events', 'none', 'important');
+                slider.style.setProperty('transition', 'transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.32s cubic-bezier(0.2, 0.8, 0.2, 1)', 'important');
+                slider.style.setProperty('will-change', 'transform, width', 'important');
+                tablist.prepend(slider);
+            }
 
-            // Скрываем все внутренние элементы BaseWeb, не являющиеся кнопками табов
+            // Позиционируем слайдер по активной вкладке
+            var activeTab = tablist.querySelector('button[role="tab"][aria-selected="true"], button[data-baseweb="tab"][aria-selected="true"], [data-testid="stTab"][aria-selected="true"], [data-selected="true"]');
+            if (activeTab && slider) {
+                var targetX = activeTab.offsetLeft;
+                var targetW = activeTab.offsetWidth;
+                var targetH = activeTab.offsetHeight;
+                var targetTop = activeTab.offsetTop;
+                if (targetW > 0) {
+                    slider.style.setProperty('transform', 'translateX(' + targetX + 'px)', 'important');
+                    slider.style.setProperty('width', targetW + 'px', 'important');
+                    slider.style.setProperty('height', targetH + 'px', 'important');
+                    slider.style.setProperty('top', targetTop + 'px', 'important');
+                    slider.style.setProperty('display', 'block', 'important');
+                }
+            }
+
+            // Скрываем все внутренние элементы BaseWeb, кроме кнопок и слайдера
             var ch = tablist.children;
             for (var k = 0; k < ch.length; k++) {
-                if (ch[k].tagName !== 'BUTTON' && ch[k].getAttribute('role') !== 'tab') {
+                if (ch[k].id !== 'apple-tab-slider' && ch[k].tagName !== 'BUTTON' && ch[k].getAttribute('role') !== 'tab') {
                     ch[k].style.setProperty('display', 'none', 'important');
                     ch[k].style.setProperty('height', '0px', 'important');
                     ch[k].style.setProperty('opacity', '0', 'important');
@@ -1173,43 +1256,51 @@ _comp_meta.html("""
             tabsParent.style.setProperty('box-shadow', 'none', 'important');
         }
 
-        var tabs = doc.querySelectorAll('button[role="tab"], button[data-baseweb="tab"]');
+        var tabs = doc.querySelectorAll('button[role="tab"], button[data-baseweb="tab"], button[data-testid="stTab"]');
         tabs.forEach(function(tab) {
+            tab.style.setProperty('position', 'relative', 'important');
+            tab.style.setProperty('z-index', '2', 'important');
             tab.style.setProperty('flex', '1 1 0', 'important');
-            tab.style.setProperty('min-width', 'fit-content', 'important');
-            tab.style.setProperty('height', '38px', 'important');
-            tab.style.setProperty('padding', '0 16px', 'important');
+            tab.style.setProperty('min-width', '0px', 'important');
+            tab.style.setProperty('height', '34px', 'important');
+            tab.style.setProperty('padding', '0 12px', 'important');
             tab.style.setProperty('display', 'inline-flex', 'important');
             tab.style.setProperty('align-items', 'center', 'important');
             tab.style.setProperty('justify-content', 'center', 'important');
-            tab.style.setProperty('border-radius', '999px', 'important');
+            tab.style.setProperty('border-radius', '9px', 'important');
             tab.style.setProperty('outline', 'none', 'important');
-            tab.style.setProperty('border-bottom', 'none', 'important');
+            tab.style.setProperty('border', 'none', 'important');
+            tab.style.setProperty('background', 'transparent', 'important');
+            tab.style.setProperty('box-shadow', 'none', 'important');
+
+            if (!tab._appleTabBound) {
+                tab._appleTabBound = true;
+                tab.addEventListener('click', function() {
+                    setTimeout(function() {
+                        var sl = doc.getElementById('apple-tab-slider');
+                        if (sl && tab && tab.offsetWidth > 0) {
+                            sl.style.setProperty('transform', 'translateX(' + tab.offsetLeft + 'px)', 'important');
+                            sl.style.setProperty('width', tab.offsetWidth + 'px', 'important');
+                        }
+                    }, 0);
+                });
+            }
             
-            var isSel = tab.getAttribute('aria-selected') === 'true';
-            if (isSel) {
-                tab.style.setProperty('background', 'linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.82) 100%)', 'important');
-                tab.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.95)', 'important');
-                tab.style.setProperty('box-shadow', '0 4px 12px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)', 'important');
-                var p = tab.querySelector('p') || tab.querySelector('span');
-                if (p) {
+            var isSel = tab.getAttribute('aria-selected') === 'true' || tab.getAttribute('data-selected') === 'true';
+            var p = tab.querySelector('p') || tab.querySelector('span');
+            if (p) {
+                if (isSel) {
                     p.style.setProperty('color', '#0F172A', 'important');
                     p.style.setProperty('font-weight', '600', 'important');
-                }
-            } else {
-                tab.style.setProperty('background', 'transparent', 'important');
-                tab.style.setProperty('border', '1px solid transparent', 'important');
-                tab.style.setProperty('box-shadow', 'none', 'important');
-                var p = tab.querySelector('p') || tab.querySelector('span');
-                if (p) {
-                    p.style.setProperty('color', '#475569', 'important');
+                } else {
+                    p.style.setProperty('color', '#64748B', 'important');
                     p.style.setProperty('font-weight', '500', 'important');
                 }
             }
         });
 
         // Уничтожаем любую синюю полоску и белые кнопки прокрутки табов
-        var tabExtras = doc.querySelectorAll('[data-baseweb="tab-scroll-forward"], [data-baseweb="tab-scroll-backward"], [data-baseweb="tab-highlight"], [data-baseweb="tab-border"], [data-baseweb="tab-bar"] > button, [data-testid="stTabs"] button:not([role="tab"]), [data-testid="stTabs"] div[style*="height: 2px"], [data-testid="stTabs"] div[style*="height:2px"], [data-testid="stTabs"] div[style*="height: 3px"], [data-testid="stTabs"] div[style*="height:3px"], [data-testid="stTabs"] div[style*="rgb(37, 99, 235)"]');
+        var tabExtras = doc.querySelectorAll('[data-baseweb="tab-scroll-forward"], [data-baseweb="tab-scroll-backward"], [data-baseweb="tab-highlight"], [data-baseweb="tab-border"], [data-baseweb="tab-bar"] > button, [data-testid="stTabs"] button:not([role="tab"]), [data-testid="stTabs"] div[style*="height: 2px"], [data-testid="stTabs"] div[style*="height:2px"], [data-testid="stTabs"] div[style*="height: 3px"], [data-testid="stTabs"] div[style*="height:3px"], [data-testid="stTabs"] div[style*="rgb(37, 99, 235)"], .react-aria-SelectionIndicator');
         tabExtras.forEach(function(el) {
             el.style.setProperty('display', 'none', 'important');
             el.style.setProperty('width', '0px', 'important');
@@ -1217,6 +1308,7 @@ _comp_meta.html("""
             el.style.setProperty('opacity', '0', 'important');
             el.style.setProperty('background', 'transparent', 'important');
             el.style.setProperty('border', 'none', 'important');
+            el.style.setProperty('visibility', 'hidden', 'important');
         });
     }
     setInterval(enforceLightAndFixBg, 350);
