@@ -218,17 +218,18 @@ div[data-baseweb="tab-list"]::-webkit-scrollbar {
     height: calc(100% - 8px) !important;
     border-radius: 999px !important;
     background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.95) 0%,
-        rgba(255, 255, 255, 0.72) 100%
+        135deg,
+        rgba(255, 255, 255, 0.35) 0%,
+        rgba(255, 255, 255, 0.10) 100%
     ) !important;
-    backdrop-filter: blur(20px) saturate(180%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(14px) saturate(200%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(200%) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.85) !important;
     box-shadow:
-        0 4px 16px rgba(15, 23, 42, 0.08),
-        0 1px 3px rgba(15, 23, 42, 0.04),
-        inset 0 1px 1px rgba(255, 255, 255, 1) !important;
+        0 4px 16px rgba(37, 99, 235, 0.10),
+        0 1px 3px rgba(15, 23, 42, 0.05),
+        inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 1px 0 rgba(255, 255, 255, 0.25) !important;
     z-index: 0 !important;
     pointer-events: none !important;
     transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
@@ -1245,11 +1246,11 @@ _comp_meta.html("""
                 slider.style.setProperty('top', '4px', 'important');
                 slider.style.setProperty('left', '0px', 'important');
                 slider.style.setProperty('border-radius', '999px', 'important');
-                slider.style.setProperty('background', 'linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.72) 100%)', 'important');
-                slider.style.setProperty('backdrop-filter', 'blur(20px) saturate(180%)', 'important');
-                slider.style.setProperty('-webkit-backdrop-filter', 'blur(20px) saturate(180%)', 'important');
-                slider.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.98)', 'important');
-                slider.style.setProperty('box-shadow', '0 4px 16px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04), inset 0 1px 1px rgba(255, 255, 255, 1)', 'important');
+                slider.style.setProperty('background', 'linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.10) 100%)', 'important');
+                slider.style.setProperty('backdrop-filter', 'blur(14px) saturate(200%)', 'important');
+                slider.style.setProperty('-webkit-backdrop-filter', 'blur(14px) saturate(200%)', 'important');
+                slider.style.setProperty('border', '1.5px solid rgba(255, 255, 255, 0.85)', 'important');
+                slider.style.setProperty('box-shadow', '0 4px 16px rgba(37, 99, 235, 0.10), 0 1px 3px rgba(15, 23, 42, 0.05), inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 1px 0 rgba(255, 255, 255, 0.25)', 'important');
                 slider.style.setProperty('z-index', '0', 'important');
                 slider.style.setProperty('pointer-events', 'none', 'important');
                 slider.style.setProperty('transition', 'transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.32s cubic-bezier(0.2, 0.8, 0.2, 1)', 'important');
@@ -1258,11 +1259,11 @@ _comp_meta.html("""
             } else {
                 slider.style.setProperty('top', '4px', 'important');
                 slider.style.setProperty('border-radius', '999px', 'important');
-                slider.style.setProperty('background', 'linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.72) 100%)', 'important');
-                slider.style.setProperty('backdrop-filter', 'blur(20px) saturate(180%)', 'important');
-                slider.style.setProperty('-webkit-backdrop-filter', 'blur(20px) saturate(180%)', 'important');
-                slider.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.98)', 'important');
-                slider.style.setProperty('box-shadow', '0 4px 16px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04), inset 0 1px 1px rgba(255, 255, 255, 1)', 'important');
+                slider.style.setProperty('background', 'linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.10) 100%)', 'important');
+                slider.style.setProperty('backdrop-filter', 'blur(14px) saturate(200%)', 'important');
+                slider.style.setProperty('-webkit-backdrop-filter', 'blur(14px) saturate(200%)', 'important');
+                slider.style.setProperty('border', '1.5px solid rgba(255, 255, 255, 0.85)', 'important');
+                slider.style.setProperty('box-shadow', '0 4px 16px rgba(37, 99, 235, 0.10), 0 1px 3px rgba(15, 23, 42, 0.05), inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95), inset 0 -1px 1px 0 rgba(255, 255, 255, 0.25)', 'important');
                 slider.style.setProperty('z-index', '0', 'important');
             }
 
