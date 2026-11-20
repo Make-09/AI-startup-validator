@@ -64,113 +64,124 @@ st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-/* ── Переменные ── */
+/* ══════════════════════════════════════════════════════
+   ПОЛНЫЙ ПРИНУДИТЕЛЬНЫЙ СВЕТЛЫЙ РЕЖИМ
+   Все правила с !important, агрессивные селекторы
+   ══════════════════════════════════════════════════════ */
 :root {
     --primary-color: #2563EB;
-    --background-color: #F8FAFC;
-    --secondary-background-color: #FFFFFF;
-    --text-color: #334155;
+    color-scheme: light !important;
 }
 
-/* ── Прозрачный фон — метаболлы видны сквозь него ── */
-html, body {
+/* ── Прозрачный фон везде ── */
+html, body,
+.stApp, [class*="st-"],
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"],
+section[data-testid="stMain"],
+.block-container,
+div[data-testid="stVerticalBlock"],
+div[data-testid="stHorizontalBlock"] {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
     background: transparent !important;
     color: #334155 !important;
 }
 
-[class*="st-"], .stApp {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    background: transparent !important;
-    color: #334155 !important;
-}
-
-[data-testid="stAppViewContainer"] {
-    background: transparent !important;
-}
-
-/* ── Скрываем верхнюю шторку / toolbar Streamlit ── */
+/* ── Полностью скрываем sticky header Streamlit ── */
+[data-testid="stHeader"],
 [data-testid="stToolbar"],
 [data-testid="stDecoration"],
-#MainMenu {
+#MainMenu,
+header {
     display: none !important;
-    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
 }
 
-[data-testid="stHeader"] {
-    background: rgba(248, 250, 252, 0.80) !important;
-    backdrop-filter: blur(14px) !important;
-    -webkit-backdrop-filter: blur(14px) !important;
-    border-bottom: 1px solid rgba(226, 232, 240, 0.7) !important;
+/* Убираем лишний отступ сверху (от скрытого header) */
+.block-container {
+    padding-top: 0.5rem !important;
+    padding-bottom: 3rem !important;
+    max-width: 1140px !important;
 }
 
-/* Принудительная читаемость заголовков и текста */
+/* ── Принудительная читаемость ── */
+p, span, li, label, div, td, th {
+    color: #334155 !important;
+}
+h1, h2, h3, h4, h5, h6,
+.app-title, .hero-title, .comp-name,
+.score-number, .empty-state-title,
+.done-banner-text {
+    color: #0F172A !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.3px !important;
+}
+
 [data-testid="stMarkdownContainer"] p,
 [data-testid="stMarkdownContainer"] span,
 [data-testid="stMarkdownContainer"] li {
     color: #334155 !important;
 }
-
 [data-testid="stMarkdownContainer"] h1,
 [data-testid="stMarkdownContainer"] h2,
 [data-testid="stMarkdownContainer"] h3,
 [data-testid="stMarkdownContainer"] h4 {
     color: #0F172A !important;
 }
-
-/* Вкладки (Tabs) */
-button[data-baseweb="tab"] {
-    background-color: transparent !important;
+[data-testid="stMarkdownContainer"] strong {
+    color: #0F172A !important;
 }
 
-/* Tab panel — рамка с 30% прозрачностью */
-div[data-testid="stTabsContent"] {
-    background: rgba(255, 255, 255, 0.70) !important;
-    backdrop-filter: blur(14px) !important;
-    -webkit-backdrop-filter: blur(14px) !important;
-    border: 1px solid rgba(226, 232, 240, 0.60) !important;
-    border-radius: 16px !important;
-    padding: 24px !important;
-    margin-top: 8px !important;
-    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06) !important;
+/* ── Вкладки ── */
+button[data-baseweb="tab"] {
+    background-color: transparent !important;
+    color: #64748B !important;
 }
 button[data-baseweb="tab"][aria-selected="true"] {
     color: #2563EB !important;
     border-bottom: 2px solid #2563EB !important;
 }
-button[data-baseweb="tab"][aria-selected="false"] {
-    color: #64748B !important;
+
+/* Tab panel — рамка 30% прозрачность */
+div[data-testid="stTabsContent"] {
+    background: rgba(255, 255, 255, 0.72) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(226, 232, 240, 0.65) !important;
+    border-radius: 16px !important;
+    padding: 28px !important;
+    margin-top: 8px !important;
+    box-shadow: 0 4px 24px rgba(15, 23, 42, 0.07) !important;
 }
 
-/* Поля ввода */
+/* ── Поля ввода — БЕЛЫЕ принудительно ── */
 div[data-testid="stTextInput"] input,
 div[data-testid="stTextArea"] textarea,
 div[data-testid="stNumberInput"] input {
-    background-color: #FFFFFF !important;
+    background-color: rgba(255, 255, 255, 0.95) !important;
     color: #0F172A !important;
     border: 1px solid #CBD5E1 !important;
     border-radius: 8px !important;
 }
+div[data-testid="stTextInput"] > div,
+div[data-testid="stTextArea"] > div,
+div[data-testid="stNumberInput"] > div {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 8px !important;
+}
 div[data-testid="stTextInput"] input:focus,
-div[data-testid="stTextArea"] textarea:focus,
-div[data-testid="stNumberInput"] input:focus {
+div[data-testid="stTextArea"] textarea:focus {
     border-color: #2563EB !important;
     box-shadow: 0 0 0 1px #2563EB !important;
 }
 
-/* ── Контейнер приложения ── */
-.block-container {
-    padding-top: 1.25rem !important;
-    padding-bottom: 3.5rem !important;
-    max-width: 1140px !important;
-    background: transparent !important;
-}
-
-
-/* ── Dropdown (selectbox) ── белый список, видимый на любом фоне ── */
-[data-baseweb="select"] > div {
-    background-color: rgba(255,255,255,0.95) !important;
+/* ── Dropdown ── */
+[data-baseweb="select"] > div,
+[data-baseweb="select"] > div > div {
+    background-color: rgba(255, 255, 255, 0.95) !important;
     color: #0F172A !important;
+    border-color: #CBD5E1 !important;
 }
 [data-baseweb="popover"] [role="listbox"],
 [data-baseweb="menu"],
@@ -179,197 +190,45 @@ ul[data-baseweb="menu"] {
     color: #0F172A !important;
     border: 1px solid #E2E8F0 !important;
     border-radius: 8px !important;
-    box-shadow: 0 4px 16px rgba(15,23,42,0.10) !important;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12) !important;
 }
 [data-baseweb="option"] {
     background-color: #FFFFFF !important;
     color: #0F172A !important;
 }
-[data-baseweb="option"]:hover {
+[data-baseweb="option"]:hover,
+[data-baseweb="option"][aria-selected="true"] {
     background-color: #EFF6FF !important;
     color: #2563EB !important;
 }
 
-/* Поля ввода — светлые принудительно */
-div[data-testid="stTextInput"] input,
-div[data-testid="stTextArea"] textarea,
-div[data-testid="stNumberInput"] input,
-div[data-testid="stSelectbox"] > div,
-div[data-testid="stSelectbox"] select,
-input[class*="st-"],
-textarea[class*="st-"] {
-    background-color: rgba(255,255,255,0.95) !important;
+/* ── Кнопки — БЕЛЫЕ ── */
+.stButton > button {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 0.88rem !important;
+    padding: 0.5rem 1rem !important;
+    transition: all 0.15s ease !important;
+    background-color: #FFFFFF !important;
     color: #0F172A !important;
-    border-color: rgba(203,213,225,0.9) !important;
+    border: 1px solid #CBD5E1 !important;
+}
+.stButton > button:hover {
+    background-color: #EFF6FF !important;
+    border-color: #2563EB !important;
+    color: #2563EB !important;
+}
+.stButton > button[kind="primary"] {
+    background-color: #2563EB !important;
+    color: #FFFFFF !important;
+    border: 1px solid #2563EB !important;
+}
+.stButton > button[kind="primary"]:hover {
+    background-color: #1D4ED8 !important;
+    border-color: #1D4ED8 !important;
 }
 
-/* Контейнеры полей ввода */
-div[data-testid="stTextInput"] > div,
-div[data-testid="stTextArea"] > div,
-div[data-testid="stNumberInput"] > div {
-    background-color: rgba(255,255,255,0.95) !important;
-    border-color: rgba(203,213,225,0.9) !important;
-}
-
-/* Принудительно светлый фон для блока формы */
-div[data-testid="stForm"],
-div[data-testid="stVerticalBlock"],
-section[data-testid="stMain"] > div {
-    background: transparent !important;
-}
-
-/* hero-pill — светлее */
-.hero-pill {
-    background: rgba(248,250,252,0.85) !important;
-    border-color: rgba(226,232,240,0.7) !important;
-}
-
-/* ── Шапка ── */
-.app-header {
-    border-bottom: 1px solid #E2E8F0;
-    padding-bottom: 1.25rem;
-    margin-bottom: 1.5rem;
-}
-.app-title {
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: #0F172A !important;
-    letter-spacing: -0.5px;
-    margin: 0 0 4px 0;
-}
-.app-subtitle {
-    font-size: 0.9rem;
-    color: #64748B !important;
-    margin: 0;
-}
-
-/* ── Заголовки ── */
-h1, h2, h3, h4 {
-    color: #0F172A !important;
-    letter-spacing: -0.3px;
-    font-weight: 700 !important;
-}
-
-/* ── Hero-карточка ── */
-.hero-card {
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    border-radius: 12px;
-    padding: 24px 28px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
-    margin-bottom: 1.75rem;
-}
-.hero-badge {
-    display: inline-block;
-    background: #EFF6FF;
-    color: #2563EB;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 6px;
-    margin-bottom: 10px;
-}
-.hero-title {
-    font-size: 1.35rem;
-    font-weight: 800;
-    color: #0F172A;
-    margin: 0 0 8px 0;
-    letter-spacing: -0.3px;
-}
-.hero-desc {
-    font-size: 0.9rem;
-    color: #334155;
-    line-height: 1.6;
-    margin-bottom: 18px;
-}
-.hero-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 12px;
-}
-.hero-pill {
-    background: #F8FAFC;
-    border: 1px solid #E2E8F0;
-    border-radius: 8px;
-    padding: 14px 16px;
-}
-.hero-pill-num {
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    color: #2563EB;
-    font-size: 0.8rem;
-    margin-bottom: 4px;
-}
-.hero-pill-title {
-    font-weight: 700;
-    color: #0F172A;
-    font-size: 0.85rem;
-    margin-bottom: 4px;
-}
-.hero-pill-sub {
-    font-size: 0.78rem;
-    color: #64748B;
-    line-height: 1.45;
-}
-
-/* ── Баннер завершения анализа ── */
-.done-banner {
-    background: #F0FDFA;
-    border: 1px solid #CCFBF1;
-    border-radius: 10px;
-    padding: 14px 20px;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-.done-banner-icon {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1rem;
-    background: #0D9488;
-    color: white;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-}
-.done-banner-text { font-size: 0.95rem; font-weight: 700; color: #0F172A; }
-.done-banner-sub  { font-size: 0.82rem; color: #0D9488; font-weight: 500; }
-
-/* ── Empty State Card ── */
-.empty-state-card {
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    border-radius: 12px;
-    padding: 48px 24px;
-    text-align: center;
-    margin: 2rem 0;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
-}
-.empty-state-title {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #0F172A;
-    margin-bottom: 8px;
-}
-.empty-state-desc {
-    font-size: 0.9rem;
-    color: #64748B;
-    max-width: 540px;
-    margin: 0 auto;
-    line-height: 1.6;
-}
-
-/* ── Метрики Streamlit ── */
+/* ── Метрики ── */
 [data-testid="stMetric"] {
     background: rgba(255, 255, 255, 0.85) !important;
     backdrop-filter: blur(10px) !important;
@@ -392,260 +251,265 @@ h1, h2, h3, h4 {
     font-weight: 700 !important;
     color: #0F172A !important;
 }
+[data-testid="stMetricDelta"] svg { display: none; }
+
+/* ── Шапка приложения ── */
+.app-header {
+    border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+.app-title {
+    font-size: 1.75rem !important;
+    font-weight: 800 !important;
+    color: #0F172A !important;
+    letter-spacing: -0.5px;
+    margin: 0 0 4px 0;
+}
+.app-subtitle {
+    font-size: 0.9rem;
+    color: #64748B !important;
+    margin: 0;
+}
+
+/* ── Hero-карточка ── */
+.hero-card {
+    background: rgba(255, 255, 255, 0.90) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    border: 1px solid rgba(226, 232, 240, 0.75) !important;
+    border-radius: 12px !important;
+    padding: 24px 28px !important;
+    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.07) !important;
+    margin-bottom: 1.75rem !important;
+}
+.hero-badge {
+    display: inline-block;
+    background: #EFF6FF !important;
+    color: #2563EB !important;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+.hero-title {
+    font-size: 1.35rem !important;
+    font-weight: 800 !important;
+    color: #0F172A !important;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.3px;
+}
+.hero-desc {
+    font-size: 0.9rem !important;
+    color: #334155 !important;
+    line-height: 1.6;
+    margin-bottom: 18px;
+}
+.hero-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+}
+.hero-pill {
+    background: rgba(241, 245, 249, 0.90) !important;
+    border: 1px solid rgba(226, 232, 240, 0.80) !important;
+    border-radius: 8px !important;
+    padding: 14px 16px !important;
+}
+.hero-pill-num {
+    font-family: 'JetBrains Mono', monospace !important;
+    font-weight: 700 !important;
+    color: #2563EB !important;
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+}
+.hero-pill-title {
+    font-weight: 700 !important;
+    color: #0F172A !important;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+}
+.hero-pill-sub {
+    font-size: 0.78rem !important;
+    color: #475569 !important;
+    line-height: 1.45;
+}
+
+/* ── Баннер завершения ── */
+.done-banner {
+    background: rgba(240, 253, 250, 0.90) !important;
+    border: 1px solid #CCFBF1 !important;
+    border-radius: 10px !important;
+    padding: 14px 20px !important;
+    margin-bottom: 1.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+}
+.done-banner-icon {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    background: #0D9488 !important;
+    color: white !important;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+.done-banner-text { font-size: 0.95rem !important; font-weight: 700 !important; color: #0F172A !important; }
+.done-banner-sub  { font-size: 0.82rem !important; color: #0D9488 !important; font-weight: 500 !important; }
+
+/* ── Empty State ── */
+.empty-state-card {
+    background: rgba(255, 255, 255, 0.90) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(226, 232, 240, 0.75) !important;
+    border-radius: 12px !important;
+    padding: 48px 24px !important;
+    text-align: center !important;
+    margin: 2rem 0 !important;
+}
+.empty-state-title {
+    font-size: 1.15rem !important;
+    font-weight: 700 !important;
+    color: #0F172A !important;
+    margin-bottom: 8px !important;
+}
+.empty-state-desc {
+    font-size: 0.9rem !important;
+    color: #64748B !important;
+    max-width: 540px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
 
 /* ── Карточка скоринга ── */
 .score-card {
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    background: rgba(255, 255, 255, 0.90) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(226, 232, 240, 0.75) !important;
+    border-radius: 12px !important;
+    padding: 24px !important;
 }
 .score-number {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 3.5rem;
-    font-weight: 800;
-    line-height: 1;
-    color: #0F172A;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 3.5rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    color: #0F172A !important;
 }
 .score-denom {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 1.3rem;
-    color: #64748B;
-    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 1.3rem !important;
+    color: #64748B !important;
+    font-weight: 500 !important;
 }
 
 /* ── Семантические бейджи ── */
-.badge-success {
-    background: #F0FDFA;
-    color: #0D9488;
-    border: 1px solid #CCFBF1;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.82rem;
-    display: inline-block;
-}
-.badge-warning {
-    background: #FFFBEB;
-    color: #D97706;
-    border: 1px solid #FEF3C7;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.82rem;
-    display: inline-block;
-}
-.badge-danger {
-    background: #FFF1F2;
-    color: #E11D48;
-    border: 1px solid #FFE4E6;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.82rem;
-    display: inline-block;
-}
+.badge-success { background:#F0FDFA!important;color:#0D9488!important;border:1px solid #CCFBF1!important;padding:5px 12px;border-radius:20px;font-weight:600;font-size:0.82rem;display:inline-block; }
+.badge-warning { background:#FFFBEB!important;color:#D97706!important;border:1px solid #FEF3C7!important;padding:5px 12px;border-radius:20px;font-weight:600;font-size:0.82rem;display:inline-block; }
+.badge-danger  { background:#FFF1F2!important;color:#E11D48!important;border:1px solid #FFE4E6!important;padding:5px 12px;border-radius:20px;font-weight:600;font-size:0.82rem;display:inline-block; }
 
-/* ── Карточки конкурентного анализа ── */
+/* ── Карточки конкурентов ── */
 .comp-card {
-    background: rgba(255, 255, 255, 0.88);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    border-radius: 12px;
-    padding: 18px 22px;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
-    margin-bottom: 12px;
+    background: rgba(255, 255, 255, 0.90) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(226, 232, 240, 0.75) !important;
+    border-radius: 12px !important;
+    padding: 18px 22px !important;
+    margin-bottom: 12px !important;
 }
 .comp-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #F1F5F9;
+    border-bottom: 1px solid #F1F5F9 !important;
     padding-bottom: 10px;
     margin-bottom: 12px;
 }
-.comp-name {
-    font-weight: 700;
-    font-size: 1rem;
-    color: #0F172A;
-}
-.comp-price {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #2563EB;
-    background: #EFF6FF;
-    padding: 4px 10px;
-    border-radius: 6px;
-    border: 1px solid #DBEAFE;
-}
-.comp-badge-direct {
-    background: #FFF1F2;
-    color: #E11D48;
-    border: 1px solid #FFE4E6;
-    font-size: 0.72rem;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 4px;
-}
-.comp-badge-indirect {
-    background: #FFFBEB;
-    color: #D97706;
-    border: 1px solid #FEF3C7;
-    font-size: 0.72rem;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 4px;
-}
-.comp-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-}
-.comp-section-title {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    color: #64748B;
-    margin-bottom: 4px;
-}
-.comp-section-body {
-    font-size: 0.85rem;
-    color: #334155;
-    line-height: 1.5;
-}
+.comp-name { font-weight:700!important;font-size:1rem!important;color:#0F172A!important; }
+.comp-price { font-family:'JetBrains Mono',monospace!important;font-size:0.8rem!important;font-weight:600!important;color:#2563EB!important;background:#EFF6FF!important;padding:4px 10px;border-radius:6px;border:1px solid #DBEAFE!important; }
+.comp-badge-direct   { background:#FFF1F2!important;color:#E11D48!important;border:1px solid #FFE4E6!important;font-size:0.72rem;font-weight:600;padding:3px 8px;border-radius:4px; }
+.comp-badge-indirect { background:#FFFBEB!important;color:#D97706!important;border:1px solid #FEF3C7!important;font-size:0.72rem;font-weight:600;padding:3px 8px;border-radius:4px; }
+.comp-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+.comp-section-title { font-size:0.72rem!important;font-weight:700!important;letter-spacing:0.5px;text-transform:uppercase;color:#64748B!important;margin-bottom:4px; }
+.comp-section-body  { font-size:0.85rem!important;color:#334155!important;line-height:1.5; }
 
 /* ── Диалоги интервью ── */
-.phase-tag {
-    display: inline-block;
-    background: #EFF6FF;
-    color: #2563EB;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 4px;
-    margin: 10px 0 6px 0;
-}
-.chat-q {
-    color: #475569;
-    font-size: 0.88rem;
-    font-style: italic;
-    margin: 4px 0 4px 0;
-}
-.chat-a {
-    background: #F8FAFC;
-    border-left: 3px solid #2563EB;
-    border-radius: 0 8px 8px 0;
-    padding: 10px 14px;
-    font-size: 0.88rem;
-    color: #0F172A;
-    margin: 4px 0 12px 0;
-    line-height: 1.5;
-}
-.mono-val {
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 600;
-}
+.phase-tag { display:inline-block;background:#EFF6FF!important;color:#2563EB!important;font-family:'JetBrains Mono',monospace;font-size:0.72rem;font-weight:700;padding:3px 8px;border-radius:4px;margin:10px 0 6px 0; }
+.chat-q { color:#475569!important;font-size:0.88rem!important;font-style:italic;margin:4px 0 4px 0; }
+.chat-a { background:rgba(248,250,252,0.90)!important;border-left:3px solid #2563EB!important;border-radius:0 8px 8px 0!important;padding:10px 14px!important;font-size:0.88rem!important;color:#0F172A!important;margin:4px 0 12px 0;line-height:1.5; }
+.mono-val { font-family:'JetBrains Mono',monospace!important;font-weight:600!important;color:#0F172A!important; }
 
 /* ── Прогресс шаги ── */
-.step-row { display:flex; align-items:center; gap:10px; margin:7px 0; }
-.step-dot-done    { width:9px;height:9px;border-radius:50%;background:#0D9488;flex-shrink:0; }
-.step-dot-active  { width:9px;height:9px;border-radius:50%;background:#2563EB;flex-shrink:0;animation:pulse 1s infinite; }
-.step-dot-pending { width:9px;height:9px;border-radius:50%;background:#CBD5E1;flex-shrink:0; }
-.step-text-done    { font-size:0.85rem;color:#0D9488;font-weight:500; }
-.step-text-active  { font-size:0.85rem;color:#1D4ED8;font-weight:700; }
-.step-text-pending { font-size:0.85rem;color:#94A3B8; }
+.step-row { display:flex;align-items:center;gap:10px;margin:7px 0; }
+.step-dot-done    { width:9px;height:9px;border-radius:50%;background:#0D9488!important;flex-shrink:0; }
+.step-dot-active  { width:9px;height:9px;border-radius:50%;background:#2563EB!important;flex-shrink:0;animation:pulse 1s infinite; }
+.step-dot-pending { width:9px;height:9px;border-radius:50%;background:#CBD5E1!important;flex-shrink:0; }
+.step-text-done    { font-size:0.85rem!important;color:#0D9488!important;font-weight:500!important; }
+.step-text-active  { font-size:0.85rem!important;color:#1D4ED8!important;font-weight:700!important; }
+.step-text-pending { font-size:0.85rem!important;color:#94A3B8!important; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
 
-/* ── Кнопки ── */
-.stButton > button {
-    border-radius: 8px !important;
-    font-weight: 600 !important;
-    font-size: 0.88rem !important;
-    padding: 0.5rem 1rem !important;
-    transition: all 0.15s ease !important;
-}
-.stButton > button[kind="primary"] {
-    background-color: #2563EB !important;
-    color: #FFFFFF !important;
-    border: 1px solid #2563EB !important;
-    box-shadow: 0 1px 2px rgba(37, 99, 235, 0.15) !important;
-}
-.stButton > button[kind="primary"]:hover {
-    background-color: #1D4ED8 !important;
-    border-color: #1D4ED8 !important;
-}
-.stButton > button[kind="secondary"] {
-    background-color: #FFFFFF !important;
-    color: #0F172A !important;
-    border: 1px solid #CBD5E1 !important;
-}
-.stButton > button[kind="secondary"]:hover {
-    background-color: #F8FAFC !important;
-    border-color: #94A3B8 !important;
-}
-
-/* ── Скрываем сайдбар полностью ── */
-[data-testid="stSidebarNav"] { display: none !important; }
-button[data-testid="collapsedControl"] { display: none !important; }
-section[data-testid="stSidebar"] { display: none !important; }
+/* ── Скрываем сайдбар ── */
+[data-testid="stSidebarNav"],
+button[data-testid="collapsedControl"],
+section[data-testid="stSidebar"],
 [data-testid="stSidebar"] { display: none !important; }
-
-/* Убираем стрелочки delta у метрик */
-[data-testid="stMetricDelta"] svg { display:none; }
 
 /* ── Entrance animations ── */
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: translateY(0); }
 }
-.hero-card        { animation: fadeUp 0.4s ease-out both; }
-.empty-state-card { animation: fadeUp 0.35s ease-out both; }
-[data-testid="stMetric"] { animation: fadeUp 0.3s ease-out both; }
-.comp-card        { animation: fadeUp 0.35s ease-out both; }
-.score-card       { animation: fadeUp 0.4s ease-out both; }
-.done-banner      { animation: fadeUp 0.3s ease-out both; }
-[data-testid="stMetric"]:nth-child(1) { animation-delay: 0ms; }
-[data-testid="stMetric"]:nth-child(2) { animation-delay: 60ms; }
-[data-testid="stMetric"]:nth-child(3) { animation-delay: 120ms; }
-[data-testid="stMetric"]:nth-child(4) { animation-delay: 180ms; }
+.hero-card        { animation: fadeUp 0.4s ease-out both !important; }
+.empty-state-card { animation: fadeUp 0.35s ease-out both !important; }
+[data-testid="stMetric"] { animation: fadeUp 0.3s ease-out both !important; }
+.comp-card        { animation: fadeUp 0.35s ease-out both !important; }
+.score-card       { animation: fadeUp 0.4s ease-out both !important; }
+.done-banner      { animation: fadeUp 0.3s ease-out both !important; }
+[data-testid="stMetric"]:nth-child(1) { animation-delay:0ms; }
+[data-testid="stMetric"]:nth-child(2) { animation-delay:60ms; }
+[data-testid="stMetric"]:nth-child(3) { animation-delay:120ms; }
+[data-testid="stMetric"]:nth-child(4) { animation-delay:180ms; }
 
-/* ── Принудительная светлая тема при dark-mode ОС/браузера ── */
+/* ── Dark mode — всё то же самое, никаких тёмных фонов ── */
 @media (prefers-color-scheme: dark) {
-    html, body { background: transparent !important; color: #334155 !important; }
-    .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"],
-    section[data-testid="stMain"], .block-container {
+    html, body, .stApp,
+    [data-testid="stAppViewContainer"],
+    [data-testid="stMain"],
+    section[data-testid="stMain"],
+    .block-container,
+    div[data-testid="stVerticalBlock"],
+    div[data-testid="stHorizontalBlock"] {
         background: transparent !important;
         color: #334155 !important;
     }
-    [data-testid="stHeader"] { background: rgba(248,250,252,0.85) !important; }
-    [data-testid="stMetric"] { background: rgba(255,255,255,0.90) !important; border-color: #E2E8F0 !important; }
-    [data-testid="stMetricLabel"] { color: #64748B !important; }
-    [data-testid="stMetricValue"] { color: #0F172A !important; }
+    p, span, li, label { color: #334155 !important; }
+    h1, h2, h3, h4, strong { color: #0F172A !important; }
     .hero-card, .comp-card, .score-card, .empty-state-card {
         background: rgba(255,255,255,0.90) !important;
-        border-color: #E2E8F0 !important;
     }
-    .chat-a { background: rgba(248,250,252,0.90) !important; color: #0F172A !important; }
-    button[data-baseweb="tab"] { background-color: transparent !important; color: #64748B !important; }
-    button[data-baseweb="tab"][aria-selected="true"] { color: #2563EB !important; }
-    div[data-testid="stTextInput"] input,
-    div[data-testid="stTextArea"] textarea,
-    div[data-testid="stNumberInput"] input {
-        background-color: rgba(255,255,255,0.92) !important;
+    .hero-title, .hero-desc, .hero-pill-title, .hero-pill-sub { color: #0F172A !important; }
+    .hero-pill { background: rgba(241,245,249,0.90) !important; }
+    [data-testid="stMetric"] { background: rgba(255,255,255,0.88) !important; }
+    [data-testid="stMetricLabel"] { color: #64748B !important; }
+    [data-testid="stMetricValue"] { color: #0F172A !important; }
+    .stButton > button {
+        background-color: rgba(255,255,255,0.95) !important;
         color: #0F172A !important;
         border-color: #CBD5E1 !important;
     }
-    [data-baseweb="select"] > div { background-color: rgba(255,255,255,0.95) !important; color: #0F172A !important; }
-    [data-baseweb="option"],
-    [data-baseweb="menu"],
-    ul[data-baseweb="menu"] { background-color: #FFFFFF !important; color: #0F172A !important; }
+    .stButton > button[kind="primary"] {
+        background-color: #2563EB !important;
+        color: #FFFFFF !important;
+    }
     div[data-testid="stTextInput"] input,
     div[data-testid="stTextArea"] textarea,
     div[data-testid="stNumberInput"] input {
@@ -657,15 +521,16 @@ section[data-testid="stSidebar"] { display: none !important; }
     div[data-testid="stNumberInput"] > div {
         background-color: rgba(255,255,255,0.90) !important;
     }
-    [data-testid="stMarkdownContainer"] p,
-    [data-testid="stMarkdownContainer"] span,
-    [data-testid="stMarkdownContainer"] li { color: #334155 !important; }
-    [data-testid="stMarkdownContainer"] h1,
-    [data-testid="stMarkdownContainer"] h2,
-    [data-testid="stMarkdownContainer"] h3 { color: #0F172A !important; }
-    .hero-title, .comp-name, .score-number, .empty-state-title, .done-banner-text { color: #0F172A !important; }
+    [data-baseweb="select"] > div { background-color: rgba(255,255,255,0.95) !important; color: #0F172A !important; }
+    [data-baseweb="option"],
+    [data-baseweb="menu"],
+    ul[data-baseweb="menu"] { background-color: #FFFFFF !important; color: #0F172A !important; }
+    div[data-testid="stTabsContent"] { background: rgba(255,255,255,0.75) !important; }
+    .chat-a { background: rgba(248,250,252,0.90) !important; color: #0F172A !important; }
+    button[data-baseweb="tab"] { color: #64748B !important; }
+    button[data-baseweb="tab"][aria-selected="true"] { color: #2563EB !important; }
     .app-title { color: #0F172A !important; }
-    h1, h2, h3, h4 { color: #0F172A !important; }
+    .app-subtitle { color: #64748B !important; }
 }
 </style>
 """, unsafe_allow_html=True)
