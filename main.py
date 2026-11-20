@@ -190,14 +190,16 @@ div[data-baseweb="tab-list"],
     justify-content: space-between !important;
     gap: 4px !important;
     width: 100% !important;
-    padding: 5px 8px !important;
+    padding: 6px 10px !important;
+    min-height: 56px !important;
+    margin-bottom: 24px !important;
     border-radius: 999px !important;
-    background: rgba(255, 255, 255, 0.42) !important;
+    background: rgba(255, 255, 255, 0.45) !important;
     backdrop-filter: blur(25px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
     border: 1px solid rgba(255, 255, 255, 0.85) !important;
     box-shadow:
-        0 6px 24px rgba(37, 99, 235, 0.05),
+        0 8px 32px rgba(37, 99, 235, 0.06),
         inset 0 1px 2px rgba(255, 255, 255, 0.95) !important;
     overflow: hidden !important;
     scrollbar-width: none !important;
@@ -213,9 +215,9 @@ div[data-baseweb="tab-list"]::-webkit-scrollbar {
 /* Фирменный скользящий кристально-стеклянный бегунок Apple (Liquid Glass Slider) */
 #apple-tab-slider {
     position: absolute !important;
-    top: 4px !important;
+    top: 6px !important;
     left: 0 !important;
-    height: calc(100% - 8px) !important;
+    height: calc(100% - 12px) !important;
     border-radius: 999px !important;
     background: linear-gradient(
         135deg,
@@ -244,7 +246,7 @@ button[data-testid="stTab"] {
     z-index: 10 !important;
     flex: 1 1 0 !important;
     min-width: 0 !important;
-    height: 38px !important;
+    height: 44px !important;
     padding: 0 24px !important;
     margin: 0 !important;
     border-radius: 999px !important;
@@ -266,13 +268,13 @@ button[data-testid="stTab"] {
 button[role="tab"]:first-child,
 button[role="tab"]:first-of-type,
 button[data-testid="stTab"]:first-child {
-    padding-left: 28px !important;
+    padding-left: 30px !important;
 }
 
 button[role="tab"]:last-child,
 button[role="tab"]:last-of-type,
 button[data-testid="stTab"]:last-child {
-    padding-right: 28px !important;
+    padding-right: 30px !important;
 }
 
 button[role="tab"] *,
@@ -292,9 +294,10 @@ button[data-testid="stTab"] span {
     margin: 0 !important;
     padding: 0 !important;
     line-height: 1 !important;
-    font-size: 0.88rem !important;
+    font-size: 0.92rem !important;
     font-weight: 500 !important;
     color: #475569 !important;
+    letter-spacing: -0.01em !important;
     transition: color 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), font-weight 0.2s ease !important;
     text-overflow: ellipsis !important;
     overflow: hidden !important;
@@ -355,21 +358,32 @@ button[data-testid="stTab"][data-selected="true"] {
     div[role="tablist"],
     div[data-baseweb="tab-list"],
     [data-testid="stTabsHeader"] {
-        padding: 3px !important;
-        gap: 3px !important;
-        border-radius: 12px !important;
+        padding: 4px 6px !important;
+        gap: 2px !important;
+        border-radius: 999px !important;
+        min-height: 44px !important;
     }
     #apple-tab-slider {
-        top: 3px !important;
-        height: calc(100% - 6px) !important;
-        border-radius: 9px !important;
+        top: 4px !important;
+        height: calc(100% - 8px) !important;
+        border-radius: 999px !important;
     }
     button[role="tab"],
     button[data-baseweb="tab"],
     button[data-testid="stTab"] {
-        padding: 0 6px !important;
-        height: 33px !important;
-        border-radius: 9px !important;
+        padding: 0 8px !important;
+        height: 36px !important;
+        border-radius: 999px !important;
+    }
+    button[role="tab"]:first-child,
+    button[role="tab"]:first-of-type,
+    button[data-testid="stTab"]:first-child {
+        padding-left: 12px !important;
+    }
+    button[role="tab"]:last-child,
+    button[role="tab"]:last-of-type,
+    button[data-testid="stTab"]:last-child {
+        padding-right: 12px !important;
     }
     button[role="tab"] p,
     button[role="tab"] span,
@@ -377,7 +391,7 @@ button[data-testid="stTab"][data-selected="true"] {
     button[data-baseweb="tab"] span,
     button[data-testid="stTab"] p,
     button[data-testid="stTab"] span {
-        font-size: 0.76rem !important;
+        font-size: 0.78rem !important;
     }
 }
 
@@ -1227,13 +1241,14 @@ _comp_meta.html("""
             tablist.style.setProperty('justify-content', 'space-between', 'important');
             tablist.style.setProperty('width', '100%', 'important');
             tablist.style.setProperty('gap', '4px', 'important');
-            tablist.style.setProperty('padding', '5px 8px', 'important');
+            tablist.style.setProperty('padding', '6px 10px', 'important');
+            tablist.style.setProperty('min-height', '56px', 'important');
             tablist.style.setProperty('border-radius', '999px', 'important');
-            tablist.style.setProperty('background', 'rgba(255, 255, 255, 0.42)', 'important');
+            tablist.style.setProperty('background', 'rgba(255, 255, 255, 0.45)', 'important');
             tablist.style.setProperty('backdrop-filter', 'blur(25px) saturate(180%)', 'important');
             tablist.style.setProperty('-webkit-backdrop-filter', 'blur(25px) saturate(180%)', 'important');
             tablist.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.85)', 'important');
-            tablist.style.setProperty('box-shadow', '0 6px 24px rgba(37, 99, 235, 0.05), inset 0 1px 2px rgba(255, 255, 255, 0.95)', 'important');
+            tablist.style.setProperty('box-shadow', '0 8px 32px rgba(37, 99, 235, 0.06), inset 0 1px 2px rgba(255, 255, 255, 0.95)', 'important');
             tablist.style.setProperty('border-bottom', 'none', 'important');
             tablist.style.setProperty('overflow', 'hidden', 'important');
             
@@ -1243,7 +1258,7 @@ _comp_meta.html("""
                 slider = doc.createElement('div');
                 slider.id = 'apple-tab-slider';
                 slider.style.setProperty('position', 'absolute', 'important');
-                slider.style.setProperty('top', '4px', 'important');
+                slider.style.setProperty('top', '6px', 'important');
                 slider.style.setProperty('left', '0px', 'important');
                 slider.style.setProperty('border-radius', '999px', 'important');
                 slider.style.setProperty('background', 'linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.10) 100%)', 'important');
@@ -1257,7 +1272,7 @@ _comp_meta.html("""
                 slider.style.setProperty('will-change', 'transform, width', 'important');
                 tablist.prepend(slider);
             } else {
-                slider.style.setProperty('top', '4px', 'important');
+                slider.style.setProperty('top', '6px', 'important');
                 slider.style.setProperty('border-radius', '999px', 'important');
                 slider.style.setProperty('background', 'linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.10) 100%)', 'important');
                 slider.style.setProperty('backdrop-filter', 'blur(14px) saturate(200%)', 'important');
@@ -1270,8 +1285,8 @@ _comp_meta.html("""
             // Позиционируем слайдер по активной вкладке с дополнительным запасом по ширине (padding)
             var activeTab = tablist.querySelector('button[role="tab"][aria-selected="true"], button[data-baseweb="tab"][aria-selected="true"], [data-testid="stTab"][aria-selected="true"], [data-selected="true"]');
             if (activeTab && slider) {
-                var extraPadX = 8;
-                var targetX = activeTab.offsetLeft - extraPadX;
+                var extraPadX = 6;
+                var targetX = Math.max(4, activeTab.offsetLeft - extraPadX);
                 var targetW = activeTab.offsetWidth + (extraPadX * 2);
                 var targetH = activeTab.offsetHeight;
                 var targetTop = activeTab.offsetTop;
@@ -1307,13 +1322,13 @@ _comp_meta.html("""
             tab.style.setProperty('z-index', '10', 'important');
             tab.style.setProperty('flex', '1 1 0', 'important');
             tab.style.setProperty('min-width', '0px', 'important');
-            tab.style.setProperty('height', '38px', 'important');
+            tab.style.setProperty('height', '44px', 'important');
             tab.style.setProperty('padding', '0 24px', 'important');
             if (idx === 0) {
-                tab.style.setProperty('padding-left', '28px', 'important');
+                tab.style.setProperty('padding-left', '30px', 'important');
             }
             if (idx === arr.length - 1) {
-                tab.style.setProperty('padding-right', '28px', 'important');
+                tab.style.setProperty('padding-right', '30px', 'important');
             }
             tab.style.setProperty('display', 'inline-flex', 'important');
             tab.style.setProperty('align-items', 'center', 'important');
@@ -1330,9 +1345,11 @@ _comp_meta.html("""
                     setTimeout(function() {
                         var sl = doc.getElementById('apple-tab-slider');
                         if (sl && tab && tab.offsetWidth > 0) {
-                            var extraPadX = 8;
-                            sl.style.setProperty('transform', 'translateX(' + (tab.offsetLeft - extraPadX) + 'px)', 'important');
-                            sl.style.setProperty('width', (tab.offsetWidth + extraPadX * 2) + 'px', 'important');
+                            var extraPadX = 6;
+                            var targetX = Math.max(4, tab.offsetLeft - extraPadX);
+                            var targetW = tab.offsetWidth + (extraPadX * 2);
+                            sl.style.setProperty('transform', 'translateX(' + targetX + 'px)', 'important');
+                            sl.style.setProperty('width', targetW + 'px', 'important');
                         }
                     }, 0);
                 });
@@ -1525,7 +1542,7 @@ with tab1:
     st.markdown("<div style='height: 10px'></div>", unsafe_allow_html=True)
     st.subheader("Параметры бизнес-идеи")
 
-    col_left, col_right = st.columns([3, 2])
+    col_left, col_right = st.columns(2, gap="large")
 
     with col_left:
         name = st.text_input(
@@ -1580,6 +1597,40 @@ with tab1:
         st.session_state["_last_bt"] = business_type
         st.session_state["_last_country"] = country
         st.session_state["_last_desc"] = description
+
+        # ── Бенчмарк индустрии (перенесён под Язык интервью для идеального геометрического баланса) ──
+        active_bench = st.session_state.get("realtime_benchmark") or get_benchmark(business_type)
+        bench_is_rt = "realtime_benchmark" in st.session_state
+        bench_badge = "актуальный онлайн" if bench_is_rt else "статичный (2025)"
+
+        st.markdown(f"""
+        <div style="background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(226, 232, 240, 0.9); border-radius: 14px; padding: 14px 16px; margin-top: 14px; box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 7px;">
+              <span style="font-size: 1rem;">📊</span>
+              <span style="font-weight: 600; font-size: 0.88rem; color: #0F172A;">Бенчмарк: {active_bench.display_name}</span>
+            </div>
+            <span style="font-size: 0.70rem; padding: 2px 8px; border-radius: 999px; background: rgba(37, 99, 235, 0.08); color: #2563EB; font-weight: 600; border: 1px solid rgba(37, 99, 235, 0.16);">{bench_badge}</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; text-align: center;">
+            <div style="background: rgba(248, 250, 252, 0.85); border-radius: 9px; padding: 8px 4px; border: 1px solid rgba(226, 232, 240, 0.7);">
+              <div style="font-size: 0.68rem; color: #64748B; margin-bottom: 2px; font-weight: 500;">Провал 12 мес</div>
+              <div style="font-size: 0.90rem; font-weight: 700; color: #E11D48;">{active_bench.failure_rate_12_months:.0%}</div>
+            </div>
+            <div style="background: rgba(248, 250, 252, 0.85); border-radius: 9px; padding: 8px 4px; border: 1px solid rgba(226, 232, 240, 0.7);">
+              <div style="font-size: 0.68rem; color: #64748B; margin-bottom: 2px; font-weight: 500;">Конверсия</div>
+              <div style="font-size: 0.90rem; font-weight: 700; color: #2563EB;">{active_bench.conversion_trial_to_paid.low:.0%}–{active_bench.conversion_trial_to_paid.high:.0%}</div>
+            </div>
+            <div style="background: rgba(248, 250, 252, 0.85); border-radius: 9px; padding: 8px 4px; border: 1px solid rgba(226, 232, 240, 0.7);">
+              <div style="font-size: 0.68rem; color: #64748B; margin-bottom: 2px; font-weight: 500;">Churn / мес</div>
+              <div style="font-size: 0.90rem; font-weight: 700; color: #0D9488;">{active_bench.monthly_churn.low:.0%}–{active_bench.monthly_churn.high:.0%}</div>
+            </div>
+          </div>
+          <div style="font-size: 0.72rem; color: #64748B; display: flex; align-items: center; gap: 5px;">
+            <span>ℹ️</span> <span>Источник: {active_bench.source}</span>
+          </div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with col_right:
         st.markdown("**Модель монетизации**")
@@ -1665,22 +1716,25 @@ with tab1:
 
         st.markdown("---")
         st.markdown("**Финансовые параметры**")
-        initial_capital = st.number_input(
-            "Стартовый капитал ($)",
-            min_value=0.0, step=1000.0, value=float(st.session_state.get("_f_cap", 10000.0)),
-        )
-        monthly_marketing_budget = st.number_input(
-            "Маркетинговый бюджет ($/мес)",
-            min_value=0.0, step=100.0, value=float(st.session_state.get("_f_mkt", 500.0)),
-        )
-        monthly_operating_costs = st.number_input(
-            "Операционные расходы ($/мес)",
-            min_value=0.0, step=100.0, value=float(st.session_state.get("_f_ops", 300.0)),
-        )
-        market_size_estimate = st.number_input(
-            "TAM (потенциальных клиентов)",
-            min_value=1000, step=10000, value=int(st.session_state.get("_f_tam", 100000)),
-        )
+        fin_col1, fin_col2 = st.columns(2)
+        with fin_col1:
+            initial_capital = st.number_input(
+                "Стартовый капитал ($)",
+                min_value=0.0, step=1000.0, value=float(st.session_state.get("_f_cap", 10000.0)),
+            )
+            monthly_operating_costs = st.number_input(
+                "Операционные расходы ($/мес)",
+                min_value=0.0, step=100.0, value=float(st.session_state.get("_f_ops", 300.0)),
+            )
+        with fin_col2:
+            monthly_marketing_budget = st.number_input(
+                "Маркетинговый бюджет ($/мес)",
+                min_value=0.0, step=100.0, value=float(st.session_state.get("_f_mkt", 500.0)),
+            )
+            market_size_estimate = st.number_input(
+                "TAM (потенциальных клиентов)",
+                min_value=1000, step=10000, value=int(st.session_state.get("_f_tam", 100000)),
+            )
 
         num_personas = st.number_input(
             "Количество респондентов",
@@ -1688,25 +1742,6 @@ with tab1:
             help="Рекомендуем 5–7 для быстрого теста.",
         )
         st.caption(f"Будет выполнено ~{int(num_personas) + 1} API-запросов")
-
-        active_bench = st.session_state.get("realtime_benchmark") or get_benchmark(business_type)
-        bench_is_rt = "realtime_benchmark" in st.session_state
-
-        st.markdown("---")
-        st.markdown(
-            f"**Бенчмарк: {active_bench.display_name}** "
-            + ("· актуальный" if bench_is_rt else "· статичный (2025)")
-        )
-        st.caption(f"Провал за 12 мес: {active_bench.failure_rate_12_months:.0%}")
-        st.caption(
-            f"Конверсия: {active_bench.conversion_trial_to_paid.low:.0%} – "
-            f"{active_bench.conversion_trial_to_paid.high:.0%}"
-        )
-        st.caption(
-            f"Churn: {active_bench.monthly_churn.low:.0%} – "
-            f"{active_bench.monthly_churn.high:.0%} / мес"
-        )
-        st.caption(f"Источник: {active_bench.source}")
 
     st.divider()
 
@@ -1977,7 +2012,7 @@ with tab2:
         _sc4.metric("Solution Fit", "– / 10")
 
         st.divider()
-        _col_pie, _col_con = st.columns([1, 1])
+        _col_pie, _col_con = st.columns([1, 1], gap="large")
         with _col_pie:
             st.markdown("**Ценовое восприятие**")
             _fig_sk = go.Figure(data=[go.Pie(
@@ -2033,7 +2068,7 @@ with tab2:
 
         st.divider()
 
-        col_pie, col_concerns = st.columns([1, 1])
+        col_pie, col_concerns = st.columns([1, 1], gap="large")
 
         with col_pie:
             st.markdown("**Ценовое восприятие**")
@@ -2166,7 +2201,7 @@ with tab3:
         """, unsafe_allow_html=True)
 
         st.subheader("Общая оценка жизнеспособности (Overall Viability Score)")
-        _c1, _c2 = st.columns([1, 2])
+        _c1, _c2 = st.columns([1, 2], gap="large")
         with _c1:
             st.markdown(
                 "<div class='score-card'>"
@@ -2269,7 +2304,7 @@ with tab3:
         st.subheader("Общая оценка жизнеспособности (Overall Viability Score)")
 
         score = int(report.overall_score)
-        col_score1, col_score2 = st.columns([1, 2])
+        col_score1, col_score2 = st.columns([1, 2], gap="large")
 
         with col_score1:
             if score <= 25:
@@ -2593,55 +2628,57 @@ with tab4:
         _idea_name_fb  = _report_for_fb.business_input.name if _report_for_fb.business_input else ""
         _idea_score_fb = int(_report_for_fb.overall_score) if _report_for_fb.overall_score else None
 
-    with st.form("feedback_form", clear_on_submit=True):
-        st.markdown("#### Оцените инструмент")
+    col_fb_l, col_fb_center, col_fb_r = st.columns([1, 2, 1])
+    with col_fb_center:
+        with st.form("feedback_form", clear_on_submit=True):
+            st.markdown("#### Оцените инструмент")
 
-        _rating = st.select_slider(
-            "Ваша оценка",
-            options=[1, 2, 3, 4, 5],
-            value=5,
-            format_func=lambda x: {1: "1 — плохо", 2: "2 — ниже среднего", 3: "3 — нормально", 4: "4 — хорошо", 5: "5 — отлично"}[x],
-        )
+            _rating = st.select_slider(
+                "Ваша оценка",
+                options=[1, 2, 3, 4, 5],
+                value=5,
+                format_func=lambda x: {1: "1 — плохо", 2: "2 — ниже среднего", 3: "3 — нормально", 4: "4 — хорошо", 5: "5 — отлично"}[x],
+            )
 
-        _text = st.text_area(
-            "Ваш отзыв",
-            placeholder="Что понравилось? Что можно улучшить? Был ли результат полезен?",
-            height=150,
-            max_chars=1000,
-        )
+            _text = st.text_area(
+                "Ваш отзыв",
+                placeholder="Что понравилось? Что можно улучшить? Был ли результат полезен?",
+                height=150,
+                max_chars=1000,
+            )
 
-        _submitted = st.form_submit_button("Отправить отзыв", type="primary", use_container_width=True)
+            _submitted = st.form_submit_button("Отправить отзыв", type="primary", use_container_width=True)
 
-    if _submitted:
-        if not _text.strip():
-            st.warning("Напишите текст отзыва перед отправкой")
-        elif len(_text.strip()) < 5:
-            st.warning("Отзыв слишком короткий")
-        else:
-            with st.spinner("Отправляем..."):
-                _ok = send_feedback(
-                    text=_text,
-                    rating=_rating,
-                    idea_name=_idea_name_fb,
-                    idea_score=_idea_score_fb,
-                )
-            if _ok:
-                st.success("Спасибо за отзыв!")
-                st.balloons()
+        if _submitted:
+            if not _text.strip():
+                st.warning("Напишите текст отзыва перед отправкой")
+            elif len(_text.strip()) < 5:
+                st.warning("Отзыв слишком короткий")
             else:
-                import datetime as _dt
-                _fb_entry = {
-                    "time":    str(_dt.datetime.now()),
-                    "rating":  _rating,
-                    "idea":    _idea_name_fb,
-                    "score":   _idea_score_fb,
-                    "text":    _text,
-                }
-                _fb_log = str(Path(tempfile.gettempdir()) / "feedbacks.jsonl")
-                try:
-                    with open(_fb_log, "a", encoding="utf-8") as _f:
-                        import json as _json
-                        _f.write(_json.dumps(_fb_entry, ensure_ascii=False) + "\n")
-                    st.success("Отзыв сохранён локально")
-                except Exception:
-                    st.info("Отзыв получен. Спасибо.")
+                with st.spinner("Отправляем..."):
+                    _ok = send_feedback(
+                        text=_text,
+                        rating=_rating,
+                        idea_name=_idea_name_fb,
+                        idea_score=_idea_score_fb,
+                    )
+                if _ok:
+                    st.success("Спасибо за отзыв!")
+                    st.balloons()
+                else:
+                    import datetime as _dt
+                    _fb_entry = {
+                        "time":    str(_dt.datetime.now()),
+                        "rating":  _rating,
+                        "idea":    _idea_name_fb,
+                        "score":   _idea_score_fb,
+                        "text":    _text,
+                    }
+                    _fb_log = str(Path(tempfile.gettempdir()) / "feedbacks.jsonl")
+                    try:
+                        with open(_fb_log, "a", encoding="utf-8") as _f:
+                            import json as _json
+                            _f.write(_json.dumps(_fb_entry, ensure_ascii=False) + "\n")
+                        st.success("Отзыв сохранён локально")
+                    except Exception:
+                        st.info("Отзыв получен. Спасибо.")
