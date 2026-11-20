@@ -122,6 +122,18 @@ html, body {
 button[data-baseweb="tab"] {
     background-color: transparent !important;
 }
+
+/* Tab panel — рамка с 30% прозрачностью */
+div[data-testid="stTabsContent"] {
+    background: rgba(255, 255, 255, 0.70) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    border: 1px solid rgba(226, 232, 240, 0.60) !important;
+    border-radius: 16px !important;
+    padding: 24px !important;
+    margin-top: 8px !important;
+    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06) !important;
+}
 button[data-baseweb="tab"][aria-selected="true"] {
     color: #2563EB !important;
     border-bottom: 2px solid #2563EB !important;
@@ -178,11 +190,38 @@ ul[data-baseweb="menu"] {
     color: #2563EB !important;
 }
 
-/* Поля ввода — полупрозрачные */
+/* Поля ввода — светлые принудительно */
 div[data-testid="stTextInput"] input,
 div[data-testid="stTextArea"] textarea,
-div[data-testid="stNumberInput"] input {
-    background-color: rgba(255,255,255,0.90) !important;
+div[data-testid="stNumberInput"] input,
+div[data-testid="stSelectbox"] > div,
+div[data-testid="stSelectbox"] select,
+input[class*="st-"],
+textarea[class*="st-"] {
+    background-color: rgba(255,255,255,0.95) !important;
+    color: #0F172A !important;
+    border-color: rgba(203,213,225,0.9) !important;
+}
+
+/* Контейнеры полей ввода */
+div[data-testid="stTextInput"] > div,
+div[data-testid="stTextArea"] > div,
+div[data-testid="stNumberInput"] > div {
+    background-color: rgba(255,255,255,0.95) !important;
+    border-color: rgba(203,213,225,0.9) !important;
+}
+
+/* Принудительно светлый фон для блока формы */
+div[data-testid="stForm"],
+div[data-testid="stVerticalBlock"],
+section[data-testid="stMain"] > div {
+    background: transparent !important;
+}
+
+/* hero-pill — светлее */
+.hero-pill {
+    background: rgba(248,250,252,0.85) !important;
+    border-color: rgba(226,232,240,0.7) !important;
 }
 
 /* ── Шапка ── */
@@ -607,6 +646,17 @@ section[data-testid="stSidebar"] { display: none !important; }
     [data-baseweb="option"],
     [data-baseweb="menu"],
     ul[data-baseweb="menu"] { background-color: #FFFFFF !important; color: #0F172A !important; }
+    div[data-testid="stTextInput"] input,
+    div[data-testid="stTextArea"] textarea,
+    div[data-testid="stNumberInput"] input {
+        background-color: rgba(255,255,255,0.95) !important;
+        color: #0F172A !important;
+    }
+    div[data-testid="stTextInput"] > div,
+    div[data-testid="stTextArea"] > div,
+    div[data-testid="stNumberInput"] > div {
+        background-color: rgba(255,255,255,0.90) !important;
+    }
     [data-testid="stMarkdownContainer"] p,
     [data-testid="stMarkdownContainer"] span,
     [data-testid="stMarkdownContainer"] li { color: #334155 !important; }
@@ -652,8 +702,8 @@ _comp_meta.html("""
         blobs.push({
             x: Math.random() * w,
             y: Math.random() * h,
-            vx: (Math.random() - 0.5) * 0.52,
-            vy: (Math.random() - 0.5) * 0.52,
+            vx: (Math.random() - 0.5) * 0.65,
+            vy: (Math.random() - 0.5) * 0.65,
             r: 70 + Math.random() * 100,
             color: colors[i % colors.length]
         });
@@ -1305,8 +1355,8 @@ with tab2:
                 height=220,
                 margin=dict(t=10, b=10, l=10, r=10),
                 showlegend=False,
-                paper_bgcolor="#FFFFFF",
-                plot_bgcolor="#FFFFFF",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
                 annotations=[dict(
                     text="<b>Ожидание<br>данных</b>",
                     x=0.5, y=0.5, font_size=13,
@@ -1352,7 +1402,7 @@ with tab2:
             st.markdown("**Ценовое восприятие**")
             labels = ["Дорого", "Нормально", "Дёшево"]
             values = [_ir.pct_price_too_high, _ir.pct_price_ok, _ir.pct_price_too_low]
-            marker_colors = ["#0F172A", "#2563EB", "#64748B"]
+            marker_colors = ["#E11D48", "#2563EB", "#0D9488"]
             fig_pie = go.Figure(data=[go.Pie(
                 labels=labels,
                 values=values,
@@ -1362,14 +1412,15 @@ with tab2:
                 textposition="auto",
                 insidetextfont=dict(family="JetBrains Mono, monospace", size=12, color="#FFFFFF"),
                 outsidetextfont=dict(family="Inter, sans-serif", size=12, color="#0F172A"),
+                textfont=dict(color="#0F172A"),
                 hoverinfo="label+percent",
             )])
             fig_pie.update_layout(
                 height=260,
                 margin=dict(t=15, b=15, l=15, r=15),
                 showlegend=True,
-                paper_bgcolor="#FFFFFF",
-                plot_bgcolor="#FFFFFF",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
                 font=dict(family="Inter, sans-serif", color="#334155", size=12),
                 legend=dict(
                     orientation="h",
@@ -1532,8 +1583,8 @@ with tab3:
             yaxis=dict(title="MRR (USD)", gridcolor="#F1F5F9"),
             height=300,
             margin=dict(l=20, r=20, t=50, b=20),
-            paper_bgcolor="#FFFFFF",
-            plot_bgcolor="#FFFFFF",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
         )
         st.plotly_chart(_fig_empty, use_container_width=True)
         _mc1, _mc2, _mc3, _mc4 = st.columns(4)
@@ -1765,8 +1816,8 @@ with tab3:
                 hovermode="x unified",
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1,
                             font=dict(family="Inter, sans-serif", size=11, color="#475569")),
-                paper_bgcolor="#FFFFFF",
-                plot_bgcolor="#FFFFFF",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
             )
             st.plotly_chart(fig_mc, use_container_width=True)
 
