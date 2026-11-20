@@ -58,7 +58,9 @@ st.set_page_config(
 
 # ── Глобальный CSS — B2B SaaS Дизайн-система ──────────────
 st.markdown("""
-<meta name="color-scheme" content="light only">
+<meta name="color-scheme" content="only light">
+<meta name="supported-color-schemes" content="light">
+<meta name="darkreader-lock" content="true">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -66,11 +68,12 @@ st.markdown("""
 <style>
 /* ══════════════════════════════════════════════════════
    ПОЛНЫЙ ПРИНУДИТЕЛЬНЫЙ СВЕТЛЫЙ РЕЖИМ
-   Все правила с !important, агрессивные селекторы
+   color-scheme: only light отключает авто-темную тему Chromium
    ══════════════════════════════════════════════════════ */
-:root {
+:root, html, body, .stApp {
     --primary-color: #2563EB;
-    color-scheme: light !important;
+    color-scheme: only light !important;
+    supported-color-schemes: light !important;
 }
 
 /* ── Прозрачный фон везде ── */
@@ -737,6 +740,25 @@ _comp_meta.html("""
 (function() {
     var doc = window.parent.document;
 
+    // Внедряем meta-теги для отключения экспериментального Auto Dark Mode в Chromium и Dark Reader
+    try {
+        var metaScheme = doc.querySelector('meta[name="color-scheme"]');
+        if (!metaScheme) {
+            metaScheme = doc.createElement('meta');
+            metaScheme.name = 'color-scheme';
+            doc.head.appendChild(metaScheme);
+        }
+        metaScheme.content = 'only light';
+
+        var metaLock = doc.querySelector('meta[name="darkreader-lock"]');
+        if (!metaLock) {
+            metaLock = doc.createElement('meta');
+            metaLock.name = 'darkreader-lock';
+            metaLock.content = 'true';
+            doc.head.appendChild(metaLock);
+        }
+    } catch(e) {}
+
     // Всегда удаляем старый фон и стили для мгновенного обновления
     var oldBg = doc.getElementById('blue-metaballs-bg');
     if (oldBg) oldBg.remove();
@@ -746,8 +768,12 @@ _comp_meta.html("""
     // Задаем светлый свежий фон страницы и форсируем светлую тему везде
     try {
         window.parent.localStorage.setItem('stActiveTheme', '{"name":"Light"}');
+        window.parent.localStorage.setItem('theme', 'Light');
+        window.localStorage.setItem('stActiveTheme', '{"name":"Light"}');
     } catch(e) {}
     doc.documentElement.setAttribute('data-theme', 'light');
+    doc.documentElement.style.setProperty('color-scheme', 'only light', 'important');
+    doc.body.style.setProperty('color-scheme', 'only light', 'important');
     doc.documentElement.style.background = 'linear-gradient(135deg, #F0F8FF 0%, #E0F2FE 45%, #F0F9FF 80%, #EFF6FF 100%)';
     doc.body.style.background = 'transparent';
 
