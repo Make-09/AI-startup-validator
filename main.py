@@ -158,30 +158,33 @@ div[data-testid="stTabsContent"] {
     padding: 8px 0 !important;
 }
 
-/* ── Поля ввода и селекты — единый стильный серый план ── */
+/* ── Поля ввода и селекты — единый чистый светлый glassmorphism (все поля одинаково заполнены) ── */
 div[data-testid="stTextInput"] input,
 div[data-testid="stTextArea"] textarea,
 div[data-testid="stNumberInput"] input,
 div[data-baseweb="select"] > div,
 div[data-baseweb="select"] > div > div,
 div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
-    background-color: rgba(22, 27, 38, 0.75) !important;
-    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    background-color: rgba(255, 255, 255, 0.92) !important;
+    border: 1px solid rgba(203, 213, 225, 0.90) !important;
     border-radius: 8px !important;
-    color: #F8FAFC !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
+    color: #0F172A !important;
+    font-size: 0.92rem !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
 }
 div[data-baseweb="select"] span {
-    color: #F8FAFC !important;
+    color: #0F172A !important;
+    font-weight: 500 !important;
     font-size: 0.92rem !important;
 }
 div[data-baseweb="select"] svg {
-    fill: #CBD5E1 !important;
+    fill: #64748B !important;
 }
 div[data-testid="stTextInput"] input::placeholder,
 div[data-testid="stTextArea"] textarea::placeholder {
-    color: rgba(255, 255, 255, 0.50) !important;
+    color: #94A3B8 !important;
 }
 div[data-testid="stTextInput"] > div,
 div[data-testid="stTextArea"] > div,
@@ -192,29 +195,30 @@ div[data-testid="stNumberInput"] > div {
 div[data-testid="stTextInput"] input:focus,
 div[data-testid="stTextArea"] textarea:focus,
 div[data-baseweb="select"] > div:focus-within {
-    border-color: #38BDF8 !important;
-    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25) !important;
+    border-color: #2563EB !important;
+    background-color: #FFFFFF !important;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18) !important;
 }
 
-/* ── Dropdown выпадающее меню — темный glassmorphism ── */
+/* ── Dropdown выпадающее меню — светлый glassmorphism ── */
 [data-baseweb="popover"] [role="listbox"],
 [data-baseweb="menu"],
 ul[data-baseweb="menu"] {
-    background-color: rgba(15, 23, 42, 0.95) !important;
-    color: #F8FAFC !important;
-    border: 1px solid rgba(255, 255, 255, 0.20) !important;
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+    border: 1px solid #CBD5E1 !important;
     border-radius: 8px !important;
     backdrop-filter: blur(16px) !important;
-    box-shadow: 0 12px 32px rgba(0,0,0,0.35) !important;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12) !important;
 }
 [data-baseweb="option"] {
     background-color: transparent !important;
-    color: #F8FAFC !important;
+    color: #0F172A !important;
 }
 [data-baseweb="option"]:hover,
 [data-baseweb="option"][aria-selected="true"] {
-    background-color: rgba(56, 189, 248, 0.20) !important;
-    color: #38BDF8 !important;
+    background-color: #EFF6FF !important;
+    color: #2563EB !important;
 }
 
 /* ── Метки полей (labels) — читаемые тёмные ── */
@@ -579,13 +583,13 @@ section[data-testid="stSidebar"],
     div[data-baseweb="select"] > div,
     div[data-baseweb="select"] > div > div,
     div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
-        background-color: rgba(22, 27, 38, 0.75) !important;
-        color: #F8FAFC !important;
-        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        background-color: rgba(255, 255, 255, 0.92) !important;
+        color: #0F172A !important;
+        border: 1px solid rgba(203, 213, 225, 0.90) !important;
         border-radius: 8px !important;
     }
-    div[data-baseweb="select"] span { color: #F8FAFC !important; }
-    div[data-baseweb="select"] svg { fill: #CBD5E1 !important; }
+    div[data-baseweb="select"] span { color: #0F172A !important; }
+    div[data-baseweb="select"] svg { fill: #64748B !important; }
     div[data-testid="stTextInput"] > div,
     div[data-testid="stTextArea"] > div,
     div[data-testid="stNumberInput"] > div {
@@ -594,7 +598,7 @@ section[data-testid="stSidebar"],
     }
     [data-baseweb="option"],
     [data-baseweb="menu"],
-    ul[data-baseweb="menu"] { background-color: rgba(15, 23, 42, 0.95) !important; color: #F8FAFC !important; }
+    ul[data-baseweb="menu"] { background-color: #FFFFFF !important; color: #0F172A !important; border: 1px solid #CBD5E1 !important; }
     div[data-testid="stTabsContent"] { background: transparent !important; }
     .chat-a { background: rgba(248,250,252,0.90) !important; color: #0F172A !important; }
     button[data-baseweb="tab"] { color: #334155 !important; }
@@ -627,7 +631,11 @@ _comp_meta.html("""
     var oldStyle = doc.getElementById('blend-style-tag');
     if (oldStyle) oldStyle.remove();
 
-    // Задаем светлый свежий фон страницы
+    // Задаем светлый свежий фон страницы и форсируем светлую тему везде
+    try {
+        window.parent.localStorage.setItem('stActiveTheme', '{"name":"Light"}');
+    } catch(e) {}
+    doc.documentElement.setAttribute('data-theme', 'light');
     doc.documentElement.style.background = 'linear-gradient(135deg, #F0F8FF 0%, #E0F2FE 45%, #F0F9FF 80%, #EFF6FF 100%)';
     doc.body.style.background = 'transparent';
 
