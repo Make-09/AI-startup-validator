@@ -98,15 +98,23 @@ header {
     overflow: hidden !important;
 }
 
-/* Убираем лишний отступ сверху (от скрытого header) */
+/* ── Большая рамка-обёртка вокруг всего контента ── */
 .block-container {
-    padding-top: 0.5rem !important;
-    padding-bottom: 3rem !important;
-    max-width: 1140px !important;
+    padding-top: 1.5rem !important;
+    padding-bottom: 3.5rem !important;
+    max-width: 1200px !important;
+    background: rgba(255, 255, 255, 0.70) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1.5px solid rgba(226, 232, 240, 0.55) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 8px 40px rgba(37, 99, 235, 0.08), 0 1px 3px rgba(15,23,42,0.06) !important;
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
 }
 
 /* ── Принудительная читаемость ── */
-p, span, li, label, div, td, th {
+p, span, li, label, td, th {
     color: #334155 !important;
 }
 h1, h2, h3, h4, h5, h6,
@@ -143,16 +151,11 @@ button[data-baseweb="tab"][aria-selected="true"] {
     border-bottom: 2px solid #2563EB !important;
 }
 
-/* Tab panel — рамка 30% прозрачность */
+/* Tab panel — без лишней рамки (рамка уже на block-container) */
 div[data-testid="stTabsContent"] {
-    background: rgba(255, 255, 255, 0.72) !important;
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    border: 1px solid rgba(226, 232, 240, 0.65) !important;
-    border-radius: 16px !important;
-    padding: 28px !important;
-    margin-top: 8px !important;
-    box-shadow: 0 4px 24px rgba(15, 23, 42, 0.07) !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 8px 0 !important;
 }
 
 /* ── Поля ввода — БЕЛЫЕ принудительно ── */
@@ -545,9 +548,9 @@ _comp_meta.html("""
 
     var bg = doc.createElement('div');
     bg.id = 'blue-metaballs-bg';
-    bg.style.cssText = 'position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(135deg,#F0F8FF 0%,#DBEAFE 55%,#EFF6FF 100%);overflow:hidden;';
+    bg.style.cssText = 'position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(135deg,#FAFCFF 0%,#F5F9FF 50%,#F8F5FF 100%);overflow:hidden;';
 
-    bg.innerHTML = '<svg style="position:absolute;width:0;height:0;"><defs><filter id="blue-goo"><feGaussianBlur in="SourceGraphic" stdDeviation="22" result="blur"/><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8" result="goo"/></filter></defs></svg><canvas id="blue-mb-canvas" style="width:100%;height:100%;display:block;filter:url(#blue-goo);opacity:0.72;"></canvas>';
+    bg.innerHTML = '<svg style="position:absolute;width:0;height:0;"><defs><filter id="blue-goo"><feGaussianBlur in="SourceGraphic" stdDeviation="22" result="blur"/><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8" result="goo"/></filter></defs></svg><canvas id="blue-mb-canvas" style="width:100%;height:100%;display:block;filter:url(#blue-goo);opacity:0.58;"></canvas>';
 
     doc.body.prepend(bg);
 
