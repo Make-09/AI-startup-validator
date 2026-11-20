@@ -179,7 +179,7 @@ div[data-baseweb="tab-border"],
     display: none !important;
 }
 
-/* Apple Segmented Control — стеклянный трек-контейнер (Liquid Glass Tray) */
+/* Apple Segmented Control — стеклянный трек-контейнер (Apple Frosted Glass) */
 div[role="tablist"],
 div[data-baseweb="tab-list"],
 [data-testid="stTabsHeader"] {
@@ -191,15 +191,14 @@ div[data-baseweb="tab-list"],
     gap: 4px !important;
     width: 100% !important;
     padding: 5px 8px !important;
-    border-radius: 16px !important;
-    background: rgba(0, 0, 0, 0.04) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.55) !important;
+    border-radius: 999px !important;
+    background: rgba(255, 255, 255, 0.42) !important;
+    backdrop-filter: blur(25px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.85) !important;
     box-shadow:
-        inset 0 1px 3px rgba(0, 0, 0, 0.06),
-        inset 0 0.5px 1px rgba(0, 0, 0, 0.04),
-        0 1px 1px rgba(255, 255, 255, 0.8) !important;
+        0 6px 24px rgba(37, 99, 235, 0.05),
+        inset 0 1px 2px rgba(255, 255, 255, 0.95) !important;
     overflow: hidden !important;
     scrollbar-width: none !important;
     box-sizing: border-box !important;
@@ -214,23 +213,22 @@ div[data-baseweb="tab-list"]::-webkit-scrollbar {
 /* Фирменный скользящий кристально-стеклянный бегунок Apple (Liquid Glass Slider) */
 #apple-tab-slider {
     position: absolute !important;
-    top: 5px !important;
+    top: 4px !important;
     left: 0 !important;
-    height: calc(100% - 10px) !important;
-    border-radius: 12px !important;
+    height: calc(100% - 8px) !important;
+    border-radius: 999px !important;
     background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.50) 0%,
-        rgba(255, 255, 255, 0.15) 100%
+        180deg,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 255, 255, 0.72) 100%
     ) !important;
-    backdrop-filter: blur(16px) saturate(200%) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(200%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.98) !important;
     box-shadow:
         0 4px 16px rgba(15, 23, 42, 0.08),
         0 1px 3px rgba(15, 23, 42, 0.04),
-        inset 0 1.5px 1px rgba(255, 255, 255, 0.95),
-        inset 0 -1px 1px rgba(255, 255, 255, 0.25) !important;
+        inset 0 1px 1px rgba(255, 255, 255, 1) !important;
     z-index: 0 !important;
     pointer-events: none !important;
     transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
@@ -248,7 +246,7 @@ button[data-testid="stTab"] {
     height: 38px !important;
     padding: 0 16px !important;
     margin: 0 !important;
-    border-radius: 12px !important;
+    border-radius: 999px !important;
     border: none !important;
     background: transparent !important;
     box-shadow: none !important;
@@ -1229,12 +1227,12 @@ _comp_meta.html("""
             tablist.style.setProperty('width', '100%', 'important');
             tablist.style.setProperty('gap', '4px', 'important');
             tablist.style.setProperty('padding', '5px 8px', 'important');
-            tablist.style.setProperty('border-radius', '16px', 'important');
-            tablist.style.setProperty('background', 'rgba(0, 0, 0, 0.04)', 'important');
-            tablist.style.setProperty('backdrop-filter', 'blur(20px)', 'important');
-            tablist.style.setProperty('-webkit-backdrop-filter', 'blur(20px)', 'important');
-            tablist.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.55)', 'important');
-            tablist.style.setProperty('box-shadow', 'inset 0 1px 3px rgba(0, 0, 0, 0.06), inset 0 0.5px 1px rgba(0, 0, 0, 0.04), 0 1px 1px rgba(255, 255, 255, 0.8)', 'important');
+            tablist.style.setProperty('border-radius', '999px', 'important');
+            tablist.style.setProperty('background', 'rgba(255, 255, 255, 0.42)', 'important');
+            tablist.style.setProperty('backdrop-filter', 'blur(25px) saturate(180%)', 'important');
+            tablist.style.setProperty('-webkit-backdrop-filter', 'blur(25px) saturate(180%)', 'important');
+            tablist.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.85)', 'important');
+            tablist.style.setProperty('box-shadow', '0 6px 24px rgba(37, 99, 235, 0.05), inset 0 1px 2px rgba(255, 255, 255, 0.95)', 'important');
             tablist.style.setProperty('border-bottom', 'none', 'important');
             tablist.style.setProperty('overflow', 'hidden', 'important');
             
@@ -1244,27 +1242,27 @@ _comp_meta.html("""
                 slider = doc.createElement('div');
                 slider.id = 'apple-tab-slider';
                 slider.style.setProperty('position', 'absolute', 'important');
-                slider.style.setProperty('top', '5px', 'important');
+                slider.style.setProperty('top', '4px', 'important');
                 slider.style.setProperty('left', '0px', 'important');
-                slider.style.setProperty('border-radius', '12px', 'important');
-                slider.style.setProperty('background', 'linear-gradient(135deg, rgba(255, 255, 255, 0.50) 0%, rgba(255, 255, 255, 0.15) 100%)', 'important');
-                slider.style.setProperty('backdrop-filter', 'blur(16px) saturate(200%)', 'important');
-                slider.style.setProperty('-webkit-backdrop-filter', 'blur(16px) saturate(200%)', 'important');
-                slider.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.85)', 'important');
-                slider.style.setProperty('box-shadow', '0 4px 16px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04), inset 0 1.5px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(255, 255, 255, 0.25)', 'important');
+                slider.style.setProperty('border-radius', '999px', 'important');
+                slider.style.setProperty('background', 'linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.72) 100%)', 'important');
+                slider.style.setProperty('backdrop-filter', 'blur(20px) saturate(180%)', 'important');
+                slider.style.setProperty('-webkit-backdrop-filter', 'blur(20px) saturate(180%)', 'important');
+                slider.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.98)', 'important');
+                slider.style.setProperty('box-shadow', '0 4px 16px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04), inset 0 1px 1px rgba(255, 255, 255, 1)', 'important');
                 slider.style.setProperty('z-index', '0', 'important');
                 slider.style.setProperty('pointer-events', 'none', 'important');
                 slider.style.setProperty('transition', 'transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), width 0.32s cubic-bezier(0.2, 0.8, 0.2, 1)', 'important');
                 slider.style.setProperty('will-change', 'transform, width', 'important');
                 tablist.prepend(slider);
             } else {
-                slider.style.setProperty('top', '5px', 'important');
-                slider.style.setProperty('border-radius', '12px', 'important');
-                slider.style.setProperty('background', 'linear-gradient(135deg, rgba(255, 255, 255, 0.50) 0%, rgba(255, 255, 255, 0.15) 100%)', 'important');
-                slider.style.setProperty('backdrop-filter', 'blur(16px) saturate(200%)', 'important');
-                slider.style.setProperty('-webkit-backdrop-filter', 'blur(16px) saturate(200%)', 'important');
-                slider.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.85)', 'important');
-                slider.style.setProperty('box-shadow', '0 4px 16px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04), inset 0 1.5px 1px rgba(255, 255, 255, 0.95), inset 0 -1px 1px rgba(255, 255, 255, 0.25)', 'important');
+                slider.style.setProperty('top', '4px', 'important');
+                slider.style.setProperty('border-radius', '999px', 'important');
+                slider.style.setProperty('background', 'linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.72) 100%)', 'important');
+                slider.style.setProperty('backdrop-filter', 'blur(20px) saturate(180%)', 'important');
+                slider.style.setProperty('-webkit-backdrop-filter', 'blur(20px) saturate(180%)', 'important');
+                slider.style.setProperty('border', '1px solid rgba(255, 255, 255, 0.98)', 'important');
+                slider.style.setProperty('box-shadow', '0 4px 16px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04), inset 0 1px 1px rgba(255, 255, 255, 1)', 'important');
                 slider.style.setProperty('z-index', '0', 'important');
             }
 
@@ -1318,7 +1316,7 @@ _comp_meta.html("""
             tab.style.setProperty('display', 'inline-flex', 'important');
             tab.style.setProperty('align-items', 'center', 'important');
             tab.style.setProperty('justify-content', 'center', 'important');
-            tab.style.setProperty('border-radius', '12px', 'important');
+            tab.style.setProperty('border-radius', '999px', 'important');
             tab.style.setProperty('outline', 'none', 'important');
             tab.style.setProperty('border', 'none', 'important');
             tab.style.setProperty('background', 'transparent', 'important');
