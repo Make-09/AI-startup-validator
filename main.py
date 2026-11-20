@@ -227,6 +227,16 @@ st.markdown("""
 .verdict-warning  { background:#fef3c7; color:#92400e; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; }
 .verdict-moderate { background:#dbeafe; color:#1e40af; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; }
 .verdict-good     { background:#d1fae5; color:#065f46; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; }
+.verdict-pending  { background:#f1f5f9; color:#64748b; padding:6px 14px; border-radius:20px; font-weight:600; font-size:0.85rem; display:inline-block; border:1px dashed #cbd5e1; }
+
+/* Карточка превью структуры */
+.empty-state-card {
+    background: #f8fafc;
+    border: 1px dashed #94a3b8;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 1.25rem;
+}
 
 /* Метрика-карточка */
 .metric-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:1rem; }
@@ -897,135 +907,188 @@ with tab2:
     report: ValidationReport = st.session_state.report
 
     if report is None or report.interview_results is None:
-        st.info("Заполните данные и нажмите «Запустить валидацию» на первой вкладке.")
-        st.stop()
+        st.markdown("""
+        <div class="empty-state-card">
+          <div style="font-weight:700;font-size:0.92rem;color:#1e293b;margin-bottom:3px">Режим предварительного просмотра архитектуры Customer Discovery</div>
+          <div style="font-size:0.82rem;color:#64748b">Интервью ещё не запущены. Ниже отображается макет сбора клиентских инсайтов. Для получения расчётных данных запустите валидацию на вкладке «Ваша идея».</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    ir = report.interview_results
+        st.subheader("Сводка")
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Острота проблемы", "— / 10")
+        with col2:
+            st.metric("Готовы купить", "— %")
+        with col3:
+            st.metric("Рекомендация (ср.)", "— / 10")
+        with col4:
+            st.metric("Solution Fit", "— / 10")
 
-    if ir.fallback_count > 0:
-        valid_count = ir.total_personas - ir.fallback_count
-        st.warning(
-            f"Внимание: {ir.fallback_count} из {ir.total_personas} интервью завершились ошибкой LLM. "
-            f"Метрики рассчитаны по {valid_count} валидным ответам."
-        )
+        st.divider()
 
-    # ── Сводные метрики ───────────────────────────────────────
-    st.subheader("Сводка")
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.metric("Острота проблемы", f"{ir.avg_problem_severity:.1f} / 10")
-    with col2:
-        st.metric("Готовы купить", f"{ir.pct_would_buy * 100:.0f}%")
-    with col3:
-        st.metric("Рекомендация (ср.)", f"{ir.avg_nps_score:.1f} / 10")
-    with col4:
-        st.metric("Solution Fit", f"{ir.avg_solution_fit:.1f} / 10")
-
-    st.divider()
-
-    col_pie, col_concerns = st.columns([1, 1])
-
-    with col_pie:
-        st.markdown("**Ценовое восприятие**")
-        fig_pie = go.Figure(data=[go.Pie(
-            labels=["Дорого", "Нормально", "Дёшево"],
-            values=[ir.pct_price_too_high, ir.pct_price_ok, ir.pct_price_too_low],
-            marker_colors=["#e74c3c", "#2ecc71", "#3498db"],
-            hole=0.4,
-        )])
-        fig_pie.update_layout(
-            height=280,
-            margin=dict(t=10, b=10, l=10, r=10),
-            showlegend=True,
-            font=dict(family="sans-serif"),
-        )
-        st.plotly_chart(fig_pie, use_container_width=True)
-
-    with col_concerns:
-        st.markdown("**Топ-3 опасения**")
-        if ir.top_concerns:
-            for concern in ir.top_concerns:
-                st.warning(concern)
-        else:
-            st.caption("Нет данных")
-
-        st.markdown("**Топ-3 желаемые функции**")
-        if ir.top_desired_features:
-            for feature in ir.top_desired_features:
-                st.info(feature)
-        else:
-            st.caption("Нет данных")
-
-    # ── Детальные ответы персон ───────────────────────────────
-    st.divider()
-    st.subheader("Ответы персон")
-
-    _phase_labels = {1: "Фаза 1 — До знакомства с продуктом", 2: "Фаза 2 — После знакомства с продуктом"}
-
-    for resp in ir.responses:
-        buy_label = "купит" if resp.would_buy else "не купит"
-        err_label = " · ошибка API" if getattr(resp, "is_error", False) else ""
-        with st.expander(f"{resp.persona_name} · {resp.persona_occupation} · {buy_label}{err_label}"):
-
-            if getattr(resp, "is_error", False):
-                st.error(
-                    f"Ответ не получен от LLM.  \n{resp.main_concern}  \n"
-                    f"Метрики для этой персоны недостоверны."
-                )
-                continue
-
-            if resp.conversation:
-                current_phase = None
-                for turn in resp.conversation:
-                    phase = turn.get("phase", 1)
-                    q     = turn.get("question", "")
-                    a     = turn.get("answer", "")
-
-                    if phase != current_phase:
-                        current_phase = phase
-                        label = _phase_labels.get(phase, f"Фаза {phase}")
-                        st.markdown(
-                            f"<div class='phase-header'>{label}</div>",
-                            unsafe_allow_html=True,
-                        )
-
-                    if q:
-                        st.markdown(
-                            f"<div class='chat-q'>— {q}</div>",
-                            unsafe_allow_html=True,
-                        )
-                    if a:
-                        st.markdown(
-                            f"<div class='chat-a'>{a}</div>",
-                            unsafe_allow_html=True,
-                        )
-                st.divider()
-            elif resp.raw_opinion:
-                st.markdown(f"*«{resp.raw_opinion}»*")
-                st.divider()
-
-            st.caption("Итоговые оценки")
-            cols = st.columns(5)
-            metrics = [
-                ("Острота проблемы", resp.problem_severity),
-                ("Solution Fit",     resp.solution_fit),
-                ("Готовность платить", resp.willingness_to_pay),
-                ("Вероятность перехода", resp.switching_likelihood),
-                ("Рекомендует",      resp.recommend_likelihood),
-            ]
-            for col, (label, val) in zip(cols, metrics):
-                with col:
-                    st.metric(label, f"{val}/10")
-                    st.progress(val / 10)
-
-            st.markdown(
-                f"**Цена:** {resp.price_feedback} &nbsp;&nbsp; "
-                f"**Купит:** {'да' if resp.would_buy else 'нет'}"
+        col_pie, col_concerns = st.columns([1, 1])
+        with col_pie:
+            st.markdown("**Ценовое восприятие**")
+            fig_pie_empty = go.Figure(data=[go.Pie(
+                labels=["Ожидание расчёта"],
+                values=[1],
+                marker_colors=["#e2e8f0"],
+                hole=0.45,
+                textinfo="none",
+                hoverinfo="skip",
+            )])
+            fig_pie_empty.update_layout(
+                height=260,
+                margin=dict(t=10, b=10, l=10, r=10),
+                showlegend=False,
+                annotations=[dict(text="Ожидание данных", x=0.5, y=0.5, font_size=13, font_color="#94a3b8", showarrow=False)]
             )
-            if resp.main_concern:
-                st.markdown(f"**Опасение:** {resp.main_concern}")
-            if resp.desired_feature:
-                st.markdown(f"**Желаемая функция:** {resp.desired_feature}")
+            st.plotly_chart(fig_pie_empty, use_container_width=True)
+
+        with col_concerns:
+            st.markdown("**Топ-3 опасения**")
+            st.caption("— Ключевые барьеры перехода с альтернативных решений")
+            st.caption("— Скрытые риски использования и недоверие")
+            st.caption("— Ценовые возражения целевой аудитории")
+
+            st.markdown("**Топ-3 желаемые функции**")
+            st.caption("— Первоочередные требования для запуска MVP")
+            st.caption("— Функционал с наивысшей готовностью платить")
+            st.caption("— Запросы на интеграции и формат сервиса")
+
+        st.divider()
+        st.subheader("Ответы персон")
+        for placeholder_name in ["Респондент #1 · Ожидание запуска", "Респондент #2 · Ожидание запуска", "Респондент #3 · Ожидание запуска"]:
+            with st.expander(placeholder_name):
+                st.caption("Стенограмма двухфазного интервью (Phase 1: выявление скрытой боли, Phase 2: проверка ценности решения) сформируется автоматически после старта валидации.")
+    else:
+        ir = report.interview_results
+
+        if ir.fallback_count > 0:
+            valid_count = ir.total_personas - ir.fallback_count
+            st.warning(
+                f"Внимание: {ir.fallback_count} из {ir.total_personas} интервью завершились ошибкой LLM. "
+                f"Метрики рассчитаны по {valid_count} валидным ответам."
+            )
+
+        # ── Сводные метрики ───────────────────────────────────────
+        st.subheader("Сводка")
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Острота проблемы", f"{ir.avg_problem_severity:.1f} / 10")
+        with col2:
+            st.metric("Готовы купить", f"{ir.pct_would_buy * 100:.0f}%")
+        with col3:
+            st.metric("Рекомендация (ср.)", f"{ir.avg_nps_score:.1f} / 10")
+        with col4:
+            st.metric("Solution Fit", f"{ir.avg_solution_fit:.1f} / 10")
+
+        st.divider()
+
+        col_pie, col_concerns = st.columns([1, 1])
+
+        with col_pie:
+            st.markdown("**Ценовое восприятие**")
+            fig_pie = go.Figure(data=[go.Pie(
+                labels=["Дорого", "Нормально", "Дёшево"],
+                values=[ir.pct_price_too_high, ir.pct_price_ok, ir.pct_price_too_low],
+                marker_colors=["#e74c3c", "#2ecc71", "#3498db"],
+                hole=0.4,
+            )])
+            fig_pie.update_layout(
+                height=280,
+                margin=dict(t=10, b=10, l=10, r=10),
+                showlegend=True,
+                font=dict(family="sans-serif"),
+            )
+            st.plotly_chart(fig_pie, use_container_width=True)
+
+        with col_concerns:
+            st.markdown("**Топ-3 опасения**")
+            if ir.top_concerns:
+                for concern in ir.top_concerns:
+                    st.warning(concern)
+            else:
+                st.caption("Нет данных")
+
+            st.markdown("**Топ-3 желаемые функции**")
+            if ir.top_desired_features:
+                for feature in ir.top_desired_features:
+                    st.info(feature)
+            else:
+                st.caption("Нет данных")
+
+        # ── Детальные ответы персон ───────────────────────────────
+        st.divider()
+        st.subheader("Ответы персон")
+
+        _phase_labels = {1: "Фаза 1 — До знакомства с продуктом", 2: "Фаза 2 — После знакомства с продуктом"}
+
+        for resp in ir.responses:
+            buy_label = "купит" if resp.would_buy else "не купит"
+            err_label = " · ошибка API" if getattr(resp, "is_error", False) else ""
+            with st.expander(f"{resp.persona_name} · {resp.persona_occupation} · {buy_label}{err_label}"):
+
+                if getattr(resp, "is_error", False):
+                    st.error(
+                        f"Ответ не получен от LLM.  \n{resp.main_concern}  \n"
+                        f"Метрики для этой персоны недостоверны."
+                    )
+                    continue
+
+                if resp.conversation:
+                    current_phase = None
+                    for turn in resp.conversation:
+                        phase = turn.get("phase", 1)
+                        q     = turn.get("question", "")
+                        a     = turn.get("answer", "")
+
+                        if phase != current_phase:
+                            current_phase = phase
+                            label = _phase_labels.get(phase, f"Фаза {phase}")
+                            st.markdown(
+                                f"<div class='phase-header'>{label}</div>",
+                                unsafe_allow_html=True,
+                            )
+
+                        if q:
+                            st.markdown(
+                                f"<div class='chat-q'>— {q}</div>",
+                                unsafe_allow_html=True,
+                            )
+                        if a:
+                            st.markdown(
+                                f"<div class='chat-a'>{a}</div>",
+                                unsafe_allow_html=True,
+                            )
+                    st.divider()
+                elif resp.raw_opinion:
+                    st.markdown(f"*«{resp.raw_opinion}»*")
+                    st.divider()
+
+                st.caption("Итоговые оценки")
+                cols = st.columns(5)
+                metrics = [
+                    ("Острота проблемы", resp.problem_severity),
+                    ("Solution Fit",     resp.solution_fit),
+                    ("Готовность платить", resp.willingness_to_pay),
+                    ("Вероятность перехода", resp.switching_likelihood),
+                    ("Рекомендует",      resp.recommend_likelihood),
+                ]
+                for col, (label, val) in zip(cols, metrics):
+                    with col:
+                        st.metric(label, f"{val}/10")
+                        st.progress(val / 10)
+
+                st.markdown(
+                    f"**Цена:** {resp.price_feedback} &nbsp;&nbsp; "
+                    f"**Купит:** {'да' if resp.would_buy else 'нет'}"
+                )
+                if resp.main_concern:
+                    st.markdown(f"**Опасение:** {resp.main_concern}")
+                if resp.desired_feature:
+                    st.markdown(f"**Желаемая функция:** {resp.desired_feature}")
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -1036,311 +1099,402 @@ with tab3:
     report = st.session_state.report
 
     if report is None:
-        st.info("Сначала запустите валидацию на вкладке «Ваша идея»")
-        st.stop()
+        st.markdown("""
+        <div class="empty-state-card">
+          <div style="font-weight:700;font-size:0.92rem;color:#1e293b;margin-bottom:3px">Режим предварительного просмотра архитектуры инвестиционного отчета</div>
+          <div style="font-size:0.82rem;color:#64748b">Расчёт экономической модели ещё не выполнен. Ниже представлена структура итогового инвестиционного скоринга, когортной юнит-экономики и симуляции Монте-Карло.</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    # ── Overall Viability Score ───────────────────────────────
-    st.subheader("Общая оценка жизнеспособности (Overall Viability Score)")
+        st.subheader("Общая оценка жизнеспособности (Overall Viability Score)")
+        col_score1, col_score2 = st.columns([1, 2])
+        with col_score1:
+            st.markdown(
+                "<div class='score-card'>"
+                "<div class='score-number'>—<span class='score-denom'>/100</span></div>"
+                "<br><span class='verdict-pending'>Ожидание запуска симуляции</span>"
+                "</div>",
+                unsafe_allow_html=True,
+            )
+            st.progress(0.0)
 
-    score = int(report.overall_score)
-    col_score1, col_score2 = st.columns([1, 2])
-
-    with col_score1:
-        # Определяем вердикт
-        if score <= 25:
-            verdict_class = "verdict-critical"
-            verdict_text  = "Критический риск — требуется пересмотр"
-        elif score <= 50:
-            verdict_class = "verdict-warning"
-            verdict_text  = "Высокий риск — значительные доработки"
-        elif score <= 65:
-            verdict_class = "verdict-moderate"
-            verdict_text  = "Умеренный риск — необходима проверка"
-        else:
-            verdict_class = "verdict-good"
-            verdict_text  = "Перспективная идея — рекомендуется пилот"
-
-        st.markdown(
-            f"<div class='score-card'>"
-            f"<div class='score-number'>{score}<span class='score-denom'>/100</span></div>"
-            f"<br><span class='{verdict_class}'>{verdict_text}</span>"
-            f"</div>",
-            unsafe_allow_html=True,
-        )
-        st.progress(min(max(score / 100.0, 0.0), 1.0))
-
-    with col_score2:
-        subscores = st.session_state.get("subscores", {})
-        if subscores:
-            s_prob = subscores.get("problem_validation", 0.0)
-            s_fit  = subscores.get("solution_demand", 0.0)
-            s_fin  = subscores.get("financial_viability", 0.0)
-            penalties = subscores.get("penalties", 0.0)
-
+        with col_score2:
             st.markdown("**Компоненты скоринга**")
-            st.caption(f"Валидация проблемы: **{s_prob:.1f} / 40.0**")
-            st.progress(min(max(s_prob / 40.0, 0.0), 1.0))
+            st.caption("Валидация проблемы: **0.0 / 40.0**")
+            st.progress(0.0)
+            st.caption("Solution Fit и спрос: **0.0 / 35.0**")
+            st.progress(0.0)
+            st.caption("Экономическая устойчивость: **0.0 / 25.0**")
+            st.progress(0.0)
 
-            st.caption(f"Solution Fit и спрос: **{s_fit:.1f} / 35.0**")
-            st.progress(min(max(s_fit / 35.0, 0.0), 1.0))
-
-            st.caption(f"Экономическая устойчивость: **{s_fin:.1f} / 25.0**")
-            st.progress(min(max(s_fin / 25.0, 0.0), 1.0))
-
-            if penalties > 0:
-                st.caption(f"Применены штрафы за критические риски: −{penalties:.1f} б.")
-
-    st.divider()
-
-    # ── Юнит-экономика ───────────────────────────────────────
-    if report.unit_economics:
-        ue = report.unit_economics
+        st.divider()
         st.subheader("Юнит-экономика")
         st.caption("Расчёт на основе эффективного дохода, страновых коэффициентов и отраслевых бенчмарков")
 
         c1, c2, c3, c4 = st.columns(4)
-        with c1:
-            st.metric("LTV (пожизненная ценность)", f"${ue.ltv:.2f}")
-        with c2:
-            st.metric("CAC (стоимость привлечения)", f"${ue.cac:.2f}")
-        with c3:
-            ratio_delta = "Отлично (≥3.0x)" if ue.ltv_cac_ratio >= 3.0 else "Норма (1.5–3.0x)" if ue.ltv_cac_ratio >= 1.5 else "Убыточно (<1.0x)"
-            st.metric("LTV : CAC", f"{ue.ltv_cac_ratio:.2f}x", delta=ratio_delta)
-        with c4:
-            st.metric("Окупаемость CAC", f"{ue.cac_payback_months:.1f} мес.")
+        c1.metric("LTV (пожизненная ценность)", "—")
+        c2.metric("CAC (стоимость привлечения)", "—")
+        c3.metric("LTV : CAC", "—")
+        c4.metric("Окупаемость CAC", "—")
 
         c5, c6, c7, c8 = st.columns(4)
-        with c5:
-            st.metric("Monthly Burn Rate", f"${ue.monthly_burn_rate:,.0f} / мес")
-        with c6:
-            r_label = f"{ue.runway_months} мес." if ue.runway_months < 900 else "∞"
-            st.metric("Runway (статический)", r_label)
-        with c7:
-            be_label = f"Месяц {ue.break_even_month}" if ue.break_even_month else "Не достигнута"
-            st.metric("Break-even", be_label)
-        with c8:
-            st.metric("Базовый отток (Churn)", f"{ue.adjusted_churn * 100:.1f}%")
+        c5.metric("Monthly Burn Rate", "—")
+        c6.metric("Runway (статический)", "—")
+        c7.metric("Break-even", "—")
+        c8.metric("Базовый отток (Churn)", "—")
 
         cf1, cf2, cf3 = st.columns(3)
-        with cf1:
-            st.metric("Дно кассовой ямы", f"${ue.min_cash_balance:,.0f}", help="Минимальный остаток денег до выхода на самоокупаемость")
-        with cf2:
-            st.metric("Расход капитала до безубытка", f"${ue.peak_cash_drag:,.0f}", help="Сколько сожжёт бизнес из стартового капитала")
-        with cf3:
-            deficit_str = f"${ue.peak_capital_deficit:,.0f}" if ue.peak_capital_deficit > 0 else "$0 (капитала хватает)"
-            st.metric("Дефицит капитала", deficit_str, help="Дополнительный капитал для преодоления кассовой ямы")
-
-        with st.expander("Детали бенчмарков"):
-            st.markdown(
-                f"- **Отраслевой LTV:CAC:** медиана `{ue.benchmark_ltv_cac.median}x` (диапазон `{ue.benchmark_ltv_cac.low}x` – `{ue.benchmark_ltv_cac.high}x`)\n"
-                f"- **Отраслевой Churn:** `{ue.benchmark_churn.median * 100:.1f}%` в месяц\n"
-                f"- **Валовая маржа (Gross Margin):** `{ue.gross_margin * 100:.0f}%`\n"
-                f"- **Конверсия Trial-to-Paid:** `{ue.benchmark_conversion.low * 100:.1f}%` – `{ue.benchmark_conversion.high * 100:.1f}%`"
-            )
+        cf1.metric("Дно кассовой ямы", "—")
+        cf2.metric("Расход капитала до безубытка", "—")
+        cf3.metric("Дефицит капитала", "—")
 
         st.divider()
-
-    # ── Монте-Карло Fan Chart ─────────────────────────────────
-    if report.monte_carlo_results:
-        mc = report.monte_carlo_results
-        pt_label = {
-            "one_shot":  "Разовая задача (Churn Cliff ожидается на 2–3 месяце)",
-            "recurring": "Постоянная потребность (отток снижается со временем)",
-            "periodic":  "Периодический спрос (сезонные пики оттока)",
-        }.get(mc.product_type, mc.product_type)
-
         st.subheader("Вероятностный прогноз роста MRR — Fan Chart")
-        st.caption(
-            f"Тип спроса: {pt_label} · "
-            f"{mc.num_simulations} симуляций · {mc.num_months} месяцев"
-        )
+        st.caption("10 000 симуляций · 24 месяца · когортный отток · стресс-тест ликвидности")
 
-        months_x = list(range(mc.num_months + 1))
-        fig_mc = go.Figure()
-
-        if mc.sample_trajectories:
-            for traj in mc.sample_trajectories:
-                is_bankrupt = traj[-1] < (report.unit_economics.monthly_burn_rate * 0.1
-                                           if report.unit_economics else 50.0)
-                color = "rgba(220,53,69,0.04)" if is_bankrupt else "rgba(99,110,250,0.04)"
-                fig_mc.add_trace(go.Scatter(
-                    x=months_x, y=traj,
-                    mode="lines",
-                    line=dict(width=0.7, color=color),
-                    showlegend=False,
-                    hoverinfo="skip",
-                ))
-
-        fig_mc.add_trace(go.Scatter(
-            x=months_x + months_x[::-1],
-            y=mc.mrr_p90 + mc.mrr_p10[::-1],
-            fill="toself",
-            fillcolor="rgba(99,110,250,0.08)",
-            line=dict(width=0),
-            showlegend=True,
-            name="Коридор вероятности (P10–P90)",
-            hoverinfo="skip",
-        ))
-        fig_mc.add_trace(go.Scatter(
-            x=months_x, y=mc.mrr_p90,
+        fig_mc_empty = go.Figure()
+        fig_mc_empty.add_trace(go.Scatter(
+            x=[0, 6, 12, 18, 24],
+            y=[0, 0, 0, 0, 0],
             mode="lines",
-            line=dict(color="rgba(46,204,113,0.9)", width=1.8, dash="dot"),
-            name=f"Оптимистичный P90 (${mc.mrr_p90[-1]:,.0f})",
+            line=dict(color="#cbd5e1", dash="dot", width=1.5),
+            name="Базовая линия",
         ))
-        fig_mc.add_trace(go.Scatter(
-            x=months_x, y=mc.mrr_p10,
-            mode="lines",
-            line=dict(color="rgba(231,76,60,0.9)", width=1.8, dash="dot"),
-            name=f"Пессимистичный P10 (${mc.mrr_p10[-1]:,.0f})",
-        ))
-        fig_mc.add_trace(go.Scatter(
-            x=months_x, y=mc.mrr_p50,
-            mode="lines",
-            line=dict(color="#3498db", width=3),
-            name=f"Медианный прогноз P50 (${mc.mrr_p50[-1]:,.0f})",
-        ))
-
-        if report.unit_economics:
-            br = report.unit_economics.monthly_burn_rate
-            fig_mc.add_hline(
-                y=br,
-                line_dash="dot", line_color="#f39c12", line_width=1.5,
-                annotation_text=f"Burn Rate ${br:,.0f}/мес",
-                annotation_position="bottom right",
-                annotation_font_color="#f39c12",
-            )
-
-        fig_mc.update_layout(
+        fig_mc_empty.update_layout(
             title=dict(
-                text="Динамика Monthly Recurring Revenue — 24 месяца<br>"
-                     "<sup>Гуще = вероятнее | Красные линии = сценарии банкротства</sup>",
-                font=dict(size=14),
+                text="Коридор вероятности выручки (P10–P90) сформируется после проведения анализа",
+                font=dict(size=13, color="#64748b"),
             ),
             xaxis_title="Месяц",
             yaxis_title="MRR (USD)",
-            height=420,
-            margin=dict(l=20, r=20, t=60, b=20),
-            hovermode="x unified",
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            height=340,
+            margin=dict(l=20, r=20, t=50, b=20),
         )
-        st.plotly_chart(fig_mc, use_container_width=True)
+        st.plotly_chart(fig_mc_empty, use_container_width=True)
 
         mc1, mc2, mc3, mc4 = st.columns(4)
-        with mc1:
-            bk_color = "inverse" if mc.bankruptcy_probability > 50 else "off"
-            st.metric("Риск банкротства (24 мес)", f"{mc.bankruptcy_probability:.1f}%",
-                      delta="Высокий риск" if mc.bankruptcy_probability > 50 else "Умеренный",
-                      delta_color=bk_color)
-        with mc2:
-            be_label = f"Месяц {mc.median_break_even_month}" if mc.median_break_even_month else "Не достигнута"
-            st.metric("Медианная безубыточность", be_label)
-        with mc3:
-            st.metric("Вероятность $10K+ MRR", f"{mc.prob_reach_10k_mrr:.1f}%")
-        with mc4:
-            st.metric("Вероятность 1 000+ клиентов", f"{mc.prob_reach_1k_users:.1f}%")
-
-        if getattr(mc, "stress_capital_p10", 0) > 0:
-            st.markdown("**Стресс-тест ликвидности (10 000 сценариев)**")
-            sc1, sc2, sc3 = st.columns(3)
-            with sc1:
-                st.metric("Дно кассовой ямы P10 (стресс)", f"${mc.pathwise_min_balance_p10:,.0f}",
-                          help="Худшие 10% сценариев")
-            with sc2:
-                st.metric("Дно кассовой ямы P50 (медиана)", f"${mc.pathwise_min_balance_p50:,.0f}")
-            with sc3:
-                st.metric("Капитал для 90% выживаемости", f"${mc.stress_capital_p10:,.0f}")
+        mc1.metric("Риск банкротства (24 мес)", "—")
+        mc2.metric("Медианная безубыточность", "—")
+        mc3.metric("Вероятность $10K+ MRR", "—")
+        mc4.metric("Вероятность 1 000+ клиентов", "—")
 
         st.divider()
-
-    # ── Конкурентный анализ ───────────────────────────────────
-    if report.market_research:
-        mr = report.market_research
         st.subheader("Анализ конкурентной среды")
+        st.caption("Поиск прямых и косвенных конкурентов в реальном времени с оценкой сильных и слабых сторон.")
+        df_empty = pd.DataFrame([
+            {"Конкурент": "Конкурент 1 (прямой)", "Категория": "Прямой конкурент", "Преимущества": "Данные формируются...", "Уязвимости": "Данные формируются...", "Ценовая модель": "—"},
+            {"Конкурент": "Конкурент 2 (косвенный)", "Категория": "Косвенный аналог", "Преимущества": "Данные формируются...", "Уязвимости": "Данные формируются...", "Ценовая модель": "—"},
+        ])
+        st.dataframe(df_empty, use_container_width=True, hide_index=True)
 
-        competition_map = {
-            "Высокая": "высокая",
-            "Олигополия / Доминирование гигантов": "олигополия",
-            "Умеренная": "умеренная",
-        }
-        c_level = competition_map.get(mr.competition_level, mr.competition_level.lower())
-        st.markdown(f"**Плотность рынка:** `{c_level}`")
-        if mr.summary:
-            st.info(mr.summary)
+        st.divider()
+        st.subheader("Экспертные инсайты и рекомендации")
+        st.info("Рекомендации инвестиционного комитета и анализ критических рисков будут выведены после симуляции.")
 
-        if getattr(mr, "web_sources", None):
-            with st.expander("Источники (интернет-поиск)"):
-                for src_url in mr.web_sources:
-                    st.markdown(f"- [{src_url}]({src_url})")
+    else:
 
-        if mr.competitors:
-            comp_rows = []
-            for c in mr.competitors:
-                comp_rows.append({
-                    "Конкурент": c.name,
-                    "Категория": c.category,
-                    "Преимущества": c.strengths,
-                    "Уязвимости": c.weaknesses,
-                    "Ценовая модель": c.price_point,
-                })
-            df_comp = pd.DataFrame(comp_rows)
-            st.dataframe(df_comp, use_container_width=True, hide_index=True)
+        # ── Overall Viability Score ───────────────────────────────
+        st.subheader("Общая оценка жизнеспособности (Overall Viability Score)")
 
-            st.markdown("**Ценовое сравнение конкурентов**")
-            price_cols = st.columns(min(len(mr.competitors), 4))
-            for i, (col, comp) in enumerate(zip(price_cols, mr.competitors)):
-                with col:
-                    price_str = comp.price_point or "н/д"
-                    cat_label = "Прямой" if "Прямой" in comp.category else "Косвенный" if "Косвенный" in comp.category else "Иной"
-                    st.metric(
-                        label=f"{comp.name[:25]} · {cat_label}",
-                        value=price_str[:40],
-                        help=f"{comp.category}\n\n+ {comp.strengths}\n\n− {comp.weaknesses}",
-                    )
+        score = int(report.overall_score)
+        col_score1, col_score2 = st.columns([1, 2])
 
-        if mr.differentiation_strategy:
-            st.success(f"**Рекомендуемая стратегия дифференциации (УТП):**  \n{mr.differentiation_strategy}")
+        with col_score1:
+            # Определяем вердикт
+            if score <= 25:
+                verdict_class = "verdict-critical"
+                verdict_text  = "Критический риск — требуется пересмотр"
+            elif score <= 50:
+                verdict_class = "verdict-warning"
+                verdict_text  = "Высокий риск — значительные доработки"
+            elif score <= 65:
+                verdict_class = "verdict-moderate"
+                verdict_text  = "Умеренный риск — необходима проверка"
+            else:
+                verdict_class = "verdict-good"
+                verdict_text  = "Перспективная идея — рекомендуется пилот"
 
-        if mr.entry_barriers:
-            st.markdown("**Барьеры входа на рынок:**")
-            for b in mr.entry_barriers:
-                st.markdown(f"- {b}")
+            st.markdown(
+                f"<div class='score-card'>"
+                f"<div class='score-number'>{score}<span class='score-denom'>/100</span></div>"
+                f"<br><span class='{verdict_class}'>{verdict_text}</span>"
+                f"</div>",
+                unsafe_allow_html=True,
+            )
+            st.progress(min(max(score / 100.0, 0.0), 1.0))
+
+        with col_score2:
+            subscores = st.session_state.get("subscores", {})
+            if subscores:
+                s_prob = subscores.get("problem_validation", 0.0)
+                s_fit  = subscores.get("solution_demand", 0.0)
+                s_fin  = subscores.get("financial_viability", 0.0)
+                penalties = subscores.get("penalties", 0.0)
+
+                st.markdown("**Компоненты скоринга**")
+                st.caption(f"Валидация проблемы: **{s_prob:.1f} / 40.0**")
+                st.progress(min(max(s_prob / 40.0, 0.0), 1.0))
+
+                st.caption(f"Solution Fit и спрос: **{s_fit:.1f} / 35.0**")
+                st.progress(min(max(s_fit / 35.0, 0.0), 1.0))
+
+                st.caption(f"Экономическая устойчивость: **{s_fin:.1f} / 25.0**")
+                st.progress(min(max(s_fin / 25.0, 0.0), 1.0))
+
+                if penalties > 0:
+                    st.caption(f"Применены штрафы за критические риски: −{penalties:.1f} б.")
 
         st.divider()
 
-    # ── Инсайты и рекомендации ────────────────────────────────
-    st.subheader("Экспертные инсайты и рекомендации")
+        # ── Юнит-экономика ───────────────────────────────────────
+        if report.unit_economics:
+            ue = report.unit_economics
+            st.subheader("Юнит-экономика")
+            st.caption("Расчёт на основе эффективного дохода, страновых коэффициентов и отраслевых бенчмарков")
 
-    if report.insights:
-        for insight in report.insights:
-            msg = f"**{insight.title}**  \n{insight.message}"
-            if insight.recommendation:
-                msg += f"  \n*Рекомендация: {insight.recommendation}*"
-            if insight.benchmark_ref:
-                msg += f"  \n_Бенчмарк: {insight.benchmark_ref}_"
+            c1, c2, c3, c4 = st.columns(4)
+            with c1:
+                st.metric("LTV (пожизненная ценность)", f"${ue.ltv:.2f}")
+            with c2:
+                st.metric("CAC (стоимость привлечения)", f"${ue.cac:.2f}")
+            with c3:
+                ratio_delta = "Отлично (≥3.0x)" if ue.ltv_cac_ratio >= 3.0 else "Норма (1.5–3.0x)" if ue.ltv_cac_ratio >= 1.5 else "Убыточно (<1.0x)"
+                st.metric("LTV : CAC", f"{ue.ltv_cac_ratio:.2f}x", delta=ratio_delta)
+            with c4:
+                st.metric("Окупаемость CAC", f"{ue.cac_payback_months:.1f} мес.")
 
-            if insight.severity == "critical":
-                st.error(msg)
-            elif insight.severity == "warning":
-                st.warning(msg)
-            elif insight.severity == "success":
-                st.success(msg)
-            else:
-                st.info(msg)
-    else:
-        st.caption("Инсайты не сгенерированы")
+            c5, c6, c7, c8 = st.columns(4)
+            with c5:
+                st.metric("Monthly Burn Rate", f"${ue.monthly_burn_rate:,.0f} / мес")
+            with c6:
+                r_label = f"{ue.runway_months} мес." if ue.runway_months < 900 else "∞"
+                st.metric("Runway (статический)", r_label)
+            with c7:
+                be_label = f"Месяц {ue.break_even_month}" if ue.break_even_month else "Не достигнута"
+                st.metric("Break-even", be_label)
+            with c8:
+                st.metric("Базовый отток (Churn)", f"{ue.adjusted_churn * 100:.1f}%")
 
-    st.divider()
+            cf1, cf2, cf3 = st.columns(3)
+            with cf1:
+                st.metric("Дно кассовой ямы", f"${ue.min_cash_balance:,.0f}", help="Минимальный остаток денег до выхода на самоокупаемость")
+            with cf2:
+                st.metric("Расход капитала до безубытка", f"${ue.peak_cash_drag:,.0f}", help="Сколько сожжёт бизнес из стартового капитала")
+            with cf3:
+                deficit_str = f"${ue.peak_capital_deficit:,.0f}" if ue.peak_capital_deficit > 0 else "$0 (капитала хватает)"
+                st.metric("Дефицит капитала", deficit_str, help="Дополнительный капитал для преодоления кассовой ямы")
 
-    # ── Экспорт ───────────────────────────────────────────────
-    st.subheader("Экспорт отчёта")
-    report_json = report.model_dump_json(indent=2)
-    st.download_button(
-        label="Скачать полный отчёт (JSON)",
-        data=report_json,
-        file_name=f"startup_validation_{report.business_input.name or 'report'}.json",
-        mime="application/json",
-        type="primary",
-    )
+            with st.expander("Детали бенчмарков"):
+                st.markdown(
+                    f"- **Отраслевой LTV:CAC:** медиана `{ue.benchmark_ltv_cac.median}x` (диапазон `{ue.benchmark_ltv_cac.low}x` – `{ue.benchmark_ltv_cac.high}x`)\n"
+                    f"- **Отраслевой Churn:** `{ue.benchmark_churn.median * 100:.1f}%` в месяц\n"
+                    f"- **Валовая маржа (Gross Margin):** `{ue.gross_margin * 100:.0f}%`\n"
+                    f"- **Конверсия Trial-to-Paid:** `{ue.benchmark_conversion.low * 100:.1f}%` – `{ue.benchmark_conversion.high * 100:.1f}%`"
+                )
+
+            st.divider()
+
+        # ── Монте-Карло Fan Chart ─────────────────────────────────
+        if report.monte_carlo_results:
+            mc = report.monte_carlo_results
+            pt_label = {
+                "one_shot":  "Разовая задача (Churn Cliff ожидается на 2–3 месяце)",
+                "recurring": "Постоянная потребность (отток снижается со временем)",
+                "periodic":  "Периодический спрос (сезонные пики оттока)",
+            }.get(mc.product_type, mc.product_type)
+
+            st.subheader("Вероятностный прогноз роста MRR — Fan Chart")
+            st.caption(
+                f"Тип спроса: {pt_label} · "
+                f"{mc.num_simulations} симуляций · {mc.num_months} месяцев"
+            )
+
+            months_x = list(range(mc.num_months + 1))
+            fig_mc = go.Figure()
+
+            if mc.sample_trajectories:
+                for traj in mc.sample_trajectories:
+                    is_bankrupt = traj[-1] < (report.unit_economics.monthly_burn_rate * 0.1
+                                               if report.unit_economics else 50.0)
+                    color = "rgba(220,53,69,0.04)" if is_bankrupt else "rgba(99,110,250,0.04)"
+                    fig_mc.add_trace(go.Scatter(
+                        x=months_x, y=traj,
+                        mode="lines",
+                        line=dict(width=0.7, color=color),
+                        showlegend=False,
+                        hoverinfo="skip",
+                    ))
+
+            fig_mc.add_trace(go.Scatter(
+                x=months_x + months_x[::-1],
+                y=mc.mrr_p90 + mc.mrr_p10[::-1],
+                fill="toself",
+                fillcolor="rgba(99,110,250,0.08)",
+                line=dict(width=0),
+                showlegend=True,
+                name="Коридор вероятности (P10–P90)",
+                hoverinfo="skip",
+            ))
+            fig_mc.add_trace(go.Scatter(
+                x=months_x, y=mc.mrr_p90,
+                mode="lines",
+                line=dict(color="rgba(46,204,113,0.9)", width=1.8, dash="dot"),
+                name=f"Оптимистичный P90 (${mc.mrr_p90[-1]:,.0f})",
+            ))
+            fig_mc.add_trace(go.Scatter(
+                x=months_x, y=mc.mrr_p10,
+                mode="lines",
+                line=dict(color="rgba(231,76,60,0.9)", width=1.8, dash="dot"),
+                name=f"Пессимистичный P10 (${mc.mrr_p10[-1]:,.0f})",
+            ))
+            fig_mc.add_trace(go.Scatter(
+                x=months_x, y=mc.mrr_p50,
+                mode="lines",
+                line=dict(color="#3498db", width=3),
+                name=f"Медианный прогноз P50 (${mc.mrr_p50[-1]:,.0f})",
+            ))
+
+            if report.unit_economics:
+                br = report.unit_economics.monthly_burn_rate
+                fig_mc.add_hline(
+                    y=br,
+                    line_dash="dot", line_color="#f39c12", line_width=1.5,
+                    annotation_text=f"Burn Rate ${br:,.0f}/мес",
+                    annotation_position="bottom right",
+                    annotation_font_color="#f39c12",
+                )
+
+            fig_mc.update_layout(
+                title=dict(
+                    text="Динамика Monthly Recurring Revenue — 24 месяца<br>"
+                         "<sup>Гуще = вероятнее | Красные линии = сценарии банкротства</sup>",
+                    font=dict(size=14),
+                ),
+                xaxis_title="Месяц",
+                yaxis_title="MRR (USD)",
+                height=420,
+                margin=dict(l=20, r=20, t=60, b=20),
+                hovermode="x unified",
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            )
+            st.plotly_chart(fig_mc, use_container_width=True)
+
+            mc1, mc2, mc3, mc4 = st.columns(4)
+            with mc1:
+                bk_color = "inverse" if mc.bankruptcy_probability > 50 else "off"
+                st.metric("Риск банкротства (24 мес)", f"{mc.bankruptcy_probability:.1f}%",
+                          delta="Высокий риск" if mc.bankruptcy_probability > 50 else "Умеренный",
+                          delta_color=bk_color)
+            with mc2:
+                be_label = f"Месяц {mc.median_break_even_month}" if mc.median_break_even_month else "Не достигнута"
+                st.metric("Медианная безубыточность", be_label)
+            with mc3:
+                st.metric("Вероятность $10K+ MRR", f"{mc.prob_reach_10k_mrr:.1f}%")
+            with mc4:
+                st.metric("Вероятность 1 000+ клиентов", f"{mc.prob_reach_1k_users:.1f}%")
+
+            if getattr(mc, "stress_capital_p10", 0) > 0:
+                st.markdown("**Стресс-тест ликвидности (10 000 сценариев)**")
+                sc1, sc2, sc3 = st.columns(3)
+                with sc1:
+                    st.metric("Дно кассовой ямы P10 (стресс)", f"${mc.pathwise_min_balance_p10:,.0f}",
+                              help="Худшие 10% сценариев")
+                with sc2:
+                    st.metric("Дно кассовой ямы P50 (медиана)", f"${mc.pathwise_min_balance_p50:,.0f}")
+                with sc3:
+                    st.metric("Капитал для 90% выживаемости", f"${mc.stress_capital_p10:,.0f}")
+
+            st.divider()
+
+        # ── Конкурентный анализ ───────────────────────────────────
+        if report.market_research:
+            mr = report.market_research
+            st.subheader("Анализ конкурентной среды")
+
+            competition_map = {
+                "Высокая": "высокая",
+                "Олигополия / Доминирование гигантов": "олигополия",
+                "Умеренная": "умеренная",
+            }
+            c_level = competition_map.get(mr.competition_level, mr.competition_level.lower())
+            st.markdown(f"**Плотность рынка:** `{c_level}`")
+            if mr.summary:
+                st.info(mr.summary)
+
+            if getattr(mr, "web_sources", None):
+                with st.expander("Источники (интернет-поиск)"):
+                    for src_url in mr.web_sources:
+                        st.markdown(f"- [{src_url}]({src_url})")
+
+            if mr.competitors:
+                comp_rows = []
+                for c in mr.competitors:
+                    comp_rows.append({
+                        "Конкурент": c.name,
+                        "Категория": c.category,
+                        "Преимущества": c.strengths,
+                        "Уязвимости": c.weaknesses,
+                        "Ценовая модель": c.price_point,
+                    })
+                df_comp = pd.DataFrame(comp_rows)
+                st.dataframe(df_comp, use_container_width=True, hide_index=True)
+
+                st.markdown("**Ценовое сравнение конкурентов**")
+                price_cols = st.columns(min(len(mr.competitors), 4))
+                for i, (col, comp) in enumerate(zip(price_cols, mr.competitors)):
+                    with col:
+                        price_str = comp.price_point or "н/д"
+                        cat_label = "Прямой" if "Прямой" in comp.category else "Косвенный" if "Косвенный" in comp.category else "Иной"
+                        st.metric(
+                            label=f"{comp.name[:25]} · {cat_label}",
+                            value=price_str[:40],
+                            help=f"{comp.category}\n\n+ {comp.strengths}\n\n− {comp.weaknesses}",
+                        )
+
+            if mr.differentiation_strategy:
+                st.success(f"**Рекомендуемая стратегия дифференциации (УТП):**  \n{mr.differentiation_strategy}")
+
+            if mr.entry_barriers:
+                st.markdown("**Барьеры входа на рынок:**")
+                for b in mr.entry_barriers:
+                    st.markdown(f"- {b}")
+
+            st.divider()
+
+        # ── Инсайты и рекомендации ────────────────────────────────
+        st.subheader("Экспертные инсайты и рекомендации")
+
+        if report.insights:
+            for insight in report.insights:
+                msg = f"**{insight.title}**  \n{insight.message}"
+                if insight.recommendation:
+                    msg += f"  \n*Рекомендация: {insight.recommendation}*"
+                if insight.benchmark_ref:
+                    msg += f"  \n_Бенчмарк: {insight.benchmark_ref}_"
+
+                if insight.severity == "critical":
+                    st.error(msg)
+                elif insight.severity == "warning":
+                    st.warning(msg)
+                elif insight.severity == "success":
+                    st.success(msg)
+                else:
+                    st.info(msg)
+        else:
+            st.caption("Инсайты не сгенерированы")
+
+        st.divider()
+
+        # ── Экспорт ───────────────────────────────────────────────
+        st.subheader("Экспорт отчёта")
+        report_json = report.model_dump_json(indent=2)
+        st.download_button(
+            label="Скачать полный отчёт (JSON)",
+            data=report_json,
+            file_name=f"startup_validation_{report.business_input.name or 'report'}.json",
+            mime="application/json",
+            type="primary",
+        )
 
 # ═══════════════════════════════════════════════════════════════
 #  TAB 4 — Отзыв
