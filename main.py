@@ -112,6 +112,8 @@ header {
     box-shadow: 0 8px 40px rgba(37, 99, 235, 0.08), 0 1px 3px rgba(15,23,42,0.06) !important;
     margin-top: 1.5rem !important;
     margin-bottom: 1.5rem !important;
+    position: relative !important;
+    z-index: 2 !important;
 }
 
 /* ── Принудительная читаемость ── */
@@ -401,13 +403,6 @@ div[data-testid="stTabsContent"] {
     padding: 8px 0 !important;
 }
 
-/* Tab panel — без лишней рамки (рамка уже на block-container) */
-div[data-testid="stTabsContent"] {
-    background: transparent !important;
-    border: none !important;
-    padding: 8px 0 !important;
-}
-
 /* ── Поля ввода и селекты — 100% единый белый непрозрачный фон (#FFFFFF) на всех устройствах ── */
 div[data-testid="stTextInput"] input,
 div[data-testid="stTextArea"] textarea,
@@ -530,6 +525,8 @@ div[data-testid="stMarkdownContainer"] p {
 .stButton > button,
 button[kind="secondary"],
 [data-testid="baseButton-secondary"] {
+    position: relative !important;
+    z-index: 5 !important;
     border-radius: 10px !important;
     font-weight: 600 !important;
     font-size: 0.90rem !important;
@@ -570,6 +567,8 @@ button[kind="primaryFormSubmit"],
 [data-testid="baseButton-primaryFormSubmit"],
 button[data-testid="stBaseButton-primary"],
 button[data-testid="stBaseButton-primaryFormSubmit"] {
+    position: relative !important;
+    z-index: 5 !important;
     background: linear-gradient(135deg, #38BDF8 0%, #2563EB 55%, #1D4ED8 100%) !important;
     background-color: #2563EB !important;
     color: #FFFFFF !important;
@@ -583,6 +582,8 @@ button[data-testid="stBaseButton-primaryFormSubmit"] {
     letter-spacing: 0.3px !important;
     text-shadow: 0 1px 2px rgba(15, 23, 42, 0.25) !important;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 .stButton > button[kind="primary"] p,
 .stButton > button[kind="primary"] span,
@@ -602,6 +603,8 @@ button[kind="primaryFormSubmit"] span,
     font-weight: 700 !important;
     letter-spacing: 0.3px !important;
     text-shadow: 0 1px 2px rgba(15, 23, 42, 0.25) !important;
+    position: relative !important;
+    z-index: 6 !important;
 }
 .stButton > button[kind="primary"]:hover,
 .stFormSubmitButton > button:hover,
@@ -628,8 +631,17 @@ button[kind="primaryFormSubmit"]:active,
     box-shadow: 0 2px 8px rgba(37, 99, 235, 0.22) !important;
 }
 
+/* Гарантируем, что контейнеры кнопок тоже не обрезают и не прячут их */
+.stButton, .stFormSubmitButton, div[data-testid="stFormSubmitButton"] {
+    position: relative !important;
+    z-index: 5 !important;
+    overflow: visible !important;
+}
+
 /* Download button */
 [data-testid="stDownloadButton"] > button {
+    position: relative !important;
+    z-index: 5 !important;
     border-radius: 10px !important;
     font-weight: 600 !important;
     min-height: 44px !important;
@@ -1073,6 +1085,10 @@ _comp_meta.html("""
         '[data-testid="stMetric"] { background: rgba(255,255,255,0.90) !important; }',
         '[data-testid="stMetricLabel"] p { color: #64748B !important; }',
         '[data-testid="stMetricValue"] { color: #0F172A !important; }',
+        /* Кнопки — всегда поверх фонового слоя (фикс невидимой кнопки запуска) */
+        '.stButton, .stFormSubmitButton, div[data-testid="stFormSubmitButton"] { position: relative !important; z-index: 5 !important; overflow: visible !important; }',
+        '.stButton > button, .stFormSubmitButton > button, div[data-testid="stFormSubmitButton"] > button, [data-testid="stDownloadButton"] > button { position: relative !important; z-index: 5 !important; opacity: 1 !important; visibility: visible !important; }',
+        '.block-container { position: relative !important; z-index: 2 !important; }',
         /* Плавный переход при перекрашивании */
         '.app-title, .app-subtitle, [data-testid="stMarkdownContainer"] p, [data-testid="stMarkdownContainer"] strong, label, .hero-title, .hero-desc, .hero-pill-title {',
         '    transition: color 0.28s ease !important;',
@@ -1087,7 +1103,10 @@ _comp_meta.html("""
     // Создаем контейнер фона
     var bg = doc.createElement('div');
     bg.id = 'blue-metaballs-bg';
-    bg.style.cssText = 'position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(135deg,#F0F8FF 0%,#E0F2FE 45%,#F0F9FF 80%,#EFF6FF 100%);overflow:hidden;';
+    // ВАЖНО: z-index:-1 (не 0!) — гарантирует, что фон всегда строго ПОЗАДИ
+    // всего остального контента страницы, включая кнопки, независимо от
+    // порядка вставки в DOM и наличия backdrop-filter/blur у родителей.
+    bg.style.cssText = 'position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(135deg,#F0F8FF 0%,#E0F2FE 45%,#F0F9FF 80%,#EFF6FF 100%);overflow:hidden;';
 
     bg.innerHTML = '<svg style="position:absolute;width:0;height:0;"><defs><filter id="blue-goo"><feGaussianBlur in="SourceGraphic" stdDeviation="22" result="blur"/><feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8" result="goo"/></filter></defs></svg><canvas id="blue-mb-canvas" style="width:100%;height:100%;display:block;filter:url(#blue-goo);opacity:0.75;"></canvas>';
 
@@ -1229,6 +1248,27 @@ _comp_meta.html("""
             el.style.setProperty('border-color', '#CBD5E1', 'important');
             el.style.setProperty('color', '#0F172A', 'important');
         });
+
+        // Гарантируем, что кнопки (в т.ч. "Запустить валидацию" и "Отправить отзыв")
+        // всегда поверх фонового canvas и видимы, даже после st.rerun().
+        var buttonWrappers = doc.querySelectorAll('.stButton, .stFormSubmitButton, div[data-testid="stFormSubmitButton"]');
+        buttonWrappers.forEach(function(wrap) {
+            wrap.style.setProperty('position', 'relative', 'important');
+            wrap.style.setProperty('z-index', '5', 'important');
+            wrap.style.setProperty('overflow', 'visible', 'important');
+        });
+        var allButtons = doc.querySelectorAll('.stButton > button, .stFormSubmitButton > button, div[data-testid="stFormSubmitButton"] > button, [data-testid="stDownloadButton"] > button');
+        allButtons.forEach(function(btn) {
+            btn.style.setProperty('position', 'relative', 'important');
+            btn.style.setProperty('z-index', '5', 'important');
+            btn.style.setProperty('opacity', '1', 'important');
+            btn.style.setProperty('visibility', 'visible', 'important');
+        });
+        var mainBlock = doc.querySelector('.block-container');
+        if (mainBlock) {
+            mainBlock.style.setProperty('position', 'relative', 'important');
+            mainBlock.style.setProperty('z-index', '2', 'important');
+        }
 
         // Стилизация табов Apple Segmented Control со скользящим бегунком
         var tablist = doc.querySelector('[role="tablist"], [data-baseweb="tab-list"], [data-testid="stTabsHeader"]');
