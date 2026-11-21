@@ -173,11 +173,23 @@ div[data-baseweb="tab-border"],
     visibility: hidden !important;
 }
 
-/* Скрываем стрелки прокрутки вкладок */
+/* Скрываем только стрелки прокрутки в шапке вкладок */
 [data-baseweb="tab-scroll-forward"],
 [data-baseweb="tab-scroll-backward"],
-[data-testid="stTabs"] button:not([role="tab"]) {
+[data-baseweb="tab-bar"] > button,
+[data-testid="stTabsHeader"] button:not([role="tab"]),
+div[role="tablist"] button:not([role="tab"]) {
     display: none !important;
+}
+
+/* Кнопки действий внутри контента вкладок всегда видимы */
+div[data-testid="stTabsContent"] button,
+div[data-testid="stTabsContent"] .stButton > button,
+button[kind="primary"],
+button[kind="secondary"] {
+    display: inline-flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 /* Apple Segmented Control — стеклянный трек-контейнер (Apple Frosted Glass) */
@@ -1075,7 +1087,8 @@ _comp_meta.html("""
         '.app-subtitle { color: #334155 !important; text-shadow: none !important; filter: none !important; }',
         /* Вкладки — Apple Segmented Control со скользящим бегунком */
         'div[data-baseweb="tab-highlight"], div[data-baseweb="tab-border"], .react-aria-SelectionIndicator, [data-testid="stTabs"] .react-aria-SelectionIndicator { display: none !important; height: 0 !important; width: 0 !important; opacity: 0 !important; }',
-        '[data-baseweb="tab-scroll-forward"], [data-baseweb="tab-scroll-backward"], [data-baseweb="tab-bar"] > button, [data-testid="stTabs"] button:not([role="tab"]) { display: none !important; width: 0 !important; height: 0 !important; }',
+        '[data-baseweb="tab-scroll-forward"], [data-baseweb="tab-scroll-backward"], [data-baseweb="tab-bar"] > button, [data-testid="stTabsHeader"] button:not([role="tab"]), div[role="tablist"] button:not([role="tab"]) { display: none !important; width: 0 !important; height: 0 !important; }',
+        'div[data-testid="stTabsContent"] button, div[data-testid="stTabsContent"] .stButton > button { display: inline-flex !important; visibility: visible !important; opacity: 1 !important; }',
         'button[role="tab"], button[data-baseweb="tab"], button[data-testid="stTab"] { background: transparent !important; border: none !important; box-shadow: none !important; }',
         '[data-testid="stTabs"] > div:first-child { background: transparent !important; border-bottom: none !important; }',
         /* Plotly iframe — прозрачный */
@@ -1407,8 +1420,8 @@ _comp_meta.html("""
             });
         });
 
-        // Уничтожаем любую синюю полоску и белые кнопки прокрутки табов
-        var tabExtras = doc.querySelectorAll('[data-baseweb="tab-scroll-forward"], [data-baseweb="tab-scroll-backward"], [data-baseweb="tab-highlight"], [data-baseweb="tab-border"], [data-baseweb="tab-bar"] > button, [data-testid="stTabs"] button:not([role="tab"]), [data-testid="stTabs"] div[style*="height: 2px"], [data-testid="stTabs"] div[style*="height:2px"], [data-testid="stTabs"] div[style*="height: 3px"], [data-testid="stTabs"] div[style*="height:3px"], [data-testid="stTabs"] div[style*="rgb(37, 99, 235)"], .react-aria-SelectionIndicator');
+        // Уничтожаем любую синюю полоску и белые кнопки прокрутки табов ТОЛЬКО в шапке
+        var tabExtras = doc.querySelectorAll('[data-baseweb="tab-scroll-forward"], [data-baseweb="tab-scroll-backward"], [data-baseweb="tab-highlight"], [data-baseweb="tab-border"], [data-baseweb="tab-bar"] > button, [data-testid="stTabsHeader"] button:not([role="tab"]), div[role="tablist"] button:not([role="tab"]), [data-testid="stTabsHeader"] div[style*="height: 2px"], [data-testid="stTabsHeader"] div[style*="height:2px"], [data-testid="stTabsHeader"] div[style*="height: 3px"], [data-testid="stTabsHeader"] div[style*="height:3px"], [data-testid="stTabsHeader"] div[style*="rgb(37, 99, 235)"], .react-aria-SelectionIndicator');
         tabExtras.forEach(function(el) {
             el.style.setProperty('display', 'none', 'important');
             el.style.setProperty('width', '0px', 'important');
